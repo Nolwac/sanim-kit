@@ -7,6 +7,7 @@ function fitCanvasToScreen(ctx, color){
 }
 function Object(){
 	this.lineWidth = 0.0000000000000001;//setting the lineWidth to a very low value so that the lines does not show by default
+	this.children  = []; //list of children embedded in the object
 	this.isInPath = function(x, y){
 		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//the latest path is what isPointInPath looks at;
@@ -28,6 +29,11 @@ function Object(){
 				//do nothing in this case.
 			}
 		});
+	}
+	this.renderChildren =function(){
+		this.children.forEach((obj) => {
+			obj.render();
+		})
 	}
 }
 function player(obj){
@@ -105,6 +111,7 @@ function rectObject(x, y, width, height, color= 'black', fillColor = null){
 		}else{
 			this.world.context.fillRect(this.x, this.y, this.width, this.height);
 		}
+		this.renderChildren();
 		
 	}
 	Object.call(this);
@@ -202,4 +209,53 @@ function Scene(context){
 		//this function cancels the fullscreen mode for the canvas
 		this.context.canvas.cancelRequestFullscreen()// works on chrome but not all the browsers, so find the webkit versions for the other browers
 	}
+}
+function Histogram(data, obj){
+	/*
+	This object definition takes a statistical data and converts it to a histogram object; a histogram graphing of the give  data.
+
+	to achieve this we need to consider that a histogram has a equal spacing of the bars, so we will be having the expression below;
+	values = [array of values]; => representing the number of occurence
+	nums = [array of values] => representing the component values, or items.
+	the maximum of the values => max(values) will be the minimum size of the Y-axis of the graph, so let the height of the graph be L
+	let L = height of the graph
+	we may set L = max(values) + 20;
+	let W be the widthe of the bars.
+	let S be the spacing of the bars.
+	then each of the bars representing the values will be placed at positions indexOfValue(S+W);
+	*/
+	this.data = data;
+	this.obj = obj;
+	obj.children.push(this);
+	this.controlWidth = this.obj.width;
+	this.controlHeight = this.obj.height;
+	this.offsetX = 0;
+	this.offsetY = 0;
+	this.strokeWidth = 2;
+	this.strokeColor = 'magenta';
+	this.fillStyle = 'magenta';
+	this.graphOffsetY = 10;//this is the distance from the max bar to the tip of the line of the y-axis
+	this.render = function(){
+		c = this.obj.world.context;
+		console.log(this.obj.world.context);
+		var d = new Array(...this.data); //trying to make a clone of the original data
+		var maxD = Math.max(...d);//the maximum value in the list;
+		var controlRatio = (this.controlHeight-this.offsetY*2)/(maxD); //the ratio that makes sure that everything shows up in the screen
+		var barWidth = 3*(this.controlWidth-2*this.offsetX)/(4*d.length);//calculating for the width of the bars
+		var barSpacing = barWidth/3;
+		var graphHeight = maxD*controlRatio + this.graphOffsetY;
+		c.strokeStyle = this.strokeColor;
+		c.lineWidth = this.strokeWidth;
+		c.moveTo(this.obj.x + this.offsetX, this.obj.y + this.offsetY);
+		c.lineTo(this.obj.x + this.offsetX, this.obj.y + this.offsetY+graphHeight);
+		c.moveTo(this.obj.x + this.offsetX, this.obj.y + this.offsetY+graphHeight);
+		c.lineTo(d.length*(barWidth + barSpacing) + this.obj.x + this.offsetX, this.obj.y + this.offsetY + graphHeight);
+		c.stroke()
+		for(var i=0; i<d.length; i++){
+			c.fillStyle = this.fillStyle;
+			c.fillRect(i*(barWidth+barSpacing) + this.obj.x + this.offsetX + this.strokeWidth-2, this.obj.y + this.offsetY + graphHeight - data[i]*controlRatio, barWidth, data[i]*controlRatio);
+		}
+
+	}
+
 }
