@@ -97,20 +97,20 @@ function rectObject(x, y, width, height, color= 'black', fillColor = null){
 		if(this.world.camera){
 			var xStart = (this.x/this.world.camera.perspective)-this.world.camera.x, yStart = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
 			var width = this.width/this.world.camera.perspective, height = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
-			if(this.fillColor){
-				this.world.context.fillRect(xStart, yStart, width, height);
-			}
-			//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
-			this.world.context.beginPath();
-			this.world.context.moveTo(xStart, yStart);
-			this.world.context.lineTo(xStart, yStart+height);
-			this.world.context.lineTo(xStart+width, yStart+height);
-			this.world.context.lineTo(xStart+width, yStart);
-			this.world.context.closePath();
-			this.world.context.stroke();
 		}else{
-			this.world.context.fillRect(this.x, this.y, this.width, this.height);
+			var xStart = this.x, yStart = this.y;
 		}
+		if(this.fillColor){
+			this.world.context.fillRect(xStart, yStart, width, height);
+		}
+		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
+		this.world.context.beginPath();
+		this.world.context.moveTo(xStart, yStart);
+		this.world.context.lineTo(xStart, yStart+height);
+		this.world.context.lineTo(xStart+width, yStart+height);
+		this.world.context.lineTo(xStart+width, yStart);
+		this.world.context.closePath();
+		this.world.context.stroke();
 		this.renderChildren();
 		
 	}
@@ -227,33 +227,51 @@ function Histogram(data, obj){
 	this.data = data;
 	this.obj = obj;
 	obj.children.push(this);
+	this.world = obj.world;
 	this.controlWidth = this.obj.width;
 	this.controlHeight = this.obj.height;
-	this.offsetX = 0;
-	this.offsetY = 0;
+	this.scaleWithParent = true;//a boolean field that sets if the graph should scale with the object it is embedded into or not.
+	this.offsetX = 10;
+	this.offsetY = 10;
 	this.strokeWidth = 2;
 	this.strokeColor = 'magenta';
 	this.fillStyle = 'magenta';
 	this.graphOffsetY = 10;//this is the distance from the max bar to the tip of the line of the y-axis
 	this.render = function(){
+		if(this.scaleWithParent){
+			//making sure that the graph scales with the object it is embedded into if it is set to scale as the object scales
+			this.controlWidth = this.obj.width;
+			this.controlHeight = this.obj.height;
+		}
+		if(this.world.camera){
+			var xStart = ((this.obj.x + this.offsetX)/this.world.camera.perspective)-this.world.camera.x, yStart = ((this.obj.y + this.offsetY)/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			var controlWidth = this.controlWidth/this.world.camera.perspective, controlHeight = (this.controlHeight - this.graphOffsetY)/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+			var graphOffsetY = this.graphOffsetY/this.world.camera.perspective;
+			var offsetX = this.offsetX/this.world.camera.perspective, offsetY = this.offsetY/this.world.camera.perspective;
+		}else{
+			var xStart = this.obj.x + this.offsetX, yStart = this.obj.y + this.offsetY;
+			var controlWidth = this.controlWidth, controlHeight = this.controlHeight;
+			var graphOffsetY = this.graphOffsetY;
+			var offsetX = this.offsetX, offsetY = this.offsetY;
+		}
 		c = this.obj.world.context;
 		console.log(this.obj.world.context);
 		var d = new Array(...this.data); //trying to make a clone of the original data
 		var maxD = Math.max(...d);//the maximum value in the list;
-		var controlRatio = (this.controlHeight-this.offsetY*2)/(maxD); //the ratio that makes sure that everything shows up in the screen
-		var barWidth = 3*(this.controlWidth-2*this.offsetX)/(4*d.length);//calculating for the width of the bars
+		var controlRatio = (controlHeight-offsetY*2)/(maxD); //the ratio that makes sure that everything shows up in the screen
+		var barWidth = 3*(controlWidth-2*offsetX)/(4*d.length);//calculating for the width of the bars
 		var barSpacing = barWidth/3;
-		var graphHeight = maxD*controlRatio + this.graphOffsetY;
+		var graphHeight = maxD*controlRatio + graphOffsetY;
 		c.strokeStyle = this.strokeColor;
 		c.lineWidth = this.strokeWidth;
-		c.moveTo(this.obj.x + this.offsetX, this.obj.y + this.offsetY);
-		c.lineTo(this.obj.x + this.offsetX, this.obj.y + this.offsetY+graphHeight);
-		c.moveTo(this.obj.x + this.offsetX, this.obj.y + this.offsetY+graphHeight);
-		c.lineTo(d.length*(barWidth + barSpacing) + this.obj.x + this.offsetX, this.obj.y + this.offsetY + graphHeight);
+		c.moveTo(xStart, yStart);
+		c.lineTo(xStart, yStart+graphHeight);
+		c.moveTo(xStart, yStart+graphHeight);
+		c.lineTo(d.length*(barWidth + barSpacing) + xStart, yStart + graphHeight);
 		c.stroke()
 		for(var i=0; i<d.length; i++){
 			c.fillStyle = this.fillStyle;
-			c.fillRect(i*(barWidth+barSpacing) + this.obj.x + this.offsetX + this.strokeWidth-2, this.obj.y + this.offsetY + graphHeight - data[i]*controlRatio, barWidth, data[i]*controlRatio);
+			c.fillRect(i*(barWidth+barSpacing) + xStart + this.strokeWidth-2, yStart + graphHeight - data[i]*controlRatio, barWidth, data[i]*controlRatio);
 		}
 
 	}

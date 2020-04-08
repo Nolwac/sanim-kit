@@ -6,7 +6,7 @@ window.onload = function(){
 	var obj2 = new rectObject(500, 30, 200, 100, 'white', 'white');
 	scene.addObject(obj2);
 	scene.addObject(obj1);
-	var hist = new Histogram([100, 300, 500, 700, 800, 400, 100], obj1);
+	var hist = new Histogram([100, 300, 500, 700, 800, 400, 100], obj2);
 	console.log('I am here now');
 	//hist.render();
 	var camera = new Camera();
