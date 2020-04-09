@@ -30,13 +30,33 @@ function Object(){
 			}
 		});
 	}
+	this.addChild = function(obj){
+		//this method adds a child object to an object
+		if(!this.world){
+			//this will throw an error as there is no world related to the parent object
+			throw("can not add child object to parent as the parent have not been added to a world(scene)");
+		}else{
+			obj.x = obj.xInitial + this.x;//setting the origin of the child object to be with respect to the origin of the parent object
+			obj.y = obj.yInitial + this.y;//we are using the initial settings because it is tamper proof;
+			obj.world = this.world;//setting the world of the child object to be same as the world of the parent object
+			this.children.push(obj);//adding the child object to the list of children to the parent object
+		}
+
+	}
+	this.removeChild = function(obj){
+		//this method removes a child object from the parent
+		var index = this.children.indexOf(obj);
+		if(0 <= index){
+			this.children.splice(index, 1);//this removes the object from the list of children but does not change other setttings of the object
+		}//this does not throw an error if such object does not exist as child to the parent object
+	}
 	this.renderChildren =function(){
 		this.children.forEach((obj) => {
 			obj.render();
 		})
 	}
 }
-function player(obj){
+function Player(obj){
 	//this constructor function takes care of all the operations that has to do with having a player on the scene;
 	this.object = obj;//this sets the object that is going to be the controller in the scene instance.
 	this.minOffsetX = 0; //the minimum offset of the player from the edge of the viewport on x-axis
@@ -86,12 +106,12 @@ function player(obj){
 		this.world.render(); //re-rendering the scene after adjustments
 	}
 }
-function rectObject(x, y, width, height, color= 'black', fillColor = null){
+function RectObject(x, y, width, height, color= 'black', fillColor = null){
 	//this constructor function is for the rectangle object, this takes care of the operations that has to do with the objects in the canvas
 	this.x = x, this.y = y, this.width = width, this.height = height, this.color = color, this.fillColor = fillColor;
+	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.render = function(){
 		//this renders the object to the canvas
-		this.world.context.fillStyle = this.fillColor;
 		this.world.context.strokeStyle = this.color;
 		this.world.context.lineWidth = this.lineWidth;
 		if(this.world.camera){
@@ -101,6 +121,7 @@ function rectObject(x, y, width, height, color= 'black', fillColor = null){
 			var xStart = this.x, yStart = this.y;
 		}
 		if(this.fillColor){
+			this.world.context.fillStyle = this.fillColor;
 			this.world.context.fillRect(xStart, yStart, width, height);
 		}
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
@@ -117,7 +138,7 @@ function rectObject(x, y, width, height, color= 'black', fillColor = null){
 	Object.call(this);
 }
 
-function pathObject(paths){
+function PathObject(paths){
 	/*
 	This is the definition for a canvas path object.
 	This object gives more functionality to the canvas path, it literally make the path an object instead of just a path.
@@ -158,9 +179,10 @@ function Camera(){
 		this.position(x,y,z); //This sets the position of the camera
 		this.perspective = perspective; //this sets the perspective of the camera
 	}
-	this.setDimmension = function(){
+	this.setDimmension = function(width, height){
 		//this sets the camera's area of view or viewport.
-		this.width = width, this.height=height;
+		this.width = width;
+		this.height = height;
 	}
 }
 
@@ -176,6 +198,13 @@ function Scene(context){
 		//this adds an object to the scene
 		object.world = this;
 		this.objects.push(object);
+	}
+	this.removeObject = function(obj){
+		//this method removes a child object from the scene
+		var index = this.objects.indexOf(obj);
+		if(0 <= index){
+			this.objects.splice(index, 1);//this removes the object from the list of objects but does not change other setttings of the object
+		}//this does not throw an error if such object does not exist as child object to the scene
 	}
 	this.setCamera = function(camera){
 		//this adds a camera to the scene

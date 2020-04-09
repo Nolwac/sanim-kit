@@ -1,9 +1,9 @@
 window.onload = function(){
 	var c = document.getElementById('canvas').getContext('2d');
 	var scene = new Scene(c);
-	var obj1 = new rectObject(0,0, 50, 50, 'brown', 'green');
-	var plr = new player(obj1);
-	var obj2 = new rectObject(500, 30, 200, 100, 'white', 'white');
+	var obj1 = new RectObject(0,0, 50, 50, 'brown', 'green');
+	var plr = new Player(obj1);
+	var obj2 = new RectObject(500, 30, 200, 100, 'white', 'white');
 	scene.addObject(obj2);
 	scene.addObject(obj1);
 	var hist = new Histogram([100, 300, 500, 700, 800, 400, 100], obj2);
