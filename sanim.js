@@ -5,6 +5,89 @@ function fitCanvasToScreen(ctx, color){
 	ctx.fillStyle = color;
 	ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
 }
+function Animation(world){
+	//this object has all the animations types as its methods
+	//the animation object sets the scene to be continually rerendering by creating a javascript animation frame that continually rerenders it
+	this.speedReference = 0.01;
+	window.sanimKitSpeedReference = this.speedReference;//setting the speed reference number gloabally;
+	this.setSpeedReference = function(value){
+		//this method sets the speed animation speed reference number
+		this.speedReference = value;
+		window.sanimKitSpeedReference = this.speedReference;//setting it globally as well
+	}
+	this.world = world;//setting the scene
+	world.animationFrame = this;//setting the animation frame of the world
+	this.animationEasingFunction = {
+		//this object will hold animation easing functions like quadratic
+		quadraticFast: function(counter, value){
+			//returns the exponential of given value
+			counter+=window.sanimKitSpeedReference;
+			value = counter*counter;
+			return [counter, value];
+		},
+		constant: function(counter, value){
+			//returns the value given
+			return [counter, value];
+		}
+	}
+	this.AEF = this.animationEasingFunction;//for the sake of convenience using the framework as the later is very long
+	this.linear = function(obj, direction, speed, easingFunction, length){
+		//this moves the object linearly towards to the right
+		var distanceControl = 0;//distance control variable to check when we have reached the specified speed
+		var initialSpeed = speed;
+		var easingControl = 1, counter=1;//this is for applying easing to the animation;
+		function animate(){
+			//this function does the actual animation of the object
+			var animationFrame = window.requestAnimationFrame(animate);
+			if(obj.world.playAnimation){
+				speed = initialSpeed*window.sanimKitSpeedReference*easingControl;//setting the speed with reference to the speed reference of the Animation object
+				//by placing the above line of code inside the animate function instead of above it, it means that changing the world speed reference affects
+				//the speed of the object while the animation is still ongoing
+				var execFunc = easingFunction(counter, easingControl);//updating the easing controller to apply easing effect
+				counter = execFunc[0], easingControl = execFunc[1];
+				if(direction=='LEFT'){
+					obj.animationLinearLeft=animationFrame;
+					obj.x-=speed;
+				}else if(direction=='RIGHT'){
+					obj.animationLinearRight=animationFrame;
+					obj.x+=speed;
+				}else if(direction=='UP'){
+					obj.animationLinearUp=animationFrame;
+					obj.y-=speed;
+				}else if(direction=='DOWN'){
+					obj.animationLinearDown=animationFrame;
+					obj.y+=speed;
+				}
+				if(length){
+					if(distanceControl >= length){
+						window.cancelAnimationFrame(animationFrame);//trying to cancel the animation frame once the desired length has been reached
+					}
+					distanceControl += speed;
+				}
+			}
+		}
+		animate();
+
+	}
+
+	this.executeFunction = function(func){
+		//this method executes a function as long as the animation frame is on
+		function animate(){
+			//this function does the actual execution of the function over and over again
+			window.requestAnimationFrame(animate);
+			func();//executing the function;
+		}//this animation frame can be cancelled with the javascript cancelAnimationFrame API, using animation ID that is returned
+		return animate();//returning animation ID
+	}
+
+	function sceneAnimator(){
+		window.requestAnimationFrame(sceneAnimator);
+		if(world.playAnimation){
+			world.render();//rendering the scene inside the animation frame
+		}
+	}
+	this.sceneAnimator = sceneAnimator();
+}
 function Object(){
 	this.lineWidth = 0.0000000000000001;//setting the lineWidth to a very low value so that the lines does not show by default
 	this.children  = []; //list of children embedded in the object
@@ -40,20 +123,29 @@ function Object(){
 			obj.y = obj.yInitial + this.y;//we are using the initial settings because it is tamper proof;
 			obj.world = this.world;//setting the world of the child object to be same as the world of the parent object
 			this.children.push(obj);//adding the child object to the list of children to the parent object
+			this.world.objects.push(obj);//also adding it to the list of objects in the scene
 		}
 
 	}
 	this.removeChild = function(obj){
 		//this method removes a child object from the parent
-		var index = this.children.indexOf(obj);
-		if(0 <= index){
-			this.children.splice(index, 1);//this removes the object from the list of children but does not change other setttings of the object
+		var obj_index = this.children.indexOf(obj);//the index in the parent object children list
+		var scene_index = this.world.objects.indexOf(obj);//the index in the in the scene's objects list
+		if(0 <= obj_index){
+			this.children.splice(obj_index, 1);//this removes the object from the list of children but does not change other setttings of the object
+			this.world.objects.splice(scene_index, 1);// removing it from the scene too
 		}//this does not throw an error if such object does not exist as child to the parent object
 	}
 	this.renderChildren =function(){
 		this.children.forEach((obj) => {
 			obj.render();
 		})
+	}
+	this.move = function(movementType, direction, speed, easingFunction, length){
+		//this moves an object in a specific way determined by a given path movement object
+		//movementType, direction, speed and easingFunction must be specified
+		movementType(this, direction, speed, easingFunction, length);
+
 	}
 }
 function Player(obj){
@@ -193,6 +285,7 @@ function Scene(context){
 	this.player = null; // holds the player in the scene if exist
 	this.lights = new Array(); // holds the lights added to the scene
 	this.objects = new Array(); //holds the objects added to the scene
+	this.playAnimation = true;//setting if animation should play or not
 
 	this.addObject = function(object){
 		//this adds an object to the scene
@@ -284,7 +377,6 @@ function Histogram(data, obj){
 			var offsetX = this.offsetX, offsetY = this.offsetY;
 		}
 		c = this.obj.world.context;
-		console.log(this.obj.world.context);
 		var d = new Array(...this.data); //trying to make a clone of the original data
 		var maxD = Math.max(...d);//the maximum value in the list;
 		var controlRatio = (controlHeight-offsetY*2)/(maxD); //the ratio that makes sure that everything shows up in the screen

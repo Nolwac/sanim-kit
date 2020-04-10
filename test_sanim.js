@@ -15,11 +15,8 @@ window.onload = function(){
 	plr.minOffsetX = 50;
 	plr.minOffsetY = 70;
 	scene.setPlayer(plr);//setting the player in the scene
-	scene.render()
-	// c.canvas.addEventListener('mousemove', function(e){
-	// 	var x = e.clientX, y = e.clientY;
-	// 	console.log(obj1.isInPath(x,y))
-	// });
+	var mov = new Animation(scene);
+	scene.render();
 	obj1.addEvent('click', function(e){
 		console.log('I have been clicked on');
 		console.log(e.canvasTargetObject)
@@ -34,18 +31,8 @@ window.onload = function(){
 		objt.height +=200;
 		scene.render();
 	});
-	// function animation(){
-	// 	window.requestAnimationFrame(animation);
-	// 	obj1.x +=2;
-	// 	obj1.y +=1;
-	// 	obj2.width +=2;
-	// 	obj2.height +=2;
-	// 	obj1.color = 'brown';
-	// 	scene.render();
-	// 	c.canvas.addEventListener('mousemove', function(e){
-	// 		var x = e.clientX, y = e.clientY;
-	// 	});
-
-	// }
-	// animation();
+	obj1.move(mov.linear, 'RIGHT', 100, mov.AEF.quadraticFast, 200);
+	mov.executeFunction(function(){
+		obj2.y += 2;
+	});
 }
