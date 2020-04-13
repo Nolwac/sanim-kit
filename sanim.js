@@ -15,6 +15,7 @@ function Animation(world){
 		this.speedReference = value;
 		window.sanimKitSpeedReference = this.speedReference;//setting it globally as well
 	}
+
 	this.world = world;//setting the scene
 	world.animationFrame = this;//setting the animation frame of the world
 	this.animationEasingFunction = {
@@ -30,6 +31,7 @@ function Animation(world){
 			return [counter, value];
 		}
 	}
+
 	this.AEF = this.animationEasingFunction;//for the sake of convenience using the framework as the later is very long
 	this.linear = function(obj, direction, speed, easingFunction, length){
 		//this moves the object linearly towards to the right
@@ -45,6 +47,21 @@ function Animation(world){
 				//the speed of the object while the animation is still ongoing
 				var execFunc = easingFunction(counter, easingControl);//updating the easing controller to apply easing effect
 				counter = execFunc[0], easingControl = execFunc[1];
+				if(length){
+					if(distanceControl >= length){
+						if(direction=='LEFT'){
+							obj.x=obj.xInitial - length;
+						}else if(direction=='RIGHT'){
+							obj.x=obj.xInitial + length;
+						}else if(direction=='UP'){
+							obj.y=obj.yInitial - length;
+						}else if(direction=='DOWN'){
+							obj.y=obj.yInitial + length;
+						}
+						window.cancelAnimationFrame(animationFrame);//trying to cancel the animation frame once the desired length has been reached
+					}
+					distanceControl += speed;
+				}
 				if(direction=='LEFT'){
 					obj.animationLinearLeft=animationFrame;
 					obj.x-=speed;
@@ -88,9 +105,10 @@ function Animation(world){
 	}
 	this.sceneAnimator = sceneAnimator();
 }
-function Object(){
+function SanimObject(){
 	this.lineWidth = 0.0000000000000001;//setting the lineWidth to a very low value so that the lines does not show by default
 	this.children  = []; //list of children embedded in the object
+	this.props = new Object();
 	this.isInPath = function(x, y){
 		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//the latest path is what isPointInPath looks at;
@@ -147,6 +165,22 @@ function Object(){
 		movementType(this, direction, speed, easingFunction, length);
 
 	}
+	this.scale = function(arguments){
+		//the function execution here for scaling
+		//find out the mathematics behind the implementation of this and have it implemented
+	}
+	this.rotate = function(arguments){
+		//the function execution comes here for rotation
+		//find out the mathematics behind the implementation of this and have it implemented
+	}
+	this.translate = function(arguments){
+		//the function execution comes here for translation
+		//find out the mathematics behind the implementation of this and have it implemented
+	}
+	this.transform = function(arguments){
+		//the function exectution comes here for transformation
+		//find out the mathematics behind the implementation of this and have it implemented
+	}
 }
 function Player(obj){
 	//this constructor function takes care of all the operations that has to do with having a player on the scene;
@@ -198,22 +232,21 @@ function Player(obj){
 		this.world.render(); //re-rendering the scene after adjustments
 	}
 }
-function RectObject(x, y, width, height, color= 'black', fillColor = null){
+function RectObject(x, y, width, height, fillRect = false){
 	//this constructor function is for the rectangle object, this takes care of the operations that has to do with the objects in the canvas
-	this.x = x, this.y = y, this.width = width, this.height = height, this.color = color, this.fillColor = fillColor;
+	this.x = x, this.y = y, this.width = width, this.height = height, this.fillRect = fillRect;
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.render = function(){
 		//this renders the object to the canvas
-		this.world.context.strokeStyle = this.color;
-		this.world.context.lineWidth = this.lineWidth;
+		Object.assign(this.world.context, {...this.world.canvasContextProperties});//making sure that the setting are reset to what it was originally
+		Object.assign(this.world.context, {...this.props});
 		if(this.world.camera){
 			var xStart = (this.x/this.world.camera.perspective)-this.world.camera.x, yStart = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
 			var width = this.width/this.world.camera.perspective, height = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
 		}else{
 			var xStart = this.x, yStart = this.y;
 		}
-		if(this.fillColor){
-			this.world.context.fillStyle = this.fillColor;
+		if(this.fillRect==true){
 			this.world.context.fillRect(xStart, yStart, width, height);
 		}
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
@@ -227,7 +260,7 @@ function RectObject(x, y, width, height, color= 'black', fillColor = null){
 		this.renderChildren();
 		
 	}
-	Object.call(this);
+	SanimObject.call(this);
 }
 
 function PathObject(paths){
@@ -286,6 +319,31 @@ function Scene(context){
 	this.lights = new Array(); // holds the lights added to the scene
 	this.objects = new Array(); //holds the objects added to the scene
 	this.playAnimation = true;//setting if animation should play or not
+	window.context = context;//testing and debuggiing purposes
+	this.canvasContextProperties = {
+		//this sets up the initial canvas properties and only this properties that one should changewhile making use of this framework.
+		//this hack enables user of this framework to be able to apply canvas properties normally to the framework's objects
+		globalAlpha: 1,
+		globalCompositeOperation: "source-over",
+		filter: "none",
+		imageSmoothingEnabled: true,
+		imageSmoothingQuality: "low",
+		strokeStyle: "#a52a2a",
+		fillStyle: "#ffffff",
+		shadowOffsetX: 0,
+		shadowOffsetY: 0,
+		shadowBlur: 0,
+		shadowColor: "rgba(0, 0, 0, 0)",
+		lineWidth:1.0000000168623835e-16,
+		lineCap: "butt",
+		lineJoin: "miter",
+		miterLimit: 10,
+		lineDashOffset: 0,
+		font: "10px sans-serif",
+		textAlign: "start",
+		textBaseline: "alphabetic",
+		direction: "ltr"
+	}
 
 	this.addObject = function(object){
 		//this adds an object to the scene
@@ -326,10 +384,12 @@ function Scene(context){
 	this.requestFullscreen = function(){
 		//this function requests full screen for the whole canvas
 		this.context.canvas.requestFullscreen()//works on chrome but not all the browsers, find the webkit versions for the other browsers
+		this.render()//rerendering to adjust to the change in width and hieght of the canvas
 	}
 	this.cancelRequestFullscreen = function(){
 		//this function cancels the fullscreen mode for the canvas
 		this.context.canvas.cancelRequestFullscreen()// works on chrome but not all the browsers, so find the webkit versions for the other browers
+		this.render();
 	}
 }
 function Histogram(data, obj){
