@@ -118,16 +118,16 @@ function SanimObject(){
 		//this sets the world of the object
 		this.world = world;
 	}
-	this.addEvent = function (eventType, eventResponse){
+	this.addEvent = function (eventType, eventResponseIfOnObject, eventResponseIfNotOnObject=function(){}){
 		//this function is going to stand for as the event listeener function that is going to be doing the work of the normal event listener that
 		//DOM elements listens to
 		var obj = this;// trying to reassign the object to allow the eventlistener function to be able to see it as it is
 		this.world.context.canvas.addEventListener(eventType, function(e){
+			e.canvasTargetObject = obj;//setting the object to be the canvas target so that it can be refered to in the event response function
 			if(obj.isInPath(e.clientX, e.clientY)){
-				e.canvasTargetObject = obj;//setting the object to be the canvas target so that it can be refered to in the event response function
-				eventResponse(e);//fire the event response
+				eventResponseIfOnObject(e);//fire the event response if the event occurred on the object
 			}else{
-				//do nothing in this case.
+				eventResponseIfNotOnObject(e);//fire the event response if the event did not occur on the object
 			}
 		});
 	}
@@ -158,6 +158,9 @@ function SanimObject(){
 		this.children.forEach((obj) => {
 			obj.render();
 		})
+	}
+	this.implementAfterAddedToScene = function(){
+		return null;//doing nothing at this point
 	}
 	this.move = function(movementType, direction, speed, easingFunction, length){
 		//this moves an object in a specific way determined by a given path movement object
@@ -232,6 +235,20 @@ function Player(obj){
 		this.world.render(); //re-rendering the scene after adjustments
 	}
 }
+function ButtonObject(x, y, width, height, fillRect = false){
+	RectObject.call(this, x, y, width, height, fillRect);
+	this.implementAfterAddedToScene = function(){
+		var cursor = this.world.context.canvas.style.cursor;
+		this.addEvent('mousemove', function(e){
+			if(e.canvasTargetObject.isInPath(e.clientX, e.clientY)==true){
+				e.target.style.cursor = 'pointer';
+			}
+		}, function(e){
+			e.target.style.cursor = cursor;
+		});
+	}
+}
+
 function RectObject(x, y, width, height, fillRect = false){
 	//this constructor function is for the rectangle object, this takes care of the operations that has to do with the objects in the canvas
 	this.x = x, this.y = y, this.width = width, this.height = height, this.fillRect = fillRect;
@@ -349,6 +366,7 @@ function Scene(context){
 		//this adds an object to the scene
 		object.world = this;
 		this.objects.push(object);
+		object.implementAfterAddedToScene();//this is a hack to implement somethings which demand that object be added to scene before implemented
 	}
 	this.removeObject = function(obj){
 		//this method removes a child object from the scene

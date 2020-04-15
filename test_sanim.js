@@ -1,7 +1,7 @@
 window.onload = function(){
 	var c = document.getElementById('canvas').getContext('2d');
 	var scene = new Scene(c);
-	var obj1 = new RectObject(0,0, 50, 50, true);
+	var obj1 = new ButtonObject(0,0, 50, 50, true);
 	var plr = new Player(obj1);
 	var obj2 = new RectObject(500, 30, 200, 100, true);
 	scene.addObject(obj2);
@@ -27,16 +27,16 @@ window.onload = function(){
 	obj1.props.lineCap = "r";
 	//obj1.props.scale(5,5);
 	scene.render();
+	// obj1.addEvent('mousemove', function(e){
+	// 	scene.render();
+	// 	e.target.style.cursor = 'pointer';
+	// });
 	obj1.addEvent('click', function(e){
-		console.log('I have been clicked on');
-		console.log(e.canvasTargetObject)
 		var objt = e.canvasTargetObject;
 		objt.x +=200;
 		scene.render();
 	});
 	obj2.addEvent('click', function(e){
-		console.log('obj2 have been clicked on');
-		console.log(e.canvasTargetObject)
 		var objt = e.canvasTargetObject;
 		objt.height +=200;
 		scene.render();
