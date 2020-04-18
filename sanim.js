@@ -122,7 +122,7 @@ function SanimObject(){
 	this.parentObject  = null;
 	this.animationStarted = false;
 	this.isInPath = function(x, y){
-		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
+		// this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//the latest path is what isPointInPath looks at;
 		return this.world.context.isPointInPath(x,y);
 	}
@@ -294,7 +294,7 @@ function RectObject(x, y, width, height, fillRect = false){
 		this.world.context.lineTo(xStart+width, yStart);
 		this.world.context.closePath();
 		this.world.context.stroke();
-		this.renderChildren();
+		//this.renderChildren();
 		
 	}
 	SanimObject.call(this);
@@ -323,7 +323,7 @@ function PathObject(paths){
 	}
 
 	this.isInPath = function(x, y){
-		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
+		//this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//the latest path is what isPointInPath looks at;
 		return this.world.context.isPointInPath(x,y);
 	}
@@ -422,17 +422,16 @@ function Scene(context){
 	this.requestFullscreen = function(){
 		//this function requests full screen for the whole canvas
 		this.context.canvas.requestFullscreen()//works on chrome but not all the browsers, find the webkit versions for the other browsers
-		this.render()//rerendering to adjust to the change in width and hieght of the canvas
+		// this.render()//rerendering to adjust to the change in width and hieght of the canvas
 	}
 	this.cancelRequestFullscreen = function(){
 		//this function cancels the fullscreen mode for the canvas
 		this.context.canvas.cancelRequestFullscreen()// works on chrome but not all the browsers, so find the webkit versions for the other browers
-		this.render();
+		// this.render();
 	}
 	var world = this;
 	function sceneAnimator(){
 		window.requestAnimationFrame(sceneAnimator);
-		console.log(world, 'is the loop')
 		if(world.playAnimation){
 			world.render();//rendering the scene inside the animation frame
 		}
