@@ -17,6 +17,8 @@ function Animation(world){
 	}
 
 	this.world = world;//setting the scene
+	this.animationOn = false;//property that will be used to put out animation and allow another object to start animation
+	this.asynchronous = true;//this allows the animations to occur at same time for all the object and not one at a time, then the other
 	world.animationFrame = this;//setting the animation frame of the world
 	this.animationEasingFunction = {
 		//this object will hold animation easing functions like quadratic
@@ -33,15 +35,17 @@ function Animation(world){
 	}
 
 	this.AEF = this.animationEasingFunction;//for the sake of convenience using the framework as the later is very long
+	var self = this;
 	this.linear = function(obj, direction, speed, easingFunction, length){
 		//this moves the object linearly towards to the right
 		var distanceControl = 0;//distance control variable to check when we have reached the specified speed
 		var initialSpeed = speed;
 		var easingControl = 1, counter=1;//this is for applying easing to the animation;
 		function animate(){
-			//this function does the actual animation of the object
 			var animationFrame = window.requestAnimationFrame(animate);
-			if(obj.world.playAnimation){
+			if(obj.world.playAnimation && (self.animationOn==false || obj.animationStarted==true || self.asynchronous==true)){
+				obj.animationStarted = true;//toggling the state of the obj animation started check property
+				self.animationOn = true;//toggling the state of the animation object animation check
 				speed = initialSpeed*window.sanimKitSpeedReference*easingControl;//setting the speed with reference to the speed reference of the Animation object
 				//by placing the above line of code inside the animate function instead of above it, it means that changing the world speed reference affects
 				//the speed of the object while the animation is still ongoing
@@ -59,6 +63,7 @@ function Animation(world){
 							obj.y=obj.yInitial + length;
 						}
 						window.cancelAnimationFrame(animationFrame);//trying to cancel the animation frame once the desired length has been reached
+						self.animationOn = false;//putting off the animation to give way for another animation to take place
 					}
 					distanceControl += speed;
 				}
@@ -78,9 +83,11 @@ function Animation(world){
 				if(length){
 					if(distanceControl >= length){
 						window.cancelAnimationFrame(animationFrame);//trying to cancel the animation frame once the desired length has been reached
+						self.animationOn = false;//putting off the animationn for another animation to take place
 					}
 					distanceControl += speed;
 				}
+				//obj.world.render();
 			}
 		}
 		animate();
@@ -96,19 +103,24 @@ function Animation(world){
 		}//this animation frame can be cancelled with the javascript cancelAnimationFrame API, using animation ID that is returned
 		return animate();//returning animation ID
 	}
-
-	function sceneAnimator(){
-		window.requestAnimationFrame(sceneAnimator);
-		if(world.playAnimation){
-			world.render();//rendering the scene inside the animation frame
-		}
+	this.animationSequence = function(sequence){
+		//this method executes an animation sequence. what this means is that it executes animation one after the other as specified by the user
+		//for(seq in sequence)
 	}
-	this.sceneAnimator = sceneAnimator();
+	// function sceneAnimator(){
+	// 	window.requestAnimationFrame(sceneAnimator);
+	// 	if(world.playAnimation){
+	// 		world.render();//rendering the scene inside the animation frame
+	// 	}
+	// }
+	// this.sceneAnimator = sceneAnimator();
 }
 function SanimObject(){
 	this.lineWidth = 0.0000000000000001;//setting the lineWidth to a very low value so that the lines does not show by default
 	this.children  = []; //list of children embedded in the object
 	this.props = new Object();
+	this.parentObject  = null;
+	this.animationStarted = false;
 	this.isInPath = function(x, y){
 		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//the latest path is what isPointInPath looks at;
@@ -142,6 +154,7 @@ function SanimObject(){
 			obj.world = this.world;//setting the world of the child object to be same as the world of the parent object
 			this.children.push(obj);//adding the child object to the list of children to the parent object
 			this.world.objects.push(obj);//also adding it to the list of objects in the scene
+			obj.parentObject = this;//setting the parent object of the added object to this object
 		}
 
 	}
@@ -152,6 +165,7 @@ function SanimObject(){
 		if(0 <= obj_index){
 			this.children.splice(obj_index, 1);//this removes the object from the list of children but does not change other setttings of the object
 			this.world.objects.splice(scene_index, 1);// removing it from the scene too
+			obj.parentObject = null;//setting the parent object property of the object being removed to null
 		}//this does not throw an error if such object does not exist as child to the parent object
 	}
 	this.renderChildren =function(){
@@ -254,14 +268,20 @@ function RectObject(x, y, width, height, fillRect = false){
 	this.x = x, this.y = y, this.width = width, this.height = height, this.fillRect = fillRect;
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.render = function(){
+		if(this.parentObject){
+			//checking if the object has parent, so we could readjust to fit to the parent object
+			this.x = this.xInitial + this.parentObject.x;
+			this.y = this.yInitial + this.parentObject.y;
+		}
 		//this renders the object to the canvas
-		Object.assign(this.world.context, {...this.world.canvasContextProperties});//making sure that the setting are reset to what it was originally
-		Object.assign(this.world.context, {...this.props});
+		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
+		Object.assign(this.world.context, this.props);
 		if(this.world.camera){
 			var xStart = (this.x/this.world.camera.perspective)-this.world.camera.x, yStart = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
 			var width = this.width/this.world.camera.perspective, height = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
 		}else{
 			var xStart = this.x, yStart = this.y;
+			var width = this.width, height = this.height;
 		}
 		if(this.fillRect==true){
 			this.world.context.fillRect(xStart, yStart, width, height);
@@ -409,6 +429,15 @@ function Scene(context){
 		this.context.canvas.cancelRequestFullscreen()// works on chrome but not all the browsers, so find the webkit versions for the other browers
 		this.render();
 	}
+	var world = this;
+	function sceneAnimator(){
+		window.requestAnimationFrame(sceneAnimator);
+		console.log(world, 'is the loop')
+		if(world.playAnimation){
+			world.render();//rendering the scene inside the animation frame
+		}
+	}
+	this.sceneAnimator = sceneAnimator();
 }
 function Histogram(data, obj){
 	/*
@@ -475,4 +504,111 @@ function Histogram(data, obj){
 
 	}
 
+
+}
+
+function ImageObject(filePath, x, y, width, height){
+	//this is the function that will take care of playing a video in the canvas. 
+	//the hack is that the video is placed on the canvas as an image so as the canvas rerenders the frames of the video is being displayed
+	//while the audio of the video is being played by the browser as the video is element itself is hidden
+	this.x = x, this.y = y, this.width = width, this.height = height;
+	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.filePath = filePath, this.media = new Image();
+	this.media.src = filePath;
+	this.render = function(){
+		if(this.parentObject){
+			//checking if the object has parent, so we could readjust to fit to the parent object
+			this.x = this.xInitial + this.parentObject.x;
+			this.y = this.yInitial + this.parentObject.y;
+		}
+		//this renders the object to the canvas
+		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
+		Object.assign(this.world.context, this.props);
+		if(this.world.camera){
+			var xStart = (this.x/this.world.camera.perspective)-this.world.camera.x, yStart = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			var width = this.width/this.world.camera.perspective, height = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+		}else{
+			var xStart = this.x, yStart = this.y;
+			var width = this.width, height = this.height;
+		}
+		
+		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
+		this.world.context.beginPath();
+		this.world.context.moveTo(xStart, yStart);
+		this.world.context.lineTo(xStart, yStart+height);
+		this.world.context.lineTo(xStart+width, yStart+height);
+		this.world.context.lineTo(xStart+width, yStart);
+		this.world.context.closePath();
+		this.world.context.stroke();
+		//this.renderChildren(); this object should not have children
+
+		this.world.context.drawImage(this.media, this.x, this.y, this.width, this.height)
+		
+	}
+	this.setMedia=function(filePath){
+		//this methods sets the path for the image
+		this.filePath = filePath;
+		this.media.src = filePath;
+	}
+	SanimObject.call(this);
+}
+
+function VideoObject(filePath, x, y, width, height, world){
+	//this method is rendering video to the canvas
+	//Note it is not adviceable to play a video with on the canvas, but this hack can work the wonder
+	//also note that image can only be placed when the Scene has an animation frame
+	this.x = x, this.y = y, this.width = width, this.height = height;
+	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	var video  = document.createElement('video');//creating the video element
+	document.body.appendChild(video);//appending the video element to the DOM
+	// var source = document.createElement('source');//creating the video source
+	// video.appendChild(source);//this appends the source element to the video
+	video.style.display = '';
+	video.setAttribute('controls', 'true');
+	//video.addChild
+	video.setAttribute('src', filePath);//setting video file path in the source
+	video.setAttribute('type', 'video/mp4');//setting the media file type
+	//console.log(video, ' is the video')
+	this.media = video;
+	console.log(video.paused)
+	//video.autoplay = true;
+	//this.media.play();
+	var self = this;
+	window.video = this.media;
+	this.world = world;
+	this.world.video = this;
+	this.renderVideo = function(){
+		//self renders the object to the canvas
+		Object.assign(self.world.context, self.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
+		Object.assign(self.world.context, self.props);
+		if(self.world.camera){
+			var xStart = (self.x/self.world.camera.perspective)-self.world.camera.x, yStart = (self.y/self.world.camera.perspective)-self.world.camera.y;//self is defines the starting poisiton of the path to be drawn
+			var width = self.width/self.world.camera.perspective, height = self.height/self.world.camera.perspective; //self tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+		}else{
+			var xStart = self.x, yStart = self.y;
+			var width = self.width, height = self.height;
+		}
+		
+		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
+		self.world.context.beginPath();
+		self.world.context.moveTo(xStart, yStart);
+		self.world.context.lineTo(xStart, yStart+height);
+		self.world.context.lineTo(xStart+width, yStart+height);
+		self.world.context.lineTo(xStart+width, yStart);
+		self.world.context.closePath();
+		self.world.context.stroke();
+		//self.renderChildren(); self object should not have children
+		self.world.context.drawImage(self.media, self.x, self.y, self.width, self.height)
+		if(self.media.paused != true){
+			console.log(self.x, self.y, self.width, self.height, self.world.context, ' playing video')
+			requestAnimationFrame(function(){self.renderVideo()}, 20);
+		}
+		
+		
+	}
+	this.media.addEventListener('play', function(e){
+		self.renderVideo()
+	})
+	SanimObject.call(this);
+	this.render = function(){}
 }
