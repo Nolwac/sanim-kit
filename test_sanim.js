@@ -1,15 +1,17 @@
 window.onload = function(){
 	var c = document.getElementById('canvas').getContext('2d');
-	console.log(c, 'is the canvas')
 	var scene = new Scene(c);
+	window.scene = scene;
 	var obj1 = new ButtonObject(0,0, 50, 50, true);
 	var plr = new Player(obj1);
 	var obj2 = new RectObject(500, 30, 200, 140, true);
 	scene.addObject(obj2);
 	scene.addObject(obj1);
 	//var hist = new Histogram([100, 300, 500, 700, 800, 400, 100], obj2);
-	//var img = new VideoObject('media/test_video.mp4', 0,0, 450, 340, scene);
-	//obj2.addChild(img);
+	var img = new VideoObject('media/test_video.mp4', 0,0, 200, 140);
+	obj2.addChild(img);
+	// var img2 = new ImageObject('media/social_handles.png', 0,0, 200, 140);
+	// obj2.addChild(img2);
 	// console.log('I am here now');
 	// //hist.render();
 	
@@ -35,11 +37,12 @@ window.onload = function(){
 	// // 	scene.render();
 	// // 	e.target.style.cursor = 'pointer';
 	// // });
-	// obj1.addEvent('click', function(e){
-	// 	var objt = e.canvasTargetObject;
-	// 	objt.x +=200;
-	// 	scene.render();
-	// });
+	obj1.addEvent('click', function(e){
+		var objt = e.canvasTargetObject;
+		objt.x +=200;
+		scene.render();
+		scene.requestFullscreen();
+	});
 	// obj2.addEvent('click', function(e){
 	// 	var objt = e.canvasTargetObject;
 	// 	objt.height +=200;
@@ -51,13 +54,13 @@ window.onload = function(){
 	// // });
 	// function firstSeq(){
 	// 	//this plays the video
-	// 	c.canvas.addEventListener('click', function(e){
-	// 		console.log('dom loaded');
-	// 		if(img.media.paused==true){
-	// 			img.media.play();
-	// 		}
+		c.canvas.addEventListener('click', function(e){
+			console.log('dom loaded');
+			if(img.media.paused==true){
+				img.media.play();
+			}
 			
-	// 	})
+		})
 		
 	// 	img.media.addEventListener('ended', function(e){
 	// 		secondSeq();

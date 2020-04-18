@@ -107,13 +107,6 @@ function Animation(world){
 		//this method executes an animation sequence. what this means is that it executes animation one after the other as specified by the user
 		//for(seq in sequence)
 	}
-	// function sceneAnimator(){
-	// 	window.requestAnimationFrame(sceneAnimator);
-	// 	if(world.playAnimation){
-	// 		world.render();//rendering the scene inside the animation frame
-	// 	}
-	// }
-	// this.sceneAnimator = sceneAnimator();
 }
 function SanimObject(){
 	this.lineWidth = 0.0000000000000001;//setting the lineWidth to a very low value so that the lines does not show by default
@@ -122,9 +115,14 @@ function SanimObject(){
 	this.parentObject  = null;
 	this.animationStarted = false;
 	this.isInPath = function(x, y){
-		// this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
+		//this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//the latest path is what isPointInPath looks at;
-		return this.world.context.isPointInPath(x,y);
+		//return this.world.context.isPointInPath(x,y);
+		if(x >= this.renderingX && x <= this.renderingX+this.renderingWidth && y >= this.renderingY && y <= this.renderingY+this.renderingHeight){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	this.setWorld = function(world){
 		//this sets the world of the object
@@ -209,7 +207,7 @@ function Player(obj){
 	this.coupleToCamera = true;//this states if the player should be coupled with camera or not, if true the camera will be moving with the player
 	this.makeCameraAdjustments = function(){
 		//this method makes all the neccessary adjustments that need to be made to camera with respect to the players position at that time.
-		if(this.world && this.coupleToCamera === true){
+		if(this.world && this.coupleToCamera === true && this.world.camera != null){
 			//checking to be sure that the player has been attached to a scene and that the coupleToCamera setting has been set to true before performing neccessary computations
 			var Xp = this.world.camera.x;//camera position on the x-axis
 			var Yp = this.world.camera.y;//camera position on the y-axis
@@ -267,6 +265,7 @@ function RectObject(x, y, width, height, fillRect = false){
 	//this constructor function is for the rectangle object, this takes care of the operations that has to do with the objects in the canvas
 	this.x = x, this.y = y, this.width = width, this.height = height, this.fillRect = fillRect;
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.renderingX = this.x, this.renderingY = this.y, this.renderingWidth = this.width, this.renderingHeight= this.height;
 	this.render = function(){
 		if(this.parentObject){
 			//checking if the object has parent, so we could readjust to fit to the parent object
@@ -277,21 +276,21 @@ function RectObject(x, y, width, height, fillRect = false){
 		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
 		Object.assign(this.world.context, this.props);
 		if(this.world.camera){
-			var xStart = (this.x/this.world.camera.perspective)-this.world.camera.x, yStart = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			var width = this.width/this.world.camera.perspective, height = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+			 this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			this.renderingWidth = this.width/this.world.camera.perspective, this.renderingHeight = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
 		}else{
-			var xStart = this.x, yStart = this.y;
-			var width = this.width, height = this.height;
+			this.renderingX = this.x, this.renderingY = this.y;
+			this.renderingWidth = this.width, this.height = this.renderingHeight;
 		}
 		if(this.fillRect==true){
-			this.world.context.fillRect(xStart, yStart, width, height);
+			this.world.context.fillRect(this.renderingX, this.renderingY, this.renderingWidth, this.renderingHeight);
 		}
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
 		this.world.context.beginPath();
-		this.world.context.moveTo(xStart, yStart);
-		this.world.context.lineTo(xStart, yStart+height);
-		this.world.context.lineTo(xStart+width, yStart+height);
-		this.world.context.lineTo(xStart+width, yStart);
+		this.world.context.moveTo(this.renderingX, this.renderingY);
+		this.world.context.lineTo(this.renderingX, this.renderingY+this.renderingHeight);
+		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
+		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
 		this.world.context.closePath();
 		this.world.context.stroke();
 		//this.renderChildren();
@@ -421,14 +420,29 @@ function Scene(context){
 	}
 	this.requestFullscreen = function(){
 		//this function requests full screen for the whole canvas
-		this.context.canvas.requestFullscreen()//works on chrome but not all the browsers, find the webkit versions for the other browsers
-		// this.render()//rerendering to adjust to the change in width and hieght of the canvas
+		var canvas = this.context.canvas;
+		if (canvas.requestFullscreen) {
+		    canvas.requestFullscreen();
+		} else if (canvas.mozRequestFullScreen) { /* Firefox */
+		    canvas.mozRequestFullScreen();
+		} else if (canvas.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+		    canvas.webkitRequestFullscreen();
+		} else if (canvas.msRequestFullscreen) { /* IE/Edge */
+		    canvas.msRequestFullscreen();
+		}
 	}
 	this.cancelRequestFullscreen = function(){
-		//this function cancels the fullscreen mode for the canvas
-		this.context.canvas.cancelRequestFullscreen()// works on chrome but not all the browsers, so find the webkit versions for the other browers
-		// this.render();
+		if (document.exitFullscreen) {
+		    document.exitFullscreen();
+		} else if (document.mozCancelFullScreen) { /* Firefox */
+		    document.mozCancelFullScreen();
+		} else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+		    document.webkitExitFullscreen();
+		} else if (document.msExitFullscreen) { /* IE/Edge */
+		    document.msExitFullscreen();
+		}
 	}
+	
 	var world = this;
 	function sceneAnimator(){
 		window.requestAnimationFrame(sceneAnimator);
@@ -512,6 +526,7 @@ function ImageObject(filePath, x, y, width, height){
 	//while the audio of the video is being played by the browser as the video is element itself is hidden
 	this.x = x, this.y = y, this.width = width, this.height = height;
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.renderingX = this.x, this.renderingY = this.y, this.renderingWidth = this.width, this.renderingHeight= this.height;
 	this.filePath = filePath, this.media = new Image();
 	this.media.src = filePath;
 	this.render = function(){
@@ -524,24 +539,24 @@ function ImageObject(filePath, x, y, width, height){
 		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
 		Object.assign(this.world.context, this.props);
 		if(this.world.camera){
-			var xStart = (this.x/this.world.camera.perspective)-this.world.camera.x, yStart = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			var width = this.width/this.world.camera.perspective, height = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+			 this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			this.renderingWidth = this.width/this.world.camera.perspective, this.renderingHeight = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
 		}else{
-			var xStart = this.x, yStart = this.y;
-			var width = this.width, height = this.height;
+			this.renderingX = this.x, this.renderingY = this.y;
+			this.renderingWidth = this.width, this.height = this.renderingHeight;
 		}
 		
-		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
+		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object
+		this.world.context.drawImage(this.media, this.renderingX, this.renderingY, this.renderingWidth, this.renderingHeight)
 		this.world.context.beginPath();
-		this.world.context.moveTo(xStart, yStart);
-		this.world.context.lineTo(xStart, yStart+height);
-		this.world.context.lineTo(xStart+width, yStart+height);
-		this.world.context.lineTo(xStart+width, yStart);
+		this.world.context.moveTo(this.renderingX, this.renderingY);
+		this.world.context.lineTo(this.renderingX, this.renderingY+this.renderingHeight);
+		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
+		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
 		this.world.context.closePath();
 		this.world.context.stroke();
-		//this.renderChildren(); this object should not have children
+		//this.renderChildren();
 
-		this.world.context.drawImage(this.media, this.x, this.y, this.width, this.height)
 		
 	}
 	this.setMedia=function(filePath){
@@ -552,62 +567,16 @@ function ImageObject(filePath, x, y, width, height){
 	SanimObject.call(this);
 }
 
-function VideoObject(filePath, x, y, width, height, world){
+function VideoObject(filePath, x, y, width, height){
 	//this method is rendering video to the canvas
 	//Note it is not adviceable to play a video with on the canvas, but this hack can work the wonder
 	//also note that image can only be placed when the Scene has an animation frame
-	this.x = x, this.y = y, this.width = width, this.height = height;
-	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	ImageObject.call(this, filePath, x, y, width, height);
 	var video  = document.createElement('video');//creating the video element
 	document.body.appendChild(video);//appending the video element to the DOM
-	// var source = document.createElement('source');//creating the video source
-	// video.appendChild(source);//this appends the source element to the video
-	video.style.display = '';
-	video.setAttribute('controls', 'true');
-	//video.addChild
+	video.style.display = 'none';
 	video.setAttribute('src', filePath);//setting video file path in the source
-	video.setAttribute('type', 'video/mp4');//setting the media file type
-	//console.log(video, ' is the video')
 	this.media = video;
-	console.log(video.paused)
-	//video.autoplay = true;
-	//this.media.play();
 	var self = this;
 	window.video = this.media;
-	this.world = world;
-	this.world.video = this;
-	this.renderVideo = function(){
-		//self renders the object to the canvas
-		Object.assign(self.world.context, self.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
-		Object.assign(self.world.context, self.props);
-		if(self.world.camera){
-			var xStart = (self.x/self.world.camera.perspective)-self.world.camera.x, yStart = (self.y/self.world.camera.perspective)-self.world.camera.y;//self is defines the starting poisiton of the path to be drawn
-			var width = self.width/self.world.camera.perspective, height = self.height/self.world.camera.perspective; //self tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
-		}else{
-			var xStart = self.x, yStart = self.y;
-			var width = self.width, height = self.height;
-		}
-		
-		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
-		self.world.context.beginPath();
-		self.world.context.moveTo(xStart, yStart);
-		self.world.context.lineTo(xStart, yStart+height);
-		self.world.context.lineTo(xStart+width, yStart+height);
-		self.world.context.lineTo(xStart+width, yStart);
-		self.world.context.closePath();
-		self.world.context.stroke();
-		//self.renderChildren(); self object should not have children
-		self.world.context.drawImage(self.media, self.x, self.y, self.width, self.height)
-		if(self.media.paused != true){
-			console.log(self.x, self.y, self.width, self.height, self.world.context, ' playing video')
-			requestAnimationFrame(function(){self.renderVideo()}, 20);
-		}
-		
-		
-	}
-	this.media.addEventListener('play', function(e){
-		self.renderVideo()
-	})
-	SanimObject.call(this);
-	this.render = function(){}
 }
