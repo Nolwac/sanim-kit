@@ -1,10 +1,8 @@
-function fitCanvasToScreen(ctx, color){
+function fitCanvasToScreen(ctx){
 	//this sets the canvas to fill the width of the screen
 	ctx.canvas.width = window.innerWidth;
 	ctx.canvas.height = window.innerHeight;
-	ctx.canvas.style.backgroundColor = color;
 	ctx.canvas.parentElement.style.overflow = 'hidden';
-	//ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
 }
 function Animation(world){
 	//this object has all the animations types as its methods
@@ -122,6 +120,7 @@ function Animation(world){
 	}
 	this.sleep = function(time){
 		//this method sleeps the animation with the animation object for a specified period of time in milliseconds
+		//this sleep is not windows animation frame based so will not pause while the user is not on tab on the webbrowser
 		var sleep = new AnimationInstance({
 			world:this.world,
 			time:time,
@@ -313,6 +312,7 @@ function SanimObject(){
 	}
 	this.applyTransformation = function(){
 		//this method applies the transformation properties to the canvas
+		// it is very important to note that scaling transcends to the descendants of of an object. that is to it's children objects
 		this.world.context.save()//saving the state of the canvas
 		this.world.context.translate(...this.renderingTransformationOrigin);//changing transformation orgin to the specified transformation origin of the object
 		this.world.context.transform(...this.transformationMatrix);//applying the transformation
@@ -333,22 +333,46 @@ function SanimObject(){
 		//find out the mathematics behind the implementation of this and have it implemented
 		this.scaleMatrix[0] *= x;
 		this.scaleMatrix[1] *= y;
+		for(var i = 0; i<this.children.length; i++){
+			var child = this.children[i];
+			if(child.scaleMatrix && child.scale){
+				child.scale(x, y);
+			}
+		}
 	}
 	this.rotate = function(angle){
 		//the function execution comes here for rotation
 		//find out the mathematics behind the implementation of this and have it implemented
 		this.rotationAngle += (Math.PI/180)*angle;
+		for(var i = 0; i<this.children.length; i++){
+			var child = this.children[i];
+			if(child.rotationAngle && child.rotate){
+				child.rotate(angle);
+			}
+		}
 	}
 	this.translate = function(x, y){
 		//the function execution comes here for translation
 		//find out the mathematics behind the implementation of this and have it implemented
 		this.translationMatrix[0] += x;
 		this.translationMatrix[1] += y;
+		for(var i = 0; i<this.children.length; i++){
+			var child = this.children[i];
+			if(child.translationMatrix && child.translate){
+				child.translate(x, y);
+			}
+		}
 	}
 	this.skew= function(angleX, angleY){
 		//this skews the object
 		this.skewMatrix[0] += (Math.PI/180)*angleX;
 		this.skewMatrix[1] += (Math.PI/180)*angleY;
+		for(var i = 0; i<this.children.length; i++){
+			var child = this.children[i];
+			if(child.skewMatrix && child.skew){
+				child.skew(angleX, angleY);
+			}
+		}
 	}
 	this.transform = function(transformationMatrix){
 		//the function exectution comes here for transformation
@@ -360,6 +384,12 @@ function SanimObject(){
 			this.transformationMatrix[3] *= transformationMatrix[3];
 			this.transformationMatrix[4] += transformationMatrix[4];
 			this.transformationMatrix[5] += transformationMatrix[5];
+			for(var i = 0; i<this.children.length; i++){
+				var child = this.children[i];
+				if(child.transformationMatrix && child.transform){
+					child.transform(transformationMatrix);
+				}
+			}
 			/*
 			  the 2D transformation matrix is of this form: | a   c | | x |
 															|       | |   |
@@ -734,6 +764,7 @@ function Scene(context){
 	this.playAnimation = true;//setting if animation should play or not
 	window.context = context;//testing and debuggiing purposes
 	this.animationObjects = new Array();
+	this.isParentWorld = false;
 	this.canvasContextProperties = {
 		//this sets up the initial canvas properties and only this properties that one should changewhile making use of this framework.
 		//this hack enables user of this framework to be able to apply canvas properties normally to the framework's objects
@@ -759,17 +790,30 @@ function Scene(context){
 		direction: "ltr"
 	}
 
-	this.addObject = function(object){
+	this.addObject = function(obj){
 		//this adds an object to the scene
-		object.world = this;
-		this.objects.push(object);
-		object.implementAfterAddedToScene();//this is a hack to implement somethings which demand that object be added to scene before implemented
+		obj.world = this;
+		this.objects.push(obj);
+		obj.implementAfterAddedToScene();//this is a hack to implement somethings which demand that object be added to scene before implemented
+		for(var i=0; i<obj.children.length; i++){//adding the objects that the object being added is parent object to
+			var childObj = obj.children[i];
+			this.objects.push(childObj);
+			childObj.world = this;
+		}
 	}
 	this.removeObject = function(obj){
 		//this method removes a child object from the scene
 		var index = this.objects.indexOf(obj);
 		if(0 <= index){
 			this.objects.splice(index, 1);//this removes the object from the list of objects but does not change other setttings of the object
+			for(var i = 0; i<obj.children.length; i++){
+				var childObj = obj.children[i];
+				var childIndex = this.objects.indexOf(childObj);
+				if(0 <= childIndex){//removing the child objects of the object being removed
+					this.objects.splice(childIndex, 1);
+					childObj.world = null;
+				}
+			}
 		}//this does not throw an error if such object does not exist as child object to the scene
 	}
 	this.setCamera = function(camera){
@@ -785,7 +829,11 @@ function Scene(context){
 	}
 	this.render = function(){
 		//this renders the scene to the canvas
-		fitCanvasToScreen(this.context, this.color);
+		if(this.isParentWorld===true){//fit to the screen provided this is the parent world;
+			fitCanvasToScreen(this.context);
+		}
+		this.context.fillStyle = this.color;
+		this.context.fillRect(0,0,this.context.canvas.width, this.context.canvas.height);
 		if(this.player){
 			//check that the player is visible in the seen;
 			this.player.makeCameraAdjustments();// making camera adjustments with respect to the position of the player in the viewport
