@@ -214,6 +214,8 @@ function SanimObject(){
 								1, 0, 0
 								];
 	this.rotationAngle = 0;
+	this.transformationOrigin = [0, 0];//this x and y rendering origin of the object
+	this.renderingTransformationOrigin = this.transformationOrigin;
 	this.isInPath = function(x, y){
 		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//the latest path is what isPointInPath looks at;
@@ -280,15 +282,13 @@ function SanimObject(){
 	this.applyTransformation = function(){
 		//this method applies the transformation properties to the canvas
 		this.world.context.save()//saving the state of the canvas
-		var x = this.renderingX + 0.5*this.renderingWidth;//trying to make the transformation take place at the center of the object
-		var y = this.renderingY + 0.5*this.renderingHeight;
-		this.world.context.translate(x, y);//changing transformation orgin to the center of the object
+		this.world.context.translate(...this.renderingTransformationOrigin);//changing transformation orgin to the specified transformation origin of the object
 		this.world.context.transform(...this.transformationMatrix);//applying the transformation
 		this.world.context.transform(1, ...this.skewMatrix, 1, 0, 0);//transformation for skewing
 		this.world.context.rotate(this.rotationAngle);//applying the rotation
 		this.world.context.scale(...this.scaleMatrix);//applying the scaling transformation
 		this.world.context.translate(...this.translationMatrix);
-		this.world.context.translate(-x, -y);//translating back to the origin
+		this.world.context.translate(-this.renderingTransformationOrigin[0], -this.renderingTransformationOrigin[1]);//translating back to the origin
 	}
 
 	this.removeTransformation = function(){
@@ -339,10 +339,63 @@ function SanimObject(){
 			throw('the transformation matrix provided is not in the correct dimmension or length');
 		}
 	}
+	this.drawPath = function(){
+		//this method draws a path round th object for event listening purposes
+		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
+		this.world.context.beginPath();
+		this.world.context.moveTo(this.renderingX, this.renderingY);
+		this.world.context.lineTo(this.renderingX, this.renderingY+this.renderingHeight);
+		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
+		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
+		this.world.context.closePath();
+		this.world.context.stroke();
+	}
+	this.setCanvasPropsForObject = function(){
+		//this method sets the canvas props to the objects rendering properties
+		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
+		Object.assign(this.world.context, this.props);
+	}
+	this.alignOriginWithParent = function(){
+		//this method sets the rendering origin parameter of the object to align with the parent object
+		if(this.parentObject){
+			//checking if the object has parent, so we could readjust to fit to the parent object
+			this.x = this.xInitial + this.parentObject.x;
+			this.y = this.yInitial + this.parentObject.y;
+		}
+
+	}
+	this.applyTransformationOrigin = function(){
+		//this method applies the transformation origin ready for rendering
+		if(this.setTransformationOriginToCenter === true ){
+			//trying to make the transformation take place at the center of the object
+			this.transformationOrigin = [0.5*this.renderingWidth, 0.5*this.renderingHeight];
+		}
+		if(this.world.camera){
+			this.renderingTransformationOrigin[0]=(this.renderingTransformationOrigin[0]/this.world.camera.perspective);
+			this.renderingTransformationOrigin[1]=(this.renderingTransformationOrigin[1]/this.world.camera.perspective);
+		}
+		this.renderingTransformationOrigin = [this.renderingX+this.transformationOrigin[0], this.renderingY+this.transformationOrigin[1]];
+		
+	}
+	this.setRenderingParameters = function(){
+		//this method sets the rendering paramters for the object
+		if(this.world.camera){
+			this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)- this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			this.renderingWidth = this.width/this.world.camera.perspective, this.renderingHeight = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+		}else{
+			this.renderingX = this.x, this.renderingY = this.y;
+			this.renderingWidth = this.width, this.renderingHeight = this.height;
+		}
+	}
 }
 function Player(obj){
 	//this constructor function takes care of all the operations that has to do with having a player on the scene;
 	this.object = obj;//this sets the object that is going to be the controller in the scene instance.
+	obj.playerObject = obj;//setting a playerObject for the object that is now made player
+	if(obj.width == undefined || obj.height == undefined){//checking to know if the object has a width and a height
+		obj.width = 0, obj.height = 0;
+		//the developer has to set a width and height parameter to make the object a player
+	}
 	this.minOffsetX = 0; //the minimum offset of the player from the edge of the viewport on x-axis
 	this.minOffsetY = 0; //the minimum offset of the player from the edge of the viewport on y-axis
 	this.maxOffsetX = 0; //the maximum offset of the player from the edge of the viewport on x-axis
@@ -382,7 +435,12 @@ function Player(obj){
 		}else{
 			//if no scene then the programs below will take place
 		}
+		//Note that this camera coupling property does not apply when transformation is done on the object using the canvas methods. Currently 
+		//the transformations availble on objects are based on cavas methods
 
+	}
+	this.implementAfterAddedToScene = function(){
+		//the developer has to put things he wants to implement when the player gets added to the scene here
 	}
 	this.render = function(){
 		//this renders the player to the scene
@@ -415,9 +473,10 @@ function TextObject(text, x, y, fillText= false){
 	this.textMeasurement = null;
 	this.boxProps = {paddingX:0, paddingY:0};
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.setTransformationOriginToCenter=true;
 	this.render = function(){
-		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
-		Object.assign(this.world.context, this.props);
+		//first is to set canvas properties for the object
+		this.setCanvasPropsForObject();
 		this.textMeasurement = this.world.context.measureText(this.text);
 		this.width = this.textMeasurement.width;
 		if(this.props.font){
@@ -425,32 +484,18 @@ function TextObject(text, x, y, fillText= false){
 			var str = this.props.font;
 			this.height = parseFloat(str.substring(str.search(/[0-9]+px/), str.search(/[0-9]px/)+1))*(36/50);// this finds extracts the width of the text from the text
 		}
-		if(this.parentObject){
-			//checking if the object has parent, so we could readjust to fit to the parent object
-			this.x = this.xInitial + this.parentObject.x;
-			this.y = this.yInitial + this.parentObject.y;
-		}
-		if(this.world.camera){
-			 this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			this.renderingWidth = (this.width+this.boxProps.paddingX*2)/this.world.camera.perspective, this.renderingHeight = (this.height+this.boxProps.paddingY*2)/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
-		}else{
-			this.renderingX = this.x, this.renderingY = this.y;
-			this.renderingWidth = this.width + this.boxProps.paddingX*2, this.renderingHeight = this.height+this.boxProps.paddingY*2;
-		}
+		
+		this.alignOriginWithParent();
+		this.setRenderingParameters();
 		Object.assign(this.world.context, this.world.canvasContextProperties);//reseting the change so that the changes for the text box itself could be applied
 		Object.assign(this.world.context, this.boxProps);//assigning the textbox properties
+		this.applyTransformationOrigin();
 		this.applyTransformation();//applyiing transformation properties
 		if(this.fillBox==true){
 			this.world.context.fillRect(this.renderingX, this.renderingY, this.renderingWidth, this.renderingHeight);
 		}
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
-		this.world.context.beginPath();
-		this.world.context.moveTo(this.renderingX, this.renderingY);
-		this.world.context.lineTo(this.renderingX, this.renderingY+this.renderingHeight);
-		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
-		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
-		this.world.context.closePath();
-		this.world.context.stroke();
+		this.drawPath();
 		Object.assign(this.world.context, this.world.canvasContextProperties);//reseting again to apply text properties
 		Object.assign(this.world.context, this.props);//applying textproperties
 		this.renderText();
@@ -464,45 +509,45 @@ function TextObject(text, x, y, fillText= false){
 		}
 		this.world.context.strokeText(this.text, this.renderingX+this.boxProps.paddingX, this.renderingY+this.renderingHeight-this.boxProps.paddingY);
 	}
+	this.setRenderingParameters = function(){
+		//setting the rendering parameters for the button object different from the way others where set
+		if(this.world.camera){
+			this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			this.renderingWidth = (this.width+this.boxProps.paddingX*2)/this.world.camera.perspective, this.renderingHeight = (this.height+this.boxProps.paddingY*2)/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+		}else{
+			this.renderingX = this.x, this.renderingY = this.y;
+			this.renderingWidth = this.width + this.boxProps.paddingX*2, this.renderingHeight = this.height+this.boxProps.paddingY*2;
+		}
+	}
 }
 function RectObject(x, y, width, height, fillRect = false){
 	//this constructor function is for the rectangle object, this takes care of the operations that has to do with the objects in the canvas
+	SanimObject.call(this);
 	this.x = x, this.y = y, this.width = width, this.height = height, this.fillRect = fillRect;
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.renderingX = this.x, this.renderingY = this.y, this.renderingWidth = this.width, this.renderingHeight= this.height;
+	this.setTransformationOriginToCenter=true;
 	this.render = function(){
 		//this renders the object to the canvas
-		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
-		Object.assign(this.world.context, this.props);
-		if(this.parentObject){
-			//checking if the object has parent, so we could readjust to fit to the parent object
-			this.x = this.xInitial + this.parentObject.x;
-			this.y = this.yInitial + this.parentObject.y;
-		}
-		if(this.world.camera){
-			 this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			this.renderingWidth = this.width/this.world.camera.perspective, this.renderingHeight = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
-		}else{
-			this.renderingX = this.x, this.renderingY = this.y;
-			this.renderingWidth = this.width, this.renderingHeight = this.height;
-		}
+		//first is to set canvas properties for the object
+		this.setCanvasPropsForObject();
+		//second is to align the objects origin with parent
+		this.alignOriginWithParent();
+		//next is to set the rendering parameters
+		this.setRenderingParameters();
+		//next is to apply the setted transformation origin for the object
+		this.applyTransformationOrigin();
+		//next is to apply transformation on the object before rendering
 		this.applyTransformation();
 		if(this.fillRect==true){
 			this.world.context.fillRect(this.renderingX, this.renderingY, this.renderingWidth, this.renderingHeight);
 		}
-		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
-		this.world.context.beginPath();
-		this.world.context.moveTo(this.renderingX, this.renderingY);
-		this.world.context.lineTo(this.renderingX, this.renderingY+this.renderingHeight);
-		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
-		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
-		this.world.context.closePath();
-		this.world.context.stroke();
-		//this.renderChildren();
+		//next is to draw a path round the object for event listening purpose
+		this.drawPath();
+		//finally we remove the transformation on the object
 		this.removeTransformation();//removing setted transformation properties so it does not affect the next object
 		
 	}
-	SanimObject.call(this);
 }
 
 function PathObject(x, y, paths, closePath=true, fillPath=false){
@@ -513,25 +558,37 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 	this.x = x, this.y = y, this.fillPath = fillPath, this.closePath = this.closePath;
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.paths = paths;
-	this.initialPaths = this.paths;
-	this.renderingX = this.x, this.renderingY = this.y, this.renderingPaths = this.paths
-	this.render = function(){
-		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
-		Object.assign(this.world.context, this.props);
-		if(this.parentObject){
-			//checking if the object has parent, so we could readjust to fit to the parent object
-			this.x = this.xInitial + this.parentObject.x;
-			this.y = this.yInitial + this.parentObject.y;
+	this.renderingX = this.x, this.renderingY = this.y;
+	this.renderingPaths = new Array();
+	for(var i = 0; i<paths.length; i++){//trying to assign the paths to renderingPaths;
+		var path = {pathType:paths[i].pathType, params:new Array()};
+		for(var j=0; j<paths[i].params.length; j++){
+			path.params.push(paths[i].params[j]);
 		}
+		this.renderingPaths.push(path);
+	}
+
+	this.initialPaths = new Array();
+	for(var i = 0; i<paths.length; i++){//trying to assign the paths to initialPaths
+		var path = {pathType:paths[i].pathType, params:new Array()};
+		for(var j=0; j<paths[i].params.length; j++){
+			path.params.push(paths[i].params[j]);
+		}
+		this.initialPaths.push(path);
+	}
+	this.render = function(){
+		this.setCanvasPropsForObject();
+		this.alignOriginWithParent();
 		if(this.world.camera){
 			this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
 		}else{
 			this.renderingX = this.x, this.renderingY = this.y;
 			
 		}
+		//remove the rest of the general properties that where not used here
 		this.applyTransformation();
 		this.world.context.beginPath();
-		this.world.context.moveTo(this.x, this.y);
+		this.world.context.moveTo(this.renderingX, this.renderingY);
 		for(var i = 0;i<this.paths.length;i++){
 			if(this.parentObject){
 				if(this.paths[i].pathType == 'lineTo'){
@@ -560,61 +617,54 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 				}
 			}
 			if(this.world.camera){
-				for(var j=0; j<this.renderingPaths[i].params.length; j++){
-					this.renderingPaths[i].params[j] = this.renderingPaths[i].params[j]/this.world.camera.perspective;
-				}
+				// for(var j=0; j<this.renderingPaths[i].params.length; j++){
+				// 	this.renderingPaths[i].params[j] = this.renderingPaths[i].params[j]/this.world.camera.perspective;
+				// }
 				if(this.paths[i].pathType == 'lineTo'){
-					this.renderingPaths[i].params[0] = this.renderingPaths[i].params[0]/this.world.camera.perspective;
-					this.renderingPaths[i].params[1] = this.renderingPaths[i].params[1]/this.world.camera.perspective;
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective)-this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective)-this.world.camera.y;
 				}else if(this.paths[i].pathType == 'arcTo'){
-					for(var j=0; j<renderingPaths[i].params.length-2; j++){
-						this.renderingPaths[i].params[j] = this.renderingPaths[i].params[j]/this.world.camera.perspective;
-					}/*below is an alternative*/
-					// this.renderingPaths[i].params[0] = this.renderingPaths[i].params[0]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[1] = this.renderingPaths[i].params[1]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[2] = this.renderingPaths[i].params[2]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[3] = this.renderingPaths[i].params[3]/this.world.camera.perspective;
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective) -this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective) -this.world.camera.y;
+					this.renderingPaths[i].params[2] = (this.paths[i].params[2]/this.world.camera.perspective) -this.world.camera.x;
+					this.renderingPaths[i].params[3] = (this.paths[i].params[3]/this.world.camera.perspective) -this.world.camera.y;
+					this.renderingPaths[i].params[4] = (this.paths[i].params[4]/this.world.camera.perspective);
 				}else if(this.paths[i].pathType == 'bezierCurveTo'){
-					for(var j=0; j<renderingPaths[i].params.length; j++){
-						this.renderingPaths[i].params[j] = this.renderingPaths[i].params[j]/this.world.camera.perspective;
-					}/*below is an alternative*/
-					// this.renderingPaths[i].params[0] = this.renderingPaths[i].params[0]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[1] = this.renderingPaths[i].params[1]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[2] = this.renderingPaths[i].params[2]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[3] = this.renderingPaths[i].params[3]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[4] = this.renderingPaths[i].params[4]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[5] = this.renderingPaths[i].params[5]/this.world.camera.perspective;
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective) -this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective) -this.world.camera.y;
+					this.renderingPaths[i].params[2] = (this.paths[i].params[2]/this.world.camera.perspective) -this.world.camera.x;
+					this.renderingPaths[i].params[3] = (this.paths[i].params[3]/this.world.camera.perspective) -this.world.camera.y;
+					this.renderingPaths[i].params[4] = (this.paths[i].params[4]/this.world.camera.perspective) -this.world.camera.x;
+					this.renderingPaths[i].params[5] = (this.paths[i].params[5]/this.world.camera.perspective) -this.world.camera.y;
 				}else if(this.paths[i].pathType == 'quadraticCurveTo'){
-					for(var j=0; j<renderingPaths[i].params.length; j++){
-						this.renderingPaths[i].params[j] = this.renderingPaths[i].params[j]/this.world.camera.perspective;
-					}/*below is an alternative*/
-					// this.renderingPaths[i].params[0] = this.renderingPaths[i].params[0]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[1] = this.renderingPaths[i].params[1]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[2] = this.renderingPaths[i].params[2]/this.world.camera.perspective;
-					// this.renderingPaths[i].params[3] = this.renderingPaths[i].params[3]/this.world.camera.perspective;
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective) -this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective) -this.world.camera.y;
+					this.renderingPaths[i].params[2] = (this.paths[i].params[2]/this.world.camera.perspective) -this.world.camera.x;
+					this.renderingPaths[i].params[3] = (this.paths[i].params[3]/this.world.camera.perspective) -this.world.camera.y;
 				}else if(this.paths[i].pathType == 'arc'){
-					this.renderingPaths[i].params[0] = this.renderingPaths[i].params[0]/this.world.camera.perspective;
-					this.renderingPaths[i].params[1] = this.renderingPaths[i].params[1]/this.world.camera.perspective;
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective) -this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective) -this.world.camera.y;
+					this.renderingPaths[i].params[2] = (this.paths[i].params[2]/this.world.camera.perspective);
 				}
 			}else{
 				this.renderingPaths[i].params = new Array(...this.paths[i].params);
 			}
 			if(this.paths[i].pathType == 'lineTo'){
-				this.world.context.lineTo(...this.paths[i].params);
+				this.world.context.lineTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathType == 'arcTo'){
-				this.world.context.arcTo(...this.paths[i].params);
+				this.world.context.arcTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathType == 'bezierCurveTo'){
-				this.world.context.bezierCurveTo(...this.paths[i].params);
+				this.world.context.bezierCurveTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathType == 'quadraticCurveTo'){
-				this.world.context.quadraticCurveTo(...this.paths[i].params);
+				this.world.context.quadraticCurveTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathType == 'arc'){
-				this.world.context.arc(...this.paths[i].params);
+				this.world.context.arc(...this.renderingPaths[i].params);
 			}
 		}
-		if(this.closePath==true){
+		// if(this.closePath==true){
 			this.world.context.closePath();
 
-		}
+		// }
 		this.world.context.stroke();
 		if(this.fillPath==true){
 			this.world.context.fill()
@@ -699,6 +749,7 @@ function Scene(context){
 		//this adds a camera to the scene
 		player.world = this; //setting the world of the player too
 		this.player=player; //setting the player of the world
+		player.implementAfterAddedToScene();//this is a hack to implement somethings which demand that player be added to scene before implemented
 	}
 	this.render = function(){
 		//this renders the scene to the canvas
@@ -829,36 +880,19 @@ function ImageObject(filePath, x, y, width, height){
 	this.renderingX = this.x, this.renderingY = this.y, this.renderingWidth = this.width, this.renderingHeight= this.height;
 	this.filePath = filePath, this.media = new Image();
 	this.media.src = filePath;
+	this.setTransformationOriginToCenter = true;//to set user defined transformation origin developer has to disable this property by setting it to false
 	this.render = function(){
 		//this renders the object to the canvas
-		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
-		Object.assign(this.world.context, this.props);
-		if(this.parentObject){
-			//checking if the object has parent, so we could readjust to fit to the parent object
-			this.x = this.xInitial + this.parentObject.x;
-			this.y = this.yInitial + this.parentObject.y;
-		}
-		if(this.world.camera){
-			 this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			this.renderingWidth = this.width/this.world.camera.perspective, this.renderingHeight = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
-		}else{
-			this.renderingX = this.x, this.renderingY = this.y;
-			this.renderingWidth = this.width, this.renderingHeight = this.height;
-		}
+		this.setCanvasPropsForObject();
+		this.alignOriginWithParent();
+		this.setRenderingParameters();
+		this.applyTransformationOrigin();
 		this.applyTransformation();
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object
 		this.world.context.drawImage(this.media, this.renderingX, this.renderingY, this.renderingWidth, this.renderingHeight)
-		this.world.context.beginPath();
-		this.world.context.moveTo(this.renderingX, this.renderingY);
-		this.world.context.lineTo(this.renderingX, this.renderingY+this.renderingHeight);
-		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
-		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
-		this.world.context.closePath();
-		this.world.context.stroke();
+		this.drawPath();
 		//this.renderChildren();
 		this.removeTransformation();//removing setted transformation properties so it does not affect the next object
-
-		
 	}
 	this.setMedia=function(filePath){
 		//this methods sets the path for the image
@@ -901,36 +935,24 @@ function Integration(element, x, y, width, height){
 	console.log(this.element.style)
 	this.translationMatrix = [0, 0];
 	this.render = function(){
-		Object.assign(this.world.context, this.world.canvasContextProperties);//making sure that the setting are reset to what it was originally
-		Object.assign(this.world.context, this.props);
-		if(this.parentObject){
-			//checking if the object has parent, so we could readjust to fit to the parent object
-			this.x = this.xInitial + this.parentObject.x;
-			this.y = this.yInitial + this.parentObject.y;
-		}
-		if(this.world.camera){
-			 this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			this.renderingWidth = this.width/this.world.camera.perspective, this.renderingHeight = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
-		}else{
-			this.renderingX = this.x, this.renderingY = this.y;
-			this.renderingWidth = this.width, this.height = this.renderingHeight;
-		}
+		this.setCanvasPropsForObject();
+		this.alignOriginWithParent();
+		this.setRenderingParameters();
 		this.applyTransformation();
 		this.element.style.width=this.renderingWidth + 'px';
 		this.element.style.height = this.renderingHeight + 'px';
 		this.element.style.position = 'absolute';
 		this.element.style.top = this.renderingY + 'px';
 		this.element.style.left = this.renderingX + 'px';
-		// if(this.renderingWidth + this.renderingX > this.world.context.canvas.width || this.renderingHeight + this.renderingY > this.world.context.canvas.height){
-		// 	//trying to hide the element if the specified height, width relative to the starting positions is greater than the scenes canvas position
-		// 	this.element.style.display = 'none';
-		// }
 	}
 	
 	this.applyTransformation = function(){
 		//this applies the transformation on this integrated element
 		var angle = Math.round((this.rotationAngle/Math.PI) * 180);
 		this.element.style.transform = 'matrix('+this.transformationMatrix[0]+', '+this.transformationMatrix[1] +', ' + this.transformationMatrix[2]+ ', ' + this.transformationMatrix[3]+', ' + this.transformationMatrix[4]+', '+ this.transformationMatrix[5]+')';
+	}
+	this.applyTransformationOrigin = function(){
+		this.element.style.transformationOrigin = this.transformationOrigin[0] + ', '+ this.transformationOrigin[1];//check the proper way later
 	}
 	delete this.rotate;
 	delete this.skew;
