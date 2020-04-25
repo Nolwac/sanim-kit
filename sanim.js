@@ -120,12 +120,33 @@ function Animation(world){
 		}
 		return animationInstance;
 	}
-
+	this.sleep = function(time){
+		//this method sleeps the animation with the animation object for a specified period of time in milliseconds
+		var sleep = new AnimationInstance({
+			world:this.world,
+			time:time,
+			animationStatus: function(){
+				if(this.time <= 0){
+					return false
+				}else{
+					return true
+				}
+			},
+			executeOnStartOnly: function(){
+				var sleeper = this;
+				window.setTimeout(function(){sleeper.time=0;}, time);
+			}
+		});
+		this.addAnimationInstance(sleep);
+	}
 	this.animateInstances = function(){
 		//this method executes a function as long as the animation frame is on
 		for(var i=0; this.animationInstances.length>i; i++){
 			var instance = this.animationInstances[i];
 			if(instance.obj.world.playAnimation && (this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
+				if(instance.animationStarted==false){
+					instance.obj.executeOnStartOnly();
+				}
 				instance.animationStarted=true;
 				this.animationOn = true;//toggling the state of the animation object animation check
 				instance.obj.execute();//executing the function;
@@ -167,6 +188,8 @@ function AnimationInstance(obj){
 		this.obj = obj;
 		obj.animationInstance = this;//setting the animation instance of the object to be this
 		this.pauseAnimation=false;//setting that animation on that instance is not paused by default
+	}else{
+		throw('A JavaScript object must be provided to create an animation instance');
 	}
 	this.animationStarted = false;//setting that the animation have not started on that instance by default
 	this.added = false;
@@ -180,7 +203,7 @@ function AnimationInstance(obj){
 		}
 		
 	}
-	this.repeat = function(param){
+	this.repeat = function(param){//to repeat an animation instance you have to provide the parameters to reset in other to repeat the animation
 		var self = this;
 		function checkStatus(){
 			if(self.added == true){
@@ -196,6 +219,15 @@ function AnimationInstance(obj){
 			}
 		}
 		checkStatus();
+	}
+	if(this.obj.executeOnStartOnly==undefined){
+		this.obj.executeOnStartOnly = function(){};//empty function
+	}
+	if(this.obj.execute==undefined){
+		this.obj.execute = function(){};//empty function
+	}
+	if(this.obj.animationStatus==undefined){
+		this.obj.animationStatus = function(){return true};
 	}
 }
 function SanimObject(){
