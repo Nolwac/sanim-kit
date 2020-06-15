@@ -1,7 +1,9 @@
+import Sanim, {Scene, Camera, ButtonObject, TextObject, AudioObject, 
+	Integration, RectObject, PathObject, Player, Animation, AnimationInstance
+} from './sanim';
 window.onload = function(){
 	var canvas = document.getElementById('chart_canvas')
 	var ctx = canvas.getContext('2d');
-	//var body = document.getElementById('sanimkit');
 
 	var c = document.getElementById('canvas').getContext('2d');
 	ctx.canvas.width = 200;
@@ -9,15 +11,18 @@ window.onload = function(){
 	var scene = new Scene(c);
 	scene.color = 'orange';
 	scene.isParentWorld = true;
+	var camera = new Camera();
+	camera.setProperties(0,0,0,1);
+	scene.setCamera(camera);//this sets the scene of the camera to the new camera that we just created;
 	window.scene = scene;
-	var obj1 = new ButtonObject(0,0, 50, 50, true);
-	var plr = new Player(obj1);
+	var obj1 = new ButtonObject(0,0, 80, 50, true);
+	// var plr = new Player(obj1);
 	var obj2 = new RectObject(500, 30, 200, 140, true);
 	var text = new TextObject('Hello Sweetest Heart', 0, 100, true);
 	var audio = new AudioObject('media/transformers.mp3');
 	var intg = new Integration(ctx.canvas, 500, 400, 200, 200);
-	var obj3 = new RectObject(500, 400, 200, 200, true);
-	var obj4 = new PathObject(200, 200, [{pathType:'lineTo', params:[400, 200]}, {pathType:'arc', params:[200, 200, 200, 0, (Math.PI/180)*90, false]}], true, true);
+	var obj3 = new RectObject(900, 400, 200, 300, true);
+	var obj4 = new PathObject(200, 200, [{pathMethod:'arc', params:[0, 0, 200, 0, (Math.PI/180)*90, false]}], true, true);
 	//text.maxWidth = 50;
 	text.props.font = "bold 40px arial";
 	text.props.fillStyle = 'green';
@@ -26,23 +31,23 @@ window.onload = function(){
 	text.boxProps.paddingY = 20;
 	text.boxProps.fillStyle = 'pink';
 	obj4.props.fillStyle = 'blue';
+	obj4.props.lineWidth = 4;
 	scene.addObject(obj2);
-	scene.addObject(obj1);
+	scene.addObject(obj4);
 	scene.addObject(text);
 	scene.addObject(intg);
 	scene.addObject(obj3);
-	scene.addObject(obj4);
+	// obj3.addChild(obj4);
+	obj4.addChild(obj1);
 	//var hist = new Histogram([100, 300, 500, 700, 800, 400, 100], obj2);
 	
-	var camera = new Camera();
-	camera.setProperties(0,0,0,1);
-	scene.setCamera(camera);//this sets the scene of the camera to the new camera that we just created;
-	plr.minOffsetX = 50;
-	plr.minOffsetY = 70;
-	scene.setPlayer(plr);//setting the player in the scene
+	
+	// plr.minOffsetX = 50;
+	// plr.minOffsetY = 70;
+	// scene.setPlayer(plr);//setting the player in the scene
 	var mov = new Animation(scene);
 	var mov2 = new Animation(scene);
-	obj1.props.fillStyle = 'white';
+	obj1.props.fillStyle = 'green';
 	obj2.props.fillStyle = 'white';
 	obj1.props.shadowColor = 'black';
 	obj1.props.shadowOffsetY = 5;
@@ -51,35 +56,44 @@ window.onload = function(){
 	obj1.props.shadowBlur = 20;
 	obj1.props.lineCap = "r";
 	//transformations apply here
-	// obj1.rotate(45);
+	// obj1.scale(2,1);
 	// obj1.translate(100,100);
 	// obj1.scale(4,2);
 	//obj1.skew(45, -45);
 	//obj1.translate(100, 0);
 	//obj1.transform([0.7071, -0.7071, 0.7071, 0.7071, 0, 0]);
 	//obj1.transform([0.7071, -0.7071, 0.7071, 0.7071, 0, 0]);
+	obj3.rotate(90);
+	obj3.scale(0.5, 0.5);
+	obj3.translate(300,300);
+	// obj3.skew(45, 45);
+	setInterval(() => {
+	  //obj3.rotate(1);
+	  obj4.rotate(scene.radian(1));
+	  obj1.rotate(scene.radian(-4));
+	}, 10)
 	//text.rotate(90);
 	//text.translate(20, 20);
 	//transformation ends her
 	scene.render();
 	window.txt = text.textMeasurement
-	obj1.addEvent('click', function(e){
-		var objt = e.canvasTargetObject;
-		objt.x +=200;
-		// audio.media.play();
-		// scene.requestFullscreen();
-	});
-	text.addEvent('mousemove', function(e){
-		var objt = e.canvasTargetObject;
-		text.props.fillStyle = 'red';
-		//scene.render();
-	});
-	obj4.addEvent('mousemove', function(e){
-		var objt = e.canvasTargetObject;
-		text.props.fillStyle = 'red';
-		console.log('just reached');
-		//scene.render();
-	});
+	// obj1.addEvent('click', function(e){
+	// 	var objt = e.canvasTargetObject;
+	// 	objt.x +=200;
+	// 	// audio.media.play();
+	// 	// scene.requestFullscreen();
+	// });
+	// text.addEvent('mousemove', function(e){
+	// 	var objt = e.canvasTargetObject;
+	// 	text.props.fillStyle = 'red';
+	// 	//scene.render();
+	// });
+	// obj4.addEvent('mousemove', function(e){
+	// 	var objt = e.canvasTargetObject;
+	// 	text.props.fillStyle = 'red';
+	// 	console.log('just reached');
+	// 	//scene.render();
+	// });
 	function scaleObject(obj, amount){
 		var obj = new AnimationInstance({
 			world:obj.world,
@@ -123,9 +137,9 @@ window.onload = function(){
 	//scene.playAnimation = false;
 	mov.asynchronous = false;//preventing asychronous animation
 	mov2.asynchronous = false;
-	obj1.move(mov.linear, 'RIGHT', 100, mov.AEF.quadraticFast, 200);
-	mov.sleep(10000);
-	obj1.move(mov.linear, 'DOWN', 100, mov.AEF.quadraticFast, 200);
+	// obj1.move(mov.linear, 'RIGHT', 100, mov.AEF.quadraticFast, 200);
+	// mov.sleep(10000);
+	// obj1.move(mov.linear, 'DOWN', 100, mov.AEF.quadraticFast, 200);
 	// intg.move(mov.linear, 'DOWN', 100, mov.AEF.quadraticFast, 200);
 	// var down2 = obj2.move(mov.linear, 'DOWN', 100, mov.AEF.quadraticFast, 500);
 	// down2.repeat({length:200, speed:500, direction:'UP'});

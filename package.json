@@ -1,0 +1,23 @@
+{
+  "name": "sanim-kit",
+  "version": "1.0.0",
+  "description": "A Javascript library for performing simulations and animations on a HTML5 canvas",
+  "main": "sanim.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nolwac/sanim-kit.git"
+  },
+  "keywords": [
+    "Sanim", "Nwafor", "Livinus", "Anayo", "Simulation", "Animation", 
+    "HTML5 Canvas library", "Games", "browser games", "web games", "simulation on browser",
+  ],
+  "author": "Nwafor Livinus Anayo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nolwac/sanim-kit/issues"
+  },
+  "homepage": "https://github.com/Nolwac/sanim-kit#readme"
+}
