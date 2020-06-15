@@ -2,6 +2,10 @@ function fitCanvasToScreen(ctx){
 	//this sets the canvas to fill the width of the screen
 	ctx.canvas.width = window.innerWidth;
 	ctx.canvas.height = window.innerHeight;
+	ctx.canvas.style.left = "0px";
+	ctx.canvas.style.right = "0px";
+	ctx.canvas.style.top = "0px";
+	ctx.canvas.style.bottom = "0px";
 	ctx.canvas.parentElement.style.overflow = 'hidden';
 }
 function Animation(world){
@@ -118,52 +122,201 @@ function Animation(world){
 		}
 		return animationInstance;
 	}
+	this.fadeObject = function(obj, direction, speed, easingFunction){
+		//this is an animation to wipe an object
+		// var initial_opacity = obj.props.globalAlpha;
+		if(direction == 'IN'){
+			obj.props.globalAlpha = 0;
+		}else if(direction=='OUT'){
+			obj.props.globalAlpha = 1;
+		}
+		// if(initial_opacity==undefined){
+		// 	initial_opacity =1;
+		// }
+		var animationInstance = new AnimationInstance({
+			speed:speed,
+			direction:direction,
+			opacityControl:0,//distance control variable to check when we have reached the specified speed
+			initialSpeed:speed,
+			easingControl:1, 
+			counter: 1,//this is for applying easing to the animation;
+			opacity: 1,
+			obj:obj,
+			world:obj.world,
+			easingFunction:easingFunction,
+			execute: function(){
+					this.speed = this.initialSpeed*window.sanimKitSpeedReference*this.easingControl;//setting the speed with reference to the speed reference of the Animation object
+					//by placing the above line of code inside the animate function instead of above it, it means that changing the world speed reference affects
+					//the speed of the object while the animation is still ongoing
+					var execFunc = this.easingFunction(this.counter, this.easingControl);//updating the easing controller to apply easing effect
+					this.counter = execFunc[0], this.easingControl = execFunc[1];
+					if(this.opacity){
+						if(this.direction=='IN'){
+							if(this.opacityControl >= this.opacity){
+								this.obj.props.globalAlpha=this.opacity;
+							}
+							this.opacityControl += this.speed;
+						}else if(this.direction=='OUT'){
+							if(this.opacityControl <= this.opacity){
+								this.obj.props.globalAlpha=this.opacity;
+							}
+							this.opacityControl -= this.speed;
+						}
+					}
+					if(this.direction=='IN'){
+						this.obj.props.globalAlpha+=this.speed;
+					}else if(this.direction=='OUT'){
+						this.obj.props.globalAlpha-=this.speed;
+					}
+					//obj.world.render();
+			}, 
+			animationStatus: function(){
+				if(this.direction=='IN'){
+					if(this.opacityControl >= this.opacity){
+						return false;
+					}else{
+						return true;
+					}
+				}else if(this.direction=='OUT'){
+					if(this.opacityControl <= this.opacity){
+						return false;
+					}else{
+						return true;
+					}
+				}
+			},
+		});
+		self.addAnimationInstance(animationInstance);//adding the animation instance to the animation object
+		animationInstance.reset= function(param){
+			//this resets the animation instance so that the animation could take place again;
+			this.pauseAnimation = false;
+			this.animationStarted = false;
+			Object.assign(this.obj, {
+				opacityControl:0,
+				easingControl:1, 
+				counter: 1
+			});
+			if(param){
+				Object.assign(this.obj, param);
+				if(param.speed){
+					this.obj.initialSpeed = param.speed;
+				}
+				if(param.obj){
+					this.obj.world = param.obj.world;
+				}
+			}
+				
+		}
+		animationInstance.executeOnStartOnly = function(){
+			//changing the execute on start only so as to make animation repeat iniitial executions possible from here possible from here
+			if(this.obj.direction == 'IN'){
+				this.obj.obj.props.globalAlpha = 0;
+				this.obj.opacity =1;
+			}else if(this.obj.direction == 'OUT'){
+				this.obj.obj.props.globalAlpha = 1;
+				this.obj.opacity =0;
+			}
+			this.obj.executeOnStartOnly();
+		}
+		return animationInstance;
+
+	}
+
 	this.sleep = function(time){
 		//this method sleeps the animation with the animation object for a specified period of time in milliseconds
 		//this sleep is not windows animation frame based so will not pause while the user is not on tab on the webbrowser
 		var sleep = new AnimationInstance({
 			world:this.world,
+			status:true,
 			time:time,
 			animationStatus: function(){
-				if(this.time <= 0){
-					return false
-				}else{
-					return true
-				}
+				return this.status;
 			},
 			executeOnStartOnly: function(){
 				var sleeper = this;
-				window.setTimeout(function(){sleeper.time=0;}, time);
+				window.setTimeout(function(){sleeper.status=false;}, sleeper.time);
 			}
 		});
 		this.addAnimationInstance(sleep);
+		return sleep;
+	}
+	this.setInterval = function(params){
+		//this method set an interval for a loop
+		var animInstance = new AnimationInstance(Object.assign({
+          isNotSet:true,
+          delay:100,
+          status:true,
+          world:this.world,
+          loop: function(){
+          	//the method the user needs to define at most are the methods that do the looping which will replace this one
+          	//and the method that checks the status to know when to clear the set interval
+          },
+          execute:function(){
+            var self = this;
+            if(this.isNotSet){
+              this.interval = setInterval(() => {
+                if(self.world.playAnimation==false || self.animationStatus==false){
+                	self.status = false;//making sure that it goes off the list of animations to be performed
+                    clearInterval(self.interval);
+                }else{
+                  self.loop();
+                }
+              }, self.delay);
+              this.isNotSet = false;
+            } 
+          },
+          animationStatus: function(){
+          	return this.status;//this method should not be overwritten, instead a functionality that makes status to be set to false
+          	//should be implemented in the loop method 
+          }
+        }, params)); 
+        this.addAnimationInstance(animInstance);
+        return animInstance;
+	}
+	this.clearInterval = function(animInstance){
+		//this method clears the set interval if the user wishe to clear the interval
+		animInstance.obj.status = false;//and that is all that is needed to clear it, finished
+	}
+
+	this.animateInstance = function(instance){
+		//this method animates a single instance
+		if(instance.animationStarted==false){
+			//instance.obj.executeOnStartOnly();
+			instance.executeOnStartOnly();
+		}
+		instance.animationStarted=true;
+		this.animationOn = true;//toggling the state of the animation object animation check
+		instance.obj.execute();//executing the function;
+		if(instance.obj.animationStatus()==false){
+			//window.cancelAnimationFrame(animationFrame);
+			this.animationOn=false;
+			instance.pauseAnimation = true;
+			instance.animationStarted = false;
+			var instanceIndex = this.animationInstances.indexOf(instance);
+			this.animationInstances.splice(instanceIndex, 1);//removing the instance from the list to populating the list with unecessary intances
+			instance.added = false;//putting that the instance is no longer added since it has been removed from the animation object
+			instance.onEnded();//running something once the instance is finished
+		}
 	}
 	this.animateInstances = function(){
 		//this method executes a function as long as the animation frame is on
-		for(var i=0; this.animationInstances.length>i; i++){
-			var instance = this.animationInstances[i];
+		if(this.asynchronous===true || this.animationInstances.length<=0){
+			for(var i=0; this.animationInstances.length>i; i++){
+				var instance = this.animationInstances[i];
+				if(instance.obj.world.playAnimation && (this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
+					this.animateInstance(instance);//animating the instance;
+					if(instance.obj.animationStatus()==false){
+						break;//breaking the loop since an item in the list of animation instances is being removed, check animateInstance method
+					}
+				}
+			}
+		}else{
+			var instance = this.animationInstances[0];
 			if(instance.obj.world.playAnimation && (this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
-				if(instance.animationStarted==false){
-					instance.obj.executeOnStartOnly();
-				}
-				instance.animationStarted=true;
-				this.animationOn = true;//toggling the state of the animation object animation check
-				instance.obj.execute();//executing the function;
-				if(instance.obj.animationStatus()==false){
-					//window.cancelAnimationFrame(animationFrame);
-					this.animationOn=false;
-					instance.pauseAnimation = true;
-					instance.animationStarted = false;
-					var instanceIndex = this.animationInstances.indexOf(instance);
-					this.animationInstances.splice(instanceIndex, 1);//removing the instance from the list to populating the list with unecessary intances
-					instance.added = false;//putting that the instance is no longer added since it has been removed from the animation object
-					instance.onEnded();//running something once the instance is finishe
-					break;
-				}
+				this.animateInstance(instance);
 			}
 		}
 	}
-
 	
 	this.addAnimationInstance = function(animationInstance){
 		if(this.animationInstances.indexOf(animationInstance) < 0){
@@ -203,21 +356,21 @@ function AnimationInstance(obj){
 		
 	}
 	this.repeat = function(param){//to repeat an animation instance you have to provide the parameters to reset in other to repeat the animation
-		var self = this;
-		function checkStatus(){
-			if(self.added == true){
-				var checkingFrame = window.requestAnimationFrame(checkStatus);//this animation frame keeps checking to know whent the instance has been removed from animation so as to trigger for it to be repeated
-			}else{
-				self.reset(param);
-				if(self.animationObject){
-					self.animationObject.addAnimationInstance(self);
-					if(checkingFrame){
-						window.cancelAnimationFrame(checkingFrame);
-					}
-				}
-			}
-		}
-		checkStatus();
+		/*
+		What we need to do is reset the parameters of the instance and then add it to the list of instances, but the instance and it's obj property is mutable
+		so we need to make a copy of the  instance and it's obj property so that when we reset the new instance it would not affect the one that is already running
+		*/
+		var newInstance = new Object();
+		Object.assign(newInstance, this);
+		var newObj = new Object();
+		Object.assign(newObj, this.obj);
+		newInstance.obj=newObj;
+		newInstance.reset(param);
+		this.animationObject.addAnimationInstance(newInstance);
+	}
+	this.executeOnStartOnly = function(){
+		//this gets done the momement the animation instance starts
+		this.obj.executeOnStartOnly();
 	}
 	if(this.obj.executeOnStartOnly==undefined){
 		this.obj.executeOnStartOnly = function(){};//empty function
@@ -247,6 +400,13 @@ function SanimObject(){
 	this.rotationAngle = 0;
 	this.transformationOrigin = [0, 0];//this x and y rendering origin of the object
 	this.renderingTransformationOrigin = this.transformationOrigin;
+	this.transformWithParent = true;//setting that object always transform with it's parent object if any
+	this.translateWithParent = true; //doing similar thing above for translation
+	this.skewWithParent = true;//for skewing
+	this.rotateWithParent = true;//for rotation
+	this.scaleWithParent = true;//for scaling
+	this.noTransformationWithParent = false;//with this set to true no parent transformation is ever inherited
+	this.noAncestorTransformation = false;//with this set to true no parent or ancestor transformation is ever inherited
 	this.isInPath = function(x, y){
 		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//the latest path is what isPointInPath looks at;
@@ -279,9 +439,8 @@ function SanimObject(){
 		}else{
 			obj.x = obj.xInitial + this.x;//setting the origin of the child object to be with respect to the origin of the parent object
 			obj.y = obj.yInitial + this.y;//we are using the initial settings because it is tamper proof;
-			obj.world = this.world;//setting the world of the child object to be same as the world of the parent object
 			this.children.push(obj);//adding the child object to the list of children to the parent object
-			this.world.objects.push(obj);//also adding it to the list of objects in the scene
+			this.world.addObject(obj);//also adding it to the list of objects in the scene
 			obj.parentObject = this;//setting the parent object of the added object to this object
 		}
 
@@ -291,10 +450,19 @@ function SanimObject(){
 		var obj_index = this.children.indexOf(obj);//the index in the parent object children list
 		var scene_index = this.world.objects.indexOf(obj);//the index in the in the scene's objects list
 		if(0 <= obj_index){
+			obj.flushChildren//flushing the children in the object
 			this.children.splice(obj_index, 1);//this removes the object from the list of children but does not change other setttings of the object
-			this.world.objects.splice(scene_index, 1);// removing it from the scene too
+			this.world.removeObject(obj);// removing it from the scene too
 			obj.parentObject = null;//setting the parent object property of the object being removed to null
 		}//this does not throw an error if such object does not exist as child to the parent object
+	}
+	this.flushChildren = function(){
+		//this method flushes the children attached to this object
+		var children = new Array(...this.children); //de-structuring the children
+		var self = this;//safety measures
+		children.forEach((child) => {
+			self.removeChild(child);//this removes the child
+		});
 	}
 	this.renderChildren =function(){
 		this.children.forEach((obj) => {
@@ -310,22 +478,52 @@ function SanimObject(){
 		return movementType(this, direction, speed, easingFunction, length);
 		
 	}
-	this.applyTransformation = function(){
+	this.hide = function(){
+		//this method hides an object in the canvas
+		this.props.globalAlpha = 0;//setting the global alpha to zero make it invisible
+	}
+	this.show = function(){
+		//this method shows the object in the canvas
+		this.props.globalAlpha = 1;
+	}
+	this.applyTransformation = function(child={
+		transformWithParent:true, scaleWithParent:true, translateWithParent:true, rotateWithParent:true,
+		skewWithParent:true, noTransformationWithParent:false, noAncestorTransformation:false
+	}){//setting default value as a hack not to make the code longer than neccessary
 		//this method applies the transformation properties to the canvas
-		// it is very important to note that scaling transcends to the descendants of of an object. that is to it's children objects
+		// it is very important to note that transformations transcends to the descendants of of an object by default. that is to it's children objects
+		var zoom = 1;//default zoom without camera effect
+		if(this.world.camera){//checking if to apply camera effect
+			zoom = this.world.camera.zoom;//to be used with translation option
+		}
 		this.world.context.save()//saving the state of the canvas
-		this.world.context.translate(...this.renderingTransformationOrigin);//changing transformation orgin to the specified transformation origin of the object
-		this.world.context.transform(...this.transformationMatrix);//applying the transformation
-		this.world.context.transform(1, ...this.skewMatrix, 1, 0, 0);//transformation for skewing
-		this.world.context.rotate(this.rotationAngle);//applying the rotation
-		this.world.context.scale(...this.scaleMatrix);//applying the scaling transformation
-		this.world.context.translate(...this.translationMatrix);
+		if((this.parentObject!=null || this.parentObject!=undefined) && child.noAncestorTransformation==false){
+			this.parentObject.applyTransformation(this);//applying parents transformation if parent exist
+		}else{//We are not saving the canvas state if the object has a parent because we don't want to overwrite the transformation done by parent 
+			
+		}
+		this.world.context.translate(this.renderingTransformationOrigin[0], this.renderingTransformationOrigin[1]);//changing transformation orgin to the specified transformation origin of the object
+		
+		if(child.translateWithParent==true && child.noTransformationWithParent==false){
+			this.world.context.translate(this.translationMatrix[0]*zoom, this.translationMatrix[1]*zoom);
+		}
+		if(child.transformWithParent==true && child.noTransformationWithParent==false){
+			this.world.context.transform(...this.transformationMatrix);//applying the transformation
+		}
+		if(child.skewWithParent==true && child.noTransformationWithParent==false){
+			this.world.context.transform(1, ...this.skewMatrix, 1, 0, 0);//transformation for skewing
+		}
+		if(child.rotateWithParent && child.noTransformationWithParent==false){
+			this.world.context.rotate(this.rotationAngle);//applying the rotation
+		}
+		if(child.scaleWithParent && child.noTransformationWithParent==false){
+			this.world.context.scale(this.scaleMatrix[0], this.scaleMatrix[1]);//applying the scaling transformation
+		}
+		
 		this.world.context.translate(-this.renderingTransformationOrigin[0], -this.renderingTransformationOrigin[1]);//translating back to the origin
 	}
-
 	this.removeTransformation = function(){
 		//this method removes the transformation that has been applied on the canvas so that other objects in the canvas will not be affected
-		//this.world.context.rotate(-this.rotationAngle);//removing the rotation by setting it to the default rotation value;
 		this.world.context.restore();//restoring the state of the canvas
 	}
 	this.scale = function(x, y){
@@ -333,50 +531,25 @@ function SanimObject(){
 		//find out the mathematics behind the implementation of this and have it implemented
 		this.scaleMatrix[0] *= x;
 		this.scaleMatrix[1] *= y;
-		for(var i = 0; i<this.children.length; i++){
-			var child = this.children[i];
-			if(child.scaleMatrix && child.scale){
-				child.scale(x, y);
-			}
-		}
 	}
 	this.rotate = function(angle){
-		//the function execution comes here for rotation
-		//find out the mathematics behind the implementation of this and have it implemented
-		this.rotationAngle += (Math.PI/180)*angle;
-		for(var i = 0; i<this.children.length; i++){
-			var child = this.children[i];
-			if(child.rotationAngle && child.rotate){
-				child.rotate(angle);
-			}
-		}
+		//the function execution comes here for rotation using the rotation angle property of the object
+		this.rotationAngle += angle;
 	}
 	this.translate = function(x, y){
 		//the function execution comes here for translation
 		//find out the mathematics behind the implementation of this and have it implemented
 		this.translationMatrix[0] += x;
 		this.translationMatrix[1] += y;
-		for(var i = 0; i<this.children.length; i++){
-			var child = this.children[i];
-			if(child.translationMatrix && child.translate){
-				child.translate(x, y);
-			}
-		}
 	}
 	this.skew= function(angleX, angleY){
-		//this skews the object
-		this.skewMatrix[0] += (Math.PI/180)*angleX;
-		this.skewMatrix[1] += (Math.PI/180)*angleY;
-		for(var i = 0; i<this.children.length; i++){
-			var child = this.children[i];
-			if(child.skewMatrix && child.skew){
-				child.skew(angleX, angleY);
-			}
-		}
+		//this skews the object, using the skew matrix property of the object which provides the skew x and y
+		this.skewMatrix[0] += angleX;
+		this.skewMatrix[1] += angleY;
 	}
 	this.transform = function(transformationMatrix){
-		//the function exectution comes here for transformation
-		//find out the mathematics behind the implementation of this and have it implemented
+		//the function exectution comes here for transformation using the transformation property
+		//find out the mathematics behind the implementation of this
 		if(this.transformationMatrix.length == transformationMatrix.length){
 			this.transformationMatrix[0] *= transformationMatrix[0];
 			this.transformationMatrix[1] += transformationMatrix[1];
@@ -384,12 +557,6 @@ function SanimObject(){
 			this.transformationMatrix[3] *= transformationMatrix[3];
 			this.transformationMatrix[4] += transformationMatrix[4];
 			this.transformationMatrix[5] += transformationMatrix[5];
-			for(var i = 0; i<this.children.length; i++){
-				var child = this.children[i];
-				if(child.transformationMatrix && child.transform){
-					child.transform(transformationMatrix);
-				}
-			}
 			/*
 			  the 2D transformation matrix is of this form: | a   c | | x |
 															|       | |   |
@@ -403,6 +570,11 @@ function SanimObject(){
 	}
 	this.drawPath = function(){
 		//this method draws a path round th object for event listening purposes
+		/*  
+			Path2D could serve the purpose but it is not stable yet so could have issue running in some browsers
+			var path = new Path2D();
+			[canvas api to draw paths];
+		*/
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
 		this.world.context.beginPath();
 		this.world.context.moveTo(this.renderingX, this.renderingY);
@@ -428,22 +600,27 @@ function SanimObject(){
 	}
 	this.applyTransformationOrigin = function(){
 		//this method applies the transformation origin ready for rendering
+		
+		this.renderingTransformationOrigin = [this.transformationOrigin[0], this.transformationOrigin[1]];
+		if(this.world.camera){
+			this.renderingTransformationOrigin[0]=(this.renderingTransformationOrigin[0]*this.world.camera.zoom);
+			this.renderingTransformationOrigin[1]=(this.renderingTransformationOrigin[1]*this.world.camera.zoom);
+		}
 		if(this.setTransformationOriginToCenter === true ){
 			//trying to make the transformation take place at the center of the object
-			this.transformationOrigin = [0.5*this.renderingWidth, 0.5*this.renderingHeight];
+			this.renderingTransformationOrigin = [0.5*this.renderingWidth, 0.5*this.renderingHeight];
 		}
-		if(this.world.camera){
-			this.renderingTransformationOrigin[0]=(this.renderingTransformationOrigin[0]/this.world.camera.perspective);
-			this.renderingTransformationOrigin[1]=(this.renderingTransformationOrigin[1]/this.world.camera.perspective);
-		}
-		this.renderingTransformationOrigin = [this.renderingX+this.transformationOrigin[0], this.renderingY+this.transformationOrigin[1]];
+		this.renderingTransformationOrigin = [this.renderingX+this.renderingTransformationOrigin[0], this.renderingY+this.renderingTransformationOrigin[1]];
 		
 	}
 	this.setRenderingParameters = function(){
 		//this method sets the rendering paramters for the object
 		if(this.world.camera){
-			this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)- this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			this.renderingWidth = this.width/this.world.camera.perspective, this.renderingHeight = this.height/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+			if(this.props.lineWidth){
+				this.world.context.lineWidth = this.world.context.lineWidth*this.world.camera.zoom;
+			}
+			this.renderingX = (this.x*this.world.camera.zoom)-this.world.camera.x, this.renderingY = (this.y*this.world.camera.zoom)- this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			this.renderingWidth = this.width*this.world.camera.zoom, this.renderingHeight = this.height*this.world.camera.zoom; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's zoom
 		}else{
 			this.renderingX = this.x, this.renderingY = this.y;
 			this.renderingWidth = this.width, this.renderingHeight = this.height;
@@ -471,11 +648,11 @@ function Player(obj){
 			var Yp = this.world.camera.y;//camera position on the y-axis
 			var Vw = this.world.context.canvas.width;// the width of the viewport
 			var Vh = this.world.context.canvas.height;// the height of the viewport
-			var Px = this.object.x/this.world.camera.perspective;//player origin position on x-axis
-			var Py = this.object.y/this.world.camera.perspective;//player origin position on y-axis
-			var Ph = this.object.height/this.world.camera.perspective;//player height
-			var Pw = this.object.width/this.world.camera.perspective;//player width
-			//the reason for dividing by the camera's perspective is to make sure that the values that will be using for the calculation is with respect to the camera's view
+			var Px = this.object.x*this.world.camera.zoom;//player origin position on x-axis
+			var Py = this.object.y*this.world.camera.zoom;//player origin position on y-axis
+			var Ph = this.object.height*this.world.camera.zoom;//player height
+			var Pw = this.object.width*this.world.camera.zoom;//player width
+			//the reason for dividing by the camera's zoom is to make sure that the values that will be using for the calculation is with respect to the camera's view
 			var ofX = this.minOffsetX;//player min offset from viewport on x-axis
 			var ofY = this.minOffsetY;//player min offset from viewport on y-axis
 			if(Xp >= (Px - ofX)){
@@ -536,21 +713,26 @@ function TextObject(text, x, y, fillText= false){
 	this.boxProps = {paddingX:0, paddingY:0};
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.setTransformationOriginToCenter=true;
+	this.fontSize=10;
+	this.renderingFontSize = this.fontSize;
 	this.render = function(){
 		//first is to set canvas properties for the object
 		this.setCanvasPropsForObject();
-		this.textMeasurement = this.world.context.measureText(this.text);
-		this.width = this.textMeasurement.width;
 		if(this.props.font){
 			//trying the extract the width property of the text from the font information that was given
-			var str = this.props.font;
-			this.height = parseFloat(str.substring(str.search(/[0-9]+px/), str.search(/[0-9]px/)+1))*(36/50);// this finds extracts the width of the text from the text
+			this.fontSize = this.props.font.substring(this.props.font.search(/[0-9]+px/), this.props.font.search(/[0-9]px/)+1);// this finds extracts the fontSize of the text from the text
 		}
-		
+		this.renderFont();
+		this.textMeasurement = this.world.context.measureText(this.text);
+		this.width = this.textMeasurement.width;
+		this.height = this.renderingFontSize*(36/50);
 		this.alignOriginWithParent();
 		this.setRenderingParameters();
 		Object.assign(this.world.context, this.world.canvasContextProperties);//reseting the change so that the changes for the text box itself could be applied
 		Object.assign(this.world.context, this.boxProps);//assigning the textbox properties
+		if(this.world.camera && this.boxProps.lineWidth){
+			this.world.context.lineWidth = this.world.context.lineWidth*this.world.camera.zoom;
+		}
 		this.applyTransformationOrigin();
 		this.applyTransformation();//applyiing transformation properties
 		if(this.fillBox==true){
@@ -558,24 +740,43 @@ function TextObject(text, x, y, fillText= false){
 		}
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
 		this.drawPath();
-		Object.assign(this.world.context, this.world.canvasContextProperties);//reseting again to apply text properties
-		Object.assign(this.world.context, this.props);//applying textproperties
+		this.setCanvasPropsForObject();//reseting again to apply text properties
+		this.renderFont();
 		this.renderText();
 		this.removeTransformation();//removing setted transformation properties so it does not affect the next object
 
 	}
+	this.renderFont = function(){
+		//takes care of rendering the font of the integration
+		if(this.world.camera){
+			this.renderingFontSize = this.fontSize*this.world.camera.zoom;
+		}else{
+			this.renderingFontSize = this.fontSize;
+		}
+	
+		this.world.context.font = this.world.context.font.replace(String(this.fontSize), String(this.renderingFontSize));
+		if(this.world.camera && this.props.lineWidth){
+			this.world.context.lineWidth = this.world.context.lineWidth*this.world.camera.zoom;
+		}
+
+	}
 	this.renderText = function(){
 		//this method renders the actual text to the canvas
-		if(this.fillText==true){
-			this.world.context.fillText(this.text, this.renderingX+this.boxProps.paddingX, this.renderingY+this.renderingHeight-this.boxProps.paddingY);
+		var paddingX = 0; var paddingY = 0;
+		if(this.world.camera && (this.boxProps.paddingX>0 || this.boxProps.paddingY>0)){
+			paddingX = this.boxProps.paddingX*this.world.camera.zoom;
+			paddingY = this.boxProps.paddingY*this.world.camera.zoom;
 		}
-		this.world.context.strokeText(this.text, this.renderingX+this.boxProps.paddingX, this.renderingY+this.renderingHeight-this.boxProps.paddingY);
+		if(this.fillText==true){
+			this.world.context.fillText(this.text, this.renderingX+paddingX, this.renderingY+this.renderingHeight-paddingY);
+		}
+		this.world.context.strokeText(this.text, this.renderingX+paddingX, this.renderingY+this.renderingHeight-paddingY);
 	}
 	this.setRenderingParameters = function(){
 		//setting the rendering parameters for the button object different from the way others where set
 		if(this.world.camera){
-			this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			this.renderingWidth = (this.width+this.boxProps.paddingX*2)/this.world.camera.perspective, this.renderingHeight = (this.height+this.boxProps.paddingY*2)/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
+			this.renderingX = (this.x*this.world.camera.zoom)-this.world.camera.x, this.renderingY = (this.y*this.world.camera.zoom)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			this.renderingWidth = (this.width+this.boxProps.paddingX*2)*this.world.camera.zoom, this.renderingHeight = (this.height+this.boxProps.paddingY*2)*this.world.camera.zoom; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's zoom
 		}else{
 			this.renderingX = this.x, this.renderingY = this.y;
 			this.renderingWidth = this.width + this.boxProps.paddingX*2, this.renderingHeight = this.height+this.boxProps.paddingY*2;
@@ -623,7 +824,7 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 	this.renderingX = this.x, this.renderingY = this.y;
 	this.renderingPaths = new Array();
 	for(var i = 0; i<paths.length; i++){//trying to assign the paths to renderingPaths;
-		var path = {pathType:paths[i].pathType, params:new Array()};
+		var path = {pathMethod:paths[i].pathMethod, params:new Array()};
 		for(var j=0; j<paths[i].params.length; j++){
 			path.params.push(paths[i].params[j]);
 		}
@@ -632,125 +833,153 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 
 	this.initialPaths = new Array();
 	for(var i = 0; i<paths.length; i++){//trying to assign the paths to initialPaths
-		var path = {pathType:paths[i].pathType, params:new Array()};
+		var path = {pathMethod:paths[i].pathMethod, params:new Array()};
 		for(var j=0; j<paths[i].params.length; j++){
 			path.params.push(paths[i].params[j]);
 		}
 		this.initialPaths.push(path);
 	}
+	this.appendPath = function(path){
+		//this method allows the developer to be able to append path to the already existing path
+		var newPath = {pathMethod:path.pathMethod, params:new Array()};
+		for(var j=0; j<path.params.length; j++){
+			newPath.params.push(path.params[j]);
+		}
+		this.renderingPaths.push(newPath);
+		newPath = {pathMethod:path.pathMethod, params:new Array()};//reseting it to append to the initialPaths
+		for(var j=0; j<path.params.length; j++){
+			newPath.params.push(path.params[j]);
+		}
+		this.initialPaths.push(newPath);
+		this.paths.push(path);
+	}
 	this.render = function(){
 		this.setCanvasPropsForObject();
 		this.alignOriginWithParent();
 		if(this.world.camera){
-			this.renderingX = (this.x/this.world.camera.perspective)-this.world.camera.x, this.renderingY = (this.y/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
+			this.renderingX = (this.x*this.world.camera.zoom)-this.world.camera.x, this.renderingY = (this.y*this.world.camera.zoom)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
 		}else{
 			this.renderingX = this.x, this.renderingY = this.y;
 			
 		}
 		//remove the rest of the general properties that where not used here
+		this.applyTransformationOrigin();
 		this.applyTransformation();
 		this.world.context.beginPath();
-		this.world.context.moveTo(this.renderingX, this.renderingY);
 		for(var i = 0;i<this.paths.length;i++){
-			if(this.parentObject){
-				if(this.paths[i].pathType == 'lineTo'){
-					this.paths[i].params[0] = this.initialPaths[i].params[0] + this.parentObject.x;
-					this.paths[i].params[1] = this.initialPaths[i].params[1] + this.parentObject.y;
-				}else if(this.paths[i].pathType == 'arcTo'){
-					this.paths[i].params[0] = this.initialPaths[i].params[0] + this.parentObject.x;
-					this.paths[i].params[1] = this.initialPaths[i].params[1] + this.parentObject.y;
-					this.paths[i].params[2] = this.initialPaths[i].params[2] + this.parentObject.x;
-					this.paths[i].params[3] = this.initialPaths[i].params[3] + this.parentObject.y;
-				}else if(this.paths[i].pathType == 'bezierCurveTo'){
-					this.paths[i].params[0] = this.initialPaths[i].params[0] + this.parentObject.x;
-					this.paths[i].params[1] = this.initialPaths[i].params[1] + this.parentObject.y;
-					this.paths[i].params[2] = this.initialPaths[i].params[2] + this.parentObject.x;
-					this.paths[i].params[3] = this.initialPaths[i].params[3] + this.parentObject.y;
-					this.paths[i].params[4] = this.initialPaths[i].params[4] + this.parentObject.x;
-					this.paths[i].params[5] = this.initialPaths[i].params[5] + this.parentObject.y;
-				}else if(this.paths[i].pathType == 'quadraticCurveTo'){
-					this.paths[i].params[0] = this.initialPaths[i].params[0] + this.parentObject.x;
-					this.paths[i].params[1] = this.initialPaths[i].params[1] + this.parentObject.y;
-					this.paths[i].params[2] = this.initialPaths[i].params[2] + this.parentObject.x;
-					this.paths[i].params[3] = this.initialPaths[i].params[3] + this.parentObject.y;
-				}else if(this.paths[i].pathType == 'arc'){
-					this.paths[i].params[0] = this.initialPaths[i].params[0] + this.parentObject.x;
-					this.paths[i].params[1] = this.initialPaths[i].params[1] + this.parentObject.y;
-				}
+			/* Trying to add the origin to the neccessary parameters of the path methods */
+			if(this.paths[i].pathMethod == 'lineTo' || this.paths[i].pathMethod == 'moveTo'){
+				this.paths[i].params[0] = this.initialPaths[i].params[0] + this.x;
+				this.paths[i].params[1] = this.initialPaths[i].params[1] + this.y;
+			}else if(this.paths[i].pathMethod == 'arcTo'){
+				this.paths[i].params[0] = this.initialPaths[i].params[0] + this.x;
+				this.paths[i].params[1] = this.initialPaths[i].params[1] + this.y;
+				this.paths[i].params[2] = this.initialPaths[i].params[2] + this.x;
+				this.paths[i].params[3] = this.initialPaths[i].params[3] + this.y;
+			}else if(this.paths[i].pathMethod == 'bezierCurveTo'){
+				this.paths[i].params[0] = this.initialPaths[i].params[0] + this.x;
+				this.paths[i].params[1] = this.initialPaths[i].params[1] + this.y;
+				this.paths[i].params[2] = this.initialPaths[i].params[2] + this.x;
+				this.paths[i].params[3] = this.initialPaths[i].params[3] + this.y;
+				this.paths[i].params[4] = this.initialPaths[i].params[4] + this.x;
+				this.paths[i].params[5] = this.initialPaths[i].params[5] + this.y;
+			}else if(this.paths[i].pathMethod == 'quadraticCurveTo'){
+				this.paths[i].params[0] = this.initialPaths[i].params[0] + this.x;
+				this.paths[i].params[1] = this.initialPaths[i].params[1] + this.y;
+				this.paths[i].params[2] = this.initialPaths[i].params[2] + this.x;
+				this.paths[i].params[3] = this.initialPaths[i].params[3] + this.y;
+			}else if(this.paths[i].pathMethod == 'arc'){
+				this.paths[i].params[0] = this.initialPaths[i].params[0] + this.x;
+				this.paths[i].params[1] = this.initialPaths[i].params[1] + this.y;
 			}
 			if(this.world.camera){
-				// for(var j=0; j<this.renderingPaths[i].params.length; j++){
-				// 	this.renderingPaths[i].params[j] = this.renderingPaths[i].params[j]/this.world.camera.perspective;
-				// }
-				if(this.paths[i].pathType == 'lineTo'){
-					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective)-this.world.camera.x;
-					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective)-this.world.camera.y;
-				}else if(this.paths[i].pathType == 'arcTo'){
-					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective) -this.world.camera.x;
-					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective) -this.world.camera.y;
-					this.renderingPaths[i].params[2] = (this.paths[i].params[2]/this.world.camera.perspective) -this.world.camera.x;
-					this.renderingPaths[i].params[3] = (this.paths[i].params[3]/this.world.camera.perspective) -this.world.camera.y;
-					this.renderingPaths[i].params[4] = (this.paths[i].params[4]/this.world.camera.perspective);
-				}else if(this.paths[i].pathType == 'bezierCurveTo'){
-					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective) -this.world.camera.x;
-					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective) -this.world.camera.y;
-					this.renderingPaths[i].params[2] = (this.paths[i].params[2]/this.world.camera.perspective) -this.world.camera.x;
-					this.renderingPaths[i].params[3] = (this.paths[i].params[3]/this.world.camera.perspective) -this.world.camera.y;
-					this.renderingPaths[i].params[4] = (this.paths[i].params[4]/this.world.camera.perspective) -this.world.camera.x;
-					this.renderingPaths[i].params[5] = (this.paths[i].params[5]/this.world.camera.perspective) -this.world.camera.y;
-				}else if(this.paths[i].pathType == 'quadraticCurveTo'){
-					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective) -this.world.camera.x;
-					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective) -this.world.camera.y;
-					this.renderingPaths[i].params[2] = (this.paths[i].params[2]/this.world.camera.perspective) -this.world.camera.x;
-					this.renderingPaths[i].params[3] = (this.paths[i].params[3]/this.world.camera.perspective) -this.world.camera.y;
-				}else if(this.paths[i].pathType == 'arc'){
-					this.renderingPaths[i].params[0] = (this.paths[i].params[0]/this.world.camera.perspective) -this.world.camera.x;
-					this.renderingPaths[i].params[1] = (this.paths[i].params[1]/this.world.camera.perspective) -this.world.camera.y;
-					this.renderingPaths[i].params[2] = (this.paths[i].params[2]/this.world.camera.perspective);
+				if(this.paths[i].pathMethod == 'lineTo' || this.paths[i].pathMethod == 'moveTo'){
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]*this.world.camera.zoom)-this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]*this.world.camera.zoom)-this.world.camera.y;
+				}else if(this.paths[i].pathMethod == 'arcTo'){
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]*this.world.camera.zoom) -this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]*this.world.camera.zoom) -this.world.camera.y;
+					this.renderingPaths[i].params[2] = (this.paths[i].params[2]*this.world.camera.zoom) -this.world.camera.x;
+					this.renderingPaths[i].params[3] = (this.paths[i].params[3]*this.world.camera.zoom) -this.world.camera.y;
+					this.renderingPaths[i].params[4] = (this.paths[i].params[4]*this.world.camera.zoom);
+				}else if(this.paths[i].pathMethod == 'bezierCurveTo'){
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]*this.world.camera.zoom) -this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]*this.world.camera.zoom) -this.world.camera.y;
+					this.renderingPaths[i].params[2] = (this.paths[i].params[2]*this.world.camera.zoom) -this.world.camera.x;
+					this.renderingPaths[i].params[3] = (this.paths[i].params[3]*this.world.camera.zoom) -this.world.camera.y;
+					this.renderingPaths[i].params[4] = (this.paths[i].params[4]*this.world.camera.zoom) -this.world.camera.x;
+					this.renderingPaths[i].params[5] = (this.paths[i].params[5]*this.world.camera.zoom) -this.world.camera.y;
+				}else if(this.paths[i].pathMethod == 'quadraticCurveTo'){
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]*this.world.camera.zoom) -this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]*this.world.camera.zoom) -this.world.camera.y;
+					this.renderingPaths[i].params[2] = (this.paths[i].params[2]*this.world.camera.zoom) -this.world.camera.x;
+					this.renderingPaths[i].params[3] = (this.paths[i].params[3]*this.world.camera.zoom) -this.world.camera.y;
+				}else if(this.paths[i].pathMethod == 'arc'){
+					this.renderingPaths[i].params[0] = (this.paths[i].params[0]*this.world.camera.zoom) -this.world.camera.x;
+					this.renderingPaths[i].params[1] = (this.paths[i].params[1]*this.world.camera.zoom) -this.world.camera.y;
+					this.renderingPaths[i].params[2] = (this.paths[i].params[2]*this.world.camera.zoom);
 				}
 			}else{
 				this.renderingPaths[i].params = new Array(...this.paths[i].params);
 			}
-			if(this.paths[i].pathType == 'lineTo'){
+			if(this.paths[i].pathMethod == 'moveTo'){
+				this.world.context.moveTo(...this.renderingPaths[i].params);
+			}else if(this.paths[i].pathMethod == 'lineTo'){
 				this.world.context.lineTo(...this.renderingPaths[i].params);
-			}else if(this.paths[i].pathType == 'arcTo'){
+			}else if(this.paths[i].pathMethod == 'arcTo'){
 				this.world.context.arcTo(...this.renderingPaths[i].params);
-			}else if(this.paths[i].pathType == 'bezierCurveTo'){
+			}else if(this.paths[i].pathMethod == 'bezierCurveTo'){
 				this.world.context.bezierCurveTo(...this.renderingPaths[i].params);
-			}else if(this.paths[i].pathType == 'quadraticCurveTo'){
+			}else if(this.paths[i].pathMethod == 'quadraticCurveTo'){
 				this.world.context.quadraticCurveTo(...this.renderingPaths[i].params);
-			}else if(this.paths[i].pathType == 'arc'){
+			}else if(this.paths[i].pathMethod == 'arc'){
 				this.world.context.arc(...this.renderingPaths[i].params);
 			}
 		}
-		// if(this.closePath==true){
+		if(this.closePath==true){
 			this.world.context.closePath();
 
-		// }
+		}
 		this.world.context.stroke();
 		if(this.fillPath==true){
 			this.world.context.fill()
 		}
+		//this.world.context.translate(-this.renderingX, -this.renderingY);//returning back to the origin of the canvas
+		this.removeTransformation();//removing the transformation applied on the object
 	}
+	
 	SanimObject.call(this);
 
 }
-
+function CircleObject(x, y, radius, fill=false){
+	//this object draws a circle on the canvas
+	this.radius = radius; this.width = radius*2; this.height = this.width;
+	PathObject.call(this, x, y, [{pathMethod:'arc', params:[0, 0, radius, 0, Math.PI*2, false]}], true, fill);//calls the Path object to draw the circle
+}
+function StraightLineObject(x, y, xEnd, yEnd){
+	//this funcion draws a straight line in the canvas
+	this.xEnd = xEnd; this.yEnd = yEnd;
+	PathObject.call(this, x, y, [{pathMethod:'moveTo', params:[0, 0]}, {pathMethod:'lineTo', params:[xEnd-x, yEnd-y]}], false, false);//drawing the straight path
+}
 function Camera(){
-	this.x = 0, this.y =0, this.z = 0, this.perspective = 1, this.width = window.innerWidth, this.height = window.innerHeight;
+	this.x = 0, this.y =0, this.z = 0, this.zoom = 1, this.width = window.innerWidth, this.height = window.innerHeight;
 	this.position = function(x, y, z){
 		//this function sets the position of the camera on the canvas
 		this.x = x, this.y = y; this.z =z;
 	}
-	this.setProperties = function(x,y,z,perspective){
+	this.setProperties = function(x,y,z,zoom){
 		//this method helps to reset the camera parameters or features
 		this.position(x,y,z); //This sets the position of the camera
-		this.perspective = perspective; //this sets the perspective of the camera
+		this.zoom = zoom; //this sets the zoom of the camera
 	}
 	this.setDimmension = function(width, height){
 		//this sets the camera's area of view or viewport.
 		this.width = width;
 		this.height = height;
+	}
+	this.scaleZoom = function(scale){
+		//this scales the zoom of the camera
+		this.zoom = this.zoom*scale;
 	}
 }
 
@@ -761,10 +990,14 @@ function Scene(context){
 	this.player = null; // holds the player in the scene if exist
 	this.lights = new Array(); // holds the lights added to the scene
 	this.objects = new Array(); //holds the objects added to the scene
+	this.animationObjects = new Array();//holds the animation objects in the scene
 	this.playAnimation = true;//setting if animation should play or not
 	window.context = context;//testing and debuggiing purposes
-	this.animationObjects = new Array();
 	this.isParentWorld = false;
+	this.clearBeforeRender = true;//a setting to know if to clear the scene before rendering another frame or to render the next frame with
+	//the previous frame on the scene
+	this.width = this.context.canvas.width;
+	this.height = this.context.canvas.height;
 	this.canvasContextProperties = {
 		//this sets up the initial canvas properties and only this properties that one should changewhile making use of this framework.
 		//this hack enables user of this framework to be able to apply canvas properties normally to the framework's objects
@@ -794,11 +1027,13 @@ function Scene(context){
 		//this adds an object to the scene
 		obj.world = this;
 		this.objects.push(obj);
+		if(obj.isIntegration){
+			this.context.canvas.parentElement.appendChild(obj.element);
+		}
 		obj.implementAfterAddedToScene();//this is a hack to implement somethings which demand that object be added to scene before implemented
 		for(var i=0; i<obj.children.length; i++){//adding the objects that the object being added is parent object to
 			var childObj = obj.children[i];
-			this.objects.push(childObj);
-			childObj.world = this;
+			this.addObject(childObj);
 		}
 	}
 	this.removeObject = function(obj){
@@ -806,15 +1041,24 @@ function Scene(context){
 		var index = this.objects.indexOf(obj);
 		if(0 <= index){
 			this.objects.splice(index, 1);//this removes the object from the list of objects but does not change other setttings of the object
-			for(var i = 0; i<obj.children.length; i++){
-				var childObj = obj.children[i];
-				var childIndex = this.objects.indexOf(childObj);
-				if(0 <= childIndex){//removing the child objects of the object being removed
-					this.objects.splice(childIndex, 1);
-					childObj.world = null;
-				}
+			if(obj.isIntegration){
+				obj.removeFromDOM();
 			}
+			var children = new Array(...obj.children);
+			for(var i = 0; i<children.length; i++){
+				var childObj = children[i];
+				this.removeObject(childObj);
+			}
+			obj.world = null;
 		}//this does not throw an error if such object does not exist as child object to the scene
+	}
+	this.addChild = function(obj){
+		//does same thing as addObject, just for sake of conveniency
+		this.addObject(obj);
+	}
+	this.removeChild = function(obj){
+		//does same thing as removeObject, just for sake of conveniency
+		this.removeObject(obj);
 	}
 	this.setCamera = function(camera){
 		//this adds a camera to the scene
@@ -829,25 +1073,35 @@ function Scene(context){
 	}
 	this.render = function(){
 		//this renders the scene to the canvas
-		if(this.isParentWorld===true){//fit to the screen provided this is the parent world;
-			fitCanvasToScreen(this.context);
+		if(this.clearBeforeRender == true){
+			if(this.isParentWorld===true){//fit to the screen provided this is the parent world;this.context.canvas.position = 'absolute';
+				fitCanvasToScreen(this.context);
+			}
+			this.context.fillStyle = this.color;
+			this.context.fillRect(0,0,this.context.canvas.width, this.context.canvas.height);
 		}
-		this.context.fillStyle = this.color;
-		this.context.fillRect(0,0,this.context.canvas.width, this.context.canvas.height);
+		this.executeOnRender();
 		if(this.player){
 			//check that the player is visible in the seen;
 			this.player.makeCameraAdjustments();// making camera adjustments with respect to the position of the player in the viewport
 		}else{
 			//do something here, maybe alert user that there is no player in the scene yet
 		}
-		for(var i=0; this.animationObjects.length>i; i++){
-			var animation = this.animationObjects[i];
-			animation.animateInstances();//making the animations that have been added to the scene
-		}
 		for(var i=0; this.objects.length>i; i++){
 			var obj = this.objects[i];
 			obj.render();
 		}
+	}
+	this.runAnimations = function(){
+		//this runs the animations that has been scheduled
+		for(var i=0; this.animationObjects.length>i; i++){
+			var animation = this.animationObjects[i];
+			animation.animateInstances();//making the animations that have been added to the scene
+		}
+	}
+	this.radian = function(angleInDegree){
+		//this method converts an angle from degree to radian
+		return (Math.PI/180)*angleInDegree;
 	}
 	this.requestFullscreen = function(){
 		//this function requests full screen for the whole canvas
@@ -861,6 +1115,7 @@ function Scene(context){
 		} else if (canvas.msRequestFullscreen) { /* IE/Edge */
 		    canvas.msRequestFullscreen();
 		}
+		fitCanvasToScreen(this.context);
 	}
 	this.cancelRequestFullscreen = function(){
 		if (document.exitFullscreen) {
@@ -872,84 +1127,71 @@ function Scene(context){
 		} else if (document.msExitFullscreen) { /* IE/Edge */
 		    document.msExitFullscreen();
 		}
+		this.context.canvas.width = this.width;
+		this.context.canvas.height = this.height;
 	}
-	
+	this.flush = function(){
+		//this method flushes the scene of it's objects and animations
+		this.flushObjects();
+		this.flushAnimations();
+	}
+	this.flushObjects = function(){
+		//this method flushes the objects that are available
+		this.player = null;
+		this.lights = new Array();
+		//removes every single object
+		var objects = new Array(...this.objects);
+		for(var i=0; i<objects.length; i++){
+			var obj = objects[i];
+			this.removeObject(obj);
+		}
+		this.objects = new Array();
+	}
+	this.flushAnimations = function(){
+		//this method flushes all the animations in the scene
+		this.animationObjects = new Array();//resetting the array to a whole new and empty one
+	}
+	this.executeOnRender = function(){
+		//this gets executed whenever the scene renders
+	}
 	var world = this;
-	function sceneAnimator(){
-		window.requestAnimationFrame(sceneAnimator);
-		if(world.playAnimation){
-			world.render();//rendering the scene inside the animation frame
+	this.makeFrames = function(){
+		function animator(){
+			world.frameID = window.requestAnimationFrame(animator);
+			if(world.playAnimation){
+				world.render();//rendering the scene inside the animation frame
+			}
 		}
+		animator();
 	}
-	this.sceneAnimator = sceneAnimator();
-}
-function Histogram(data, obj){
-	/*
-	This object definition takes a statistical data and converts it to a histogram object; a histogram graphing of the give  data.
-
-	to achieve this we need to consider that a histogram has a equal spacing of the bars, so we will be having the expression below;
-	values = [array of values]; => representing the number of occurence
-	nums = [array of values] => representing the component values, or items.
-	the maximum of the values => max(values) will be the minimum size of the Y-axis of the graph, so let the height of the graph be L
-	let L = height of the graph
-	we may set L = max(values) + 20;
-	let W be the widthe of the bars.
-	let S be the spacing of the bars.
-	then each of the bars representing the values will be placed at positions indexOfValue(S+W);
-	*/
-	this.data = data;
-	this.obj = obj;
-	obj.children.push(this);
-	this.world = obj.world;
-	this.controlWidth = this.obj.width;
-	this.controlHeight = this.obj.height;
-	this.scaleWithParent = true;//a boolean field that sets if the graph should scale with the object it is embedded into or not.
-	this.offsetX = 10;
-	this.offsetY = 10;
-	this.strokeWidth = 2;
-	this.strokeColor = 'magenta';
-	this.fillStyle = 'magenta';
-	this.graphOffsetY = 10;//this is the distance from the max bar to the tip of the line of the y-axis
-	this.render = function(){
-		if(this.scaleWithParent){
-			//making sure that the graph scales with the object it is embedded into if it is set to scale as the object scales
-			this.controlWidth = this.obj.width;
-			this.controlHeight = this.obj.height;
+	this.animate = function(){
+		// this.animationID = window.requestAnimationFrame(this.animate);
+		// if(world.playAnimation){
+		// 	world.runAnimations();//running the computations for the animations in the scene.
+		// }
+		function animator(){
+			world.animationID = window.requestAnimationFrame(animator);
+			if(world.playAnimation){
+				world.runAnimations();//running the computations for the animations in the scene.
+			}
 		}
-		if(this.world.camera){
-			var xStart = ((this.obj.x + this.offsetX)/this.world.camera.perspective)-this.world.camera.x, yStart = ((this.obj.y + this.offsetY)/this.world.camera.perspective)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
-			var controlWidth = this.controlWidth/this.world.camera.perspective, controlHeight = (this.controlHeight - this.graphOffsetY)/this.world.camera.perspective; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's perspective
-			var graphOffsetY = this.graphOffsetY/this.world.camera.perspective;
-			var offsetX = this.offsetX/this.world.camera.perspective, offsetY = this.offsetY/this.world.camera.perspective;
-		}else{
-			var xStart = this.obj.x + this.offsetX, yStart = this.obj.y + this.offsetY;
-			var controlWidth = this.controlWidth, controlHeight = this.controlHeight;
-			var graphOffsetY = this.graphOffsetY;
-			var offsetX = this.offsetX, offsetY = this.offsetY;
-		}
-		c = this.obj.world.context;
-		var d = new Array(...this.data); //trying to make a clone of the original data
-		var maxD = Math.max(...d);//the maximum value in the list;
-		var controlRatio = (controlHeight-offsetY*2)/(maxD); //the ratio that makes sure that everything shows up in the screen
-		var barWidth = 3*(controlWidth-2*offsetX)/(4*d.length);//calculating for the width of the bars
-		var barSpacing = barWidth/3;
-		var graphHeight = maxD*controlRatio + graphOffsetY;
-		c.strokeStyle = this.strokeColor;
-		c.lineWidth = this.strokeWidth;
-		c.moveTo(xStart, yStart);
-		c.lineTo(xStart, yStart+graphHeight);
-		c.moveTo(xStart, yStart+graphHeight);
-		c.lineTo(d.length*(barWidth + barSpacing) + xStart, yStart + graphHeight);
-		c.stroke()
-		for(var i=0; i<d.length; i++){
-			c.fillStyle = this.fillStyle;
-			c.fillRect(i*(barWidth+barSpacing) + xStart + this.strokeWidth-2, yStart + graphHeight - data[i]*controlRatio, barWidth, data[i]*controlRatio);
-		}
-
+		animator();
 	}
-
-
+	this.pause = function(){
+		//this cancels all the animations and frame rendering going on
+		this.playAnimation = false;
+		window.cancelAnimationFrame(this.frameID);
+		window.cancelAnimationFrame(this.animationID);
+	}
+	this.play = function(){
+		//this plays the animation by restarting it if it has stopped
+		this.playAnimation = true;
+		this.animate();
+		this.makeFrames();
+	}
+	this.play();//this should not always play by default
 }
+
 
 function ImageObject(filePath, x, y, width, height){
 	//this is the function that will take care of playing a video in the canvas. 
@@ -1012,8 +1254,10 @@ function Integration(element, x, y, width, height){
 	this.renderingX = this.x, this.renderingY = this.y, this.renderingWidth = this.width, this.renderingHeight= this.height;
 	this.element = element;//stating the context property of the embed
 	this.scaleMatrix = [1, 1];
-	console.log(this.element.style)
 	this.translationMatrix = [0, 0];
+	this.fontSize = 20;
+	this.renderingFontSize = this.fontSize;
+	this.isIntegration = true;//to be used later to figure out if the object is an integration object or normal canvas object
 	this.render = function(){
 		this.setCanvasPropsForObject();
 		this.alignOriginWithParent();
@@ -1024,15 +1268,36 @@ function Integration(element, x, y, width, height){
 		this.element.style.position = 'absolute';
 		this.element.style.top = this.renderingY + 'px';
 		this.element.style.left = this.renderingX + 'px';
+		this.renderFont();
 	}
 	
 	this.applyTransformation = function(){
 		//this applies the transformation on this integrated element
-		var angle = Math.round((this.rotationAngle/Math.PI) * 180);
 		this.element.style.transform = 'matrix('+this.transformationMatrix[0]+', '+this.transformationMatrix[1] +', ' + this.transformationMatrix[2]+ ', ' + this.transformationMatrix[3]+', ' + this.transformationMatrix[4]+', '+ this.transformationMatrix[5]+')';
 	}
 	this.applyTransformationOrigin = function(){
 		this.element.style.transformationOrigin = this.transformationOrigin[0] + ', '+ this.transformationOrigin[1];//check the proper way later
+	}
+	this.renderFont = function(){
+		//takes care of rendering the font of the integration
+		if(this.world.camera){
+			this.renderingFontSize = this.fontSize*this.world.camera.zoom;
+		}else{
+			this.renderingFontSize = this.fontSize;
+		}
+		this.element.style.fontSize = String(this.renderingFontSize)+'px';
+	}
+	this.removeFromDOM = function(){
+		//this method removes the integration object from the canvas
+		this.element.remove();
+	}
+	this.hide = function(){
+		//this method hides the object from the canvas
+		this.element.style.display = 'none';//this method hides the html element
+	}
+	this.show = function(){
+		//this method shows the object in the canvas
+		this.element.style.display = 'block';
 	}
 	delete this.rotate;
 	delete this.skew;
@@ -1044,4 +1309,41 @@ function Integration(element, x, y, width, height){
 	delete this.rotationMatrix;
 	delete this.skewMatrix;
 	delete this.rotationAngle;
+}
+
+/*
+Exporting the modules for use below
+*/
+var Sanim = {
+		Scene:Scene,
+		Camera:Camera,
+		Player:Player,
+		SanimObject:SanimObject,
+		PathObject:PathObject,
+		RectObject:RectObject,
+		ButtonObject:ButtonObject,
+		TextObject:TextObject,
+		ImageObject:ImageObject,
+		VideoObject:VideoObject,
+		AudioObject:AudioObject,
+		Integration:Integration,
+		Animation:Animation,
+		AnimationInstance:AnimationInstance
+	}
+if(typeof exports != undefined){//checking to be sure it is not being used from a script tag
+	exports.default = Sanim;
+	exports.Scene = Scene;
+	exports.Camera = Camera;
+	exports.Player = Player;
+	exports.SanimObject = SanimObject;
+	exports.PathObject = PathObject;
+	exports.RectObject = RectObject;
+	exports.ButtonObject = ButtonObject;
+	exports.TextObject = TextObject;
+	exports.ImageObject  = ImageObject;
+	exports.VideoObject = VideoObject;
+	exports.AudioObject = AudioObject;
+	exports.Integration = Integration;
+	exports.Animation = Animation;
+	exports.AnimationInstance = AnimationInstance;
 }
