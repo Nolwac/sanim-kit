@@ -36,7 +36,7 @@ function Pen(scene, x, y, animation){
   }
   this.moveToCurrentPosition = function(x, y){
     //this method moves the cursor to it's calculated current position
-    var lastPath = this.path.paths[this.path.paths.length-1];
+    var lastPath = this.path.initialPaths[this.path.initialPaths.length-1];
     if(lastPath.pathMethod=="moveTo"){
       lastPath.params[0]=x;
       lastPath.params[1]=y;
@@ -227,7 +227,7 @@ window.onload = function(){
   	if(radius>=5){
   		drawCircle(x-radius, y, radius/2, pen)
   		drawCircle(x+radius, y, radius/2, pen)
-  		drawCircle(x, y+radius, radius/2, pen)
+  		drawCircle(x, y-radius, radius/2, pen)
   		//pen.arc(radius, Math.PI*2)
   	}else{
   	  
