@@ -303,7 +303,7 @@ function Animation(world){
 		if(this.asynchronous===true || this.animationInstances.length<=0){
 			for(var i=0; this.animationInstances.length>i; i++){
 				var instance = this.animationInstances[i];
-				if(instance.obj.world.playAnimation && (this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
+				if((this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
 					this.animateInstance(instance);//animating the instance;
 					if(instance.obj.animationStatus()==false){
 						break;//breaking the loop since an item in the list of animation instances is being removed, check animateInstance method
@@ -312,7 +312,7 @@ function Animation(world){
 			}
 		}else{
 			var instance = this.animationInstances[0];
-			if(instance.obj.world.playAnimation && (this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
+			if((this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
 				this.animateInstance(instance);
 			}
 		}
@@ -1171,9 +1171,9 @@ function Scene(context){
 		// }
 		function animator(){
 			world.animationID = window.requestAnimationFrame(animator);
-			if(world.playAnimation){
+			//if(world.playAnimation){
 				world.runAnimations();//running the computations for the animations in the scene.
-			}
+			//}
 		}
 		animator();
 	}
@@ -1330,20 +1330,20 @@ var Sanim = {
 		Animation:Animation,
 		AnimationInstance:AnimationInstance
 	}
-if(typeof exports != undefined){//checking to be sure it is not being used from a script tag
-	exports.default = Sanim;
-	exports.Scene = Scene;
-	exports.Camera = Camera;
-	exports.Player = Player;
-	exports.SanimObject = SanimObject;
-	exports.PathObject = PathObject;
-	exports.RectObject = RectObject;
-	exports.ButtonObject = ButtonObject;
-	exports.TextObject = TextObject;
-	exports.ImageObject  = ImageObject;
-	exports.VideoObject = VideoObject;
-	exports.AudioObject = AudioObject;
-	exports.Integration = Integration;
-	exports.Animation = Animation;
-	exports.AnimationInstance = AnimationInstance;
-}
+// if(typeof exports != undefined){//checking to be sure it is not being used from a script tag
+// 	exports.default = Sanim;
+// 	exports.Scene = Scene;
+// 	exports.Camera = Camera;
+// 	exports.Player = Player;
+// 	exports.SanimObject = SanimObject;
+// 	exports.PathObject = PathObject;
+// 	exports.RectObject = RectObject;
+// 	exports.ButtonObject = ButtonObject;
+// 	exports.TextObject = TextObject;
+// 	exports.ImageObject  = ImageObject;
+// 	exports.VideoObject = VideoObject;
+// 	exports.AudioObject = AudioObject;
+// 	exports.Integration = Integration;
+// 	exports.Animation = Animation;
+// 	exports.AnimationInstance = AnimationInstance;
+// }

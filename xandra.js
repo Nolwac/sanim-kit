@@ -12,6 +12,10 @@ function Pen(scene, x, y, animation){
   this.currentY = 0;
   this.interval = 100;// interval of time for animation to occur
   this.draw = true//this property toggles if the pen is up or down
+  this.play = true;//this property sets if the animation should be played or not
+  this.fillColor = "crimson";
+  this.strokeColor = "white";
+  this.pathObjects = new Array();//this holds the individual paths drawn.
   this.animation.asynchronous = false;//stopping asynchronous animation
   
   this.delay = function(time){
@@ -25,8 +29,11 @@ function Pen(scene, x, y, animation){
     var y = this.currentY;
     
       this.animation.instantly(function (){
-        if(self.drawingStatus()===true){
+        if(self.draw===true){
           func();
+          if(self.world.playAnimation === false && self.play===true){
+            self.renderLast();
+          }
         }else{
           self.moveToCurrentPosition(x, y);
         }
@@ -77,14 +84,17 @@ function Pen(scene, x, y, animation){
   this.mov = function(length){
     
     var cord = this.calculateLandingPosition(length);
+    var x = this.currentX;//to hold previous positions
+    var y = this.currentY;
     this.currentX = cord.x;
     this.currentY = cord.y
     
     var self = this;
     this.execute(function(){
-      self.path.appendPath(
-        {pathMethod:"lineTo", params:[cord.x, cord.y]}
-        );
+      var path = {pathMethod:"lineTo", params:[cord.x, cord.y]};
+      self.path.appendPath(path);
+      //below is where the sanim path object is being created for this movement
+      self.pathObjects.push(self.makeObject(x, y, [path]));
     });
   }
   this.forward = function (length){
@@ -126,6 +136,7 @@ function Pen(scene, x, y, animation){
     this.execute(function(){
       
       self.path.appendPath(params.path);
+      self.pathObjects.push(self.makeObject(params.path.params[0], params.path.params[1], [params.path]));
     });
   }
   this.drawingStatus = function (){
@@ -150,7 +161,6 @@ function Pen(scene, x, y, animation){
     var y = this.currentY;
     this.animation.instantly(function (){
       self.draw = true;
-      //self.moveToCurrentPosition(x, y)
     });
   }
   this.setPosition = function (x, y){
@@ -163,7 +173,42 @@ function Pen(scene, x, y, animation){
     });
     //this.moveToCurrentPosition();
   }
-  this.makeObject = function (){
+  this.makeObject = function(x, y, paths){
+    //this method makes the pathObject
+    var newPaths = [{pathMethod:"moveTo", params:[x, y]}, ...paths];
+    var obj = new PathObject(0, 0, newPaths);
+    obj.props={
+      fillStyle:this.fillColor,
+      strokeStyle:this.strokeColor,
+      lineWidth:this.path.props.lineWidth
+    }
+    return obj;
+    
+  }
+  this.clonePath = function (path){
+    //this method clones a path
+    var newPath = {pathMethod:path.pathMethod, params:new Array()};
+		for(var j=0; j<path.params.length; j++){
+			newPath.params.push(path.params[j]);
+		}
+		return newPath;
+  }
+  this.clonePaths = function(paths){
+    //this method clones an array paths
+    var newPaths = new Array();
+  	for(var i = 0; i<paths.length; i++){//trying to assign the paths to renderingPaths;
+  		var path = this.clonePath(paths[i]);
+  		newPaths.push(path);
+  	}
+  	return newPaths;
+  }
+  this.renderLast = function (){
+    //this method renders the last object in the array of PathObjects
+    var last = this.pathObjects[this.pathObjects.length-1];
+    this.path.addChild(last);
+    last.render();
+  }
+  this.make = function (){
     this.path = new PathObject(this.x, this.y, [{pathMethod:"moveTo", params:[this.currentX,this.currentY]}]);
     this.world.addObject(this.path);
   }
@@ -198,8 +243,16 @@ window.onload = function(){
   }
   scene.addObject(rect);
   scene.isParentWorld = true;
+  
+  scene.context.canvas.width = window.innerWidth;
+  scene.context.canvas.height = window.innerHeight;
+  scene.render();
+  scene.playAnimation = false;
+  
+  
   var pen = new Pen(scene, 200,200);
-  pen.makeObject();
+  pen.make();
+  //pen.play = false;
   pen.path.props={
     fillStyle:"crimson",
     strokeStyle:"orange",
