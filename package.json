@@ -11,8 +11,7 @@
     "url": "git+https://github.com/Nolwac/sanim-kit.git"
   },
   "keywords": [
-    "Sanim", "Nwafor", "Livinus", "Anayo", "Simulation", "Animation", 
-    "HTML5 Canvas library", "Games", "browser games", "web games", "simulation on browser",
+    "Sanim", "Nwafor", "Livinus", "Anayo", "Simulation", "Animation", "HTML5 Canvas library", "Games", "browser games", "web games", "simulation on browser"
   ],
   "author": "Nwafor Livinus Anayo",
   "license": "MIT",

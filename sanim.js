@@ -1,13 +1,3 @@
-function fitCanvasToScreen(ctx){
-	//this sets the canvas to fill the width of the screen
-	ctx.canvas.width = window.innerWidth;
-	ctx.canvas.height = window.innerHeight;
-	ctx.canvas.style.left = "0px";
-	ctx.canvas.style.right = "0px";
-	ctx.canvas.style.top = "0px";
-	ctx.canvas.style.bottom = "0px";
-	ctx.canvas.parentElement.style.overflow = 'hidden';
-}
 function Animation(world){
 	//this object has all the animations types as its methods
 	//the animation object sets the scene to be continually rerendering by creating a javascript animation frame that continually rerenders it
@@ -255,7 +245,7 @@ function Animation(world){
             var self = this;
             if(this.isNotSet){
               this.interval = setInterval(() => {
-                if(self.world.playAnimation==false || self.animationStatus==false){
+                if(self.world.playAnimation==false || self.animationInstance.animationStatus==false){
                 	self.status = false;//making sure that it goes off the list of animations to be performed
                     clearInterval(self.interval);
                 }else{
@@ -1075,7 +1065,7 @@ function Scene(context){
 		//this renders the scene to the canvas
 		if(this.clearBeforeRender == true){
 			if(this.isParentWorld===true){//fit to the screen provided this is the parent world;this.context.canvas.position = 'absolute';
-				fitCanvasToScreen(this.context);
+				this.fitCanvasToScreen();
 			}
 			this.context.fillStyle = this.color;
 			this.context.fillRect(0,0,this.context.canvas.width, this.context.canvas.height);
@@ -1115,7 +1105,7 @@ function Scene(context){
 		} else if (canvas.msRequestFullscreen) { /* IE/Edge */
 		    canvas.msRequestFullscreen();
 		}
-		fitCanvasToScreen(this.context);
+		this.fitCanvasToScreen();
 	}
 	this.cancelRequestFullscreen = function(){
 		if (document.exitFullscreen) {
@@ -1129,6 +1119,16 @@ function Scene(context){
 		}
 		this.context.canvas.width = this.width;
 		this.context.canvas.height = this.height;
+	}
+	this.fitCanvasToScreen = function(){
+		//this sets the canvas to fill the width of the screen
+		this.context.canvas.width = window.innerWidth;
+		this.context.canvas.height = window.innerHeight;
+		this.canvas.style.left = "0px";
+		this.context.canvas.style.right = "0px";
+		this.context.canvas.style.top = "0px";
+		this.context.canvas.style.bottom = "0px";
+		this.context.canvas.parentElement.style.overflow = 'hidden';
 	}
 	this.flush = function(){
 		//this method flushes the scene of it's objects and animations
@@ -1328,7 +1328,9 @@ var Sanim = {
 		AudioObject:AudioObject,
 		Integration:Integration,
 		Animation:Animation,
-		AnimationInstance:AnimationInstance
+		AnimationInstance:AnimationInstance,
+		StraightLineObject:StraightLineObject,
+		CircleObject:CircleObject
 	}
 if(typeof exports != undefined){//checking to be sure it is not being used from a script tag
 	exports.default = Sanim;
@@ -1346,4 +1348,6 @@ if(typeof exports != undefined){//checking to be sure it is not being used from 
 	exports.Integration = Integration;
 	exports.Animation = Animation;
 	exports.AnimationInstance = AnimationInstance;
+	exports.StraightLineObject = StraightLineObject;
+	exports.CircleObject = CircleObject;
 }
