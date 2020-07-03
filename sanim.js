@@ -820,6 +820,7 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 	*/
 	this.x = x, this.y = y, this.fillPath = fillPath, this.closePath = this.closePath;
 	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.newPath = true;//stating that the object js a new path and not the continuation of another.
 	this.paths = paths;
 	this.renderingX = this.x, this.renderingY = this.y;
 	this.renderingPaths = new Array();
@@ -865,7 +866,9 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 		//remove the rest of the general properties that where not used here
 		this.applyTransformationOrigin();
 		this.applyTransformation();
-		this.world.context.beginPath();
+		if(this.newPath == true){
+      this.world.context.beginPath();
+		}
 		for(var i = 0;i<this.paths.length;i++){
 			/* Trying to add the origin to the neccessary parameters of the path methods */
 			if(this.paths[i].pathMethod == 'lineTo' || this.paths[i].pathMethod == 'moveTo'){

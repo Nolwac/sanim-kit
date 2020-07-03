@@ -13,8 +13,9 @@ function Pen(scene, x, y, animation){
   this.interval = 100;// interval of time for animation to occur
   this.draw = true//this property toggles if the pen is up or down
   this.play = true;//this property sets if the animation should be played or not
+  this.fragments = 2;//this is the number of fragments to create for eachmovement
   this.fillColor = "crimson";
-  this.strokeColor = "white";
+  this.strokeColor = "green";
   this.pathObjects = new Array();//this holds the individual paths drawn.
   this.animation.asynchronous = false;//stopping asynchronous animation
   
@@ -33,23 +34,28 @@ function Pen(scene, x, y, animation){
           func();
           if(self.world.playAnimation === false && self.play===true){
             self.renderLast();
-          }
+          }//else if(self.play==true){
+          //   self.world.pause();
+          //   self.render();
+            
+          // }
         }else{
           self.moveToCurrentPosition(x, y);
         }
       });
-
-    this.animation.sleep(this.interval);
+    if(this.interval > 0){
+      this.animation.sleep(this.interval);
+    }
   }
   this.moveToCurrentPosition = function(x, y){
     //this method moves the cursor to it's calculated current position
-    var lastPath = this.path.initialPaths[this.path.initialPaths.length-1];
+    var lastPath = this.initialPaths[this.initialPaths.length-1];
     if(lastPath.pathMethod=="moveTo"){
       lastPath.params[0]=x;
       lastPath.params[1]=y;
     }else{
       var path = {pathMethod:"moveTo", params:[x, y]};
-      this.path.appendPath(path);
+      this.appendPath(path);
     }
     
     
@@ -83,19 +89,25 @@ function Pen(scene, x, y, animation){
   }
   this.mov = function(length){
     
-    var cord = this.calculateLandingPosition(length);
-    var x = this.currentX;//to hold previous positions
-    var y = this.currentY;
-    this.currentX = cord.x;
-    this.currentY = cord.y
-    
+    this.fragments = Math.floor(Math.abs(this.fragments));
+    length = length/(this.fragments+1);
     var self = this;
-    this.execute(function(){
-      var path = {pathMethod:"lineTo", params:[cord.x, cord.y]};
-      self.path.appendPath(path);
-      //below is where the sanim path object is being created for this movement
-      self.pathObjects.push(self.makeObject(x, y, [path]));
-    });
+    for(var i =0; i <= this.fragments; i++){
+      (function(){// using IIFE to remove the function scope effect of var.
+        var cord = self.calculateLandingPosition(length);
+        var x = self.currentX;//to hold previous positions
+        var y = self.currentY;
+        self.currentX = cord.x;
+        self.currentY = cord.y;
+        self.execute(function(){
+          var path = {pathMethod:"lineTo", params:[cord.x, cord.y]};
+          self.appendPath(path);
+          //below is where the sanim path object is being created for this movement
+          self.pathObjects.push(self.makeObject(x, y, [path]));
+        });
+      })();
+    }
+    
   }
   this.forward = function (length){
     //this moves it forward
@@ -119,25 +131,31 @@ function Pen(scene, x, y, animation){
   this.arc = function(radius, angle, concave=false){
     //this method draws the arc
     //radius = Math.abs(radius);
-    
-    var initialTurnAngle = this.turnAngle;
-    var params = this.computeArcParams(radius, angle, concave);
-    this.turnAngle = params.angle;
-    //below is cordinate at the center of drawn circle
-    this.currentX = params.x;
-    this.currentY = params.y;
-    //calculating new cordinate
-    var newCord = this.calculateLandingPosition(radius, Math.PI - angle);
-    this.currentX = newCord.x;
-    this.currentY = newCord.y;
-    this.turnAngle = newCord.angle - Math.PI/2;
-    
     var self = this;
-    this.execute(function(){
-      
-      self.path.appendPath(params.path);
-      self.pathObjects.push(self.makeObject(params.path.params[0], params.path.params[1], [params.path]));
-    });
+    this.fragments = Math.floor(Math.abs(this.fragments));
+    angle = angle/(this.fragments + 1);
+    for(var i = 0; i<=this.fragments;i++){
+      //var initialTurnAngle = this.turnAngle;
+      (function(){//using IIFE to execute, as a hack to the function scope effect of var
+        var params = self.computeArcParams(radius, angle, concave);
+        self.turnAngle = params.angle;
+        //below is cordinate at the center of drawn circle
+        self.currentX = params.x;
+        self.currentY = params.y;
+        //calculating new cordinate
+        var newCord = self.calculateLandingPosition(radius, Math.PI - angle);
+        self.currentX = newCord.x;
+        self.currentY = newCord.y;
+        self.turnAngle = newCord.angle - Math.PI/2;
+        
+        self.execute(function(){
+          
+          self.appendPath(params.path);
+          self.pathObjects.push(self.makeObject(params.path.params[0], params.path.params[1], [params.path], "arc"));
+        });
+      })();
+    }
+    
   }
   this.drawingStatus = function (){
     //this method gets the drawing status
@@ -165,22 +183,32 @@ function Pen(scene, x, y, animation){
   }
   this.setPosition = function (x, y){
     //this method sets the position of the pen in the it's drawing canvas with respect to it's origin
+    var previousX = this.currentX;//holding previous positions
+    var previousY = this.currentY;
     this.currentX = x;
     this.currentY = y;
+    
     var self = this;
     this.execute(function (){
-      self.path.appendPath({pathMethod:"lineTo", params:[x, y]})
+      var path ={pathMethod:"lineTo", params:[x, y]};
+      self.pathObjects.push(self.makeObject(previousX, previousY, [path]));
+      self.appendPath(path);
     });
     //this.moveToCurrentPosition();
   }
-  this.makeObject = function(x, y, paths){
+  this.makeObject = function(x, y, paths, type="line"){
     //this method makes the pathObject
-    var newPaths = [{pathMethod:"moveTo", params:[x, y]}, ...paths];
+    if(type!="arc"){
+      
+      var newPaths = [{pathMethod:"moveTo", params:[x, y]}, ...paths];
+    }else{
+      var newPaths = [...paths];
+    }
     var obj = new PathObject(0, 0, newPaths);
     obj.props={
-      fillStyle:this.fillColor,
-      strokeStyle:this.strokeColor,
-      lineWidth:this.path.props.lineWidth
+      fillStyle:this.props.fillStyle,
+      strokeStyle:this.props.strokeStyle,
+      lineWidth:this.props.lineWidth
     }
     return obj;
     
@@ -205,12 +233,14 @@ function Pen(scene, x, y, animation){
   this.renderLast = function (){
     //this method renders the last object in the array of PathObjects
     var last = this.pathObjects[this.pathObjects.length-1];
-    this.path.addChild(last);
+    //this.addChild(last);
+    last.world = this.world;
+    last.x = this.x;
+    last.y = this.y;
     last.render();
   }
   this.make = function (){
-    this.path = new PathObject(this.x, this.y, [{pathMethod:"moveTo", params:[this.currentX,this.currentY]}]);
-    this.world.addObject(this.path);
+
   }
   
   var self = this.animation;
@@ -229,6 +259,10 @@ function Pen(scene, x, y, animation){
     });
     self.addAnimationInstance(instance)
   }
+  //this = this;
+  var initialPath =[{pathMethod:"moveTo", params:[this.currentX,this.currentY]}];
+  PathObject.call(this, x, y, initialPath);
+  this.world.addObject(this)
 }
 
 window.onload = function(){
@@ -251,14 +285,13 @@ window.onload = function(){
   
   
   var pen = new Pen(scene, 200,200);
-  pen.make();
+  //pen.make();
   //pen.play = false;
-  pen.path.props={
+  pen.props={
     fillStyle:"crimson",
     strokeStyle:"orange",
     lineWidth:4
   }
-  pen.interval = 10;
   function test1(){
     pen.forward(200);
     pen.left(scene.radian(90));
@@ -310,6 +343,13 @@ window.onload = function(){
     test2();
     
   }
+  function drawPaths(){
+    //pen.penDown();
+    pen.arc(100, scene.radian(340));
+  }
+  pen.fragments = 11;
+  pen.interval = 0;
+  //drawPaths();
   drawCircle(300,300, 200, pen);
   //oneTwo();
   //pen.path.fillPath = true;
