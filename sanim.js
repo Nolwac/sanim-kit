@@ -1333,20 +1333,20 @@ var Sanim = {
 		Animation:Animation,
 		AnimationInstance:AnimationInstance
 	}
-// if(typeof exports != undefined){//checking to be sure it is not being used from a script tag
-// 	exports.default = Sanim;
-// 	exports.Scene = Scene;
-// 	exports.Camera = Camera;
-// 	exports.Player = Player;
-// 	exports.SanimObject = SanimObject;
-// 	exports.PathObject = PathObject;
-// 	exports.RectObject = RectObject;
-// 	exports.ButtonObject = ButtonObject;
-// 	exports.TextObject = TextObject;
-// 	exports.ImageObject  = ImageObject;
-// 	exports.VideoObject = VideoObject;
-// 	exports.AudioObject = AudioObject;
-// 	exports.Integration = Integration;
-// 	exports.Animation = Animation;
-// 	exports.AnimationInstance = AnimationInstance;
-// }
+if(typeof exports != undefined){//checking to be sure it is not being used from a script tag
+	exports.default = Sanim;
+	exports.Scene = Scene;
+	exports.Camera = Camera;
+	exports.Player = Player;
+	exports.SanimObject = SanimObject;
+	exports.PathObject = PathObject;
+	exports.RectObject = RectObject;
+	exports.ButtonObject = ButtonObject;
+	exports.TextObject = TextObject;
+	exports.ImageObject  = ImageObject;
+	exports.VideoObject = VideoObject;
+	exports.AudioObject = AudioObject;
+	exports.Integration = Integration;
+	exports.Animation = Animation;
+	exports.AnimationInstance = AnimationInstance;
+}

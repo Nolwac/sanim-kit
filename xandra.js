@@ -259,7 +259,75 @@ function Pen(scene, x, y, animation){
     });
     self.addAnimationInstance(instance)
   }
-  //this = this;
+  //--------------------equation---------------------------------------
+  this.equation = function(obj){
+    //this is the constructor function for the equation object
+    if(typeof obj != "object"){
+      throw('parameter must be an object to plot an equation');
+    }else{
+      var equation = {//default object
+        xOrigin:this.currentX,
+        yOrigin:this.currentY,
+        parent:this,
+        xScale:1, //this is the scale that will be used for the graphing on the x - axis
+        yScale:1, //this is the scale that will be used on the x-axis
+        x:0,
+        y:0,
+        type:'line',
+        end:false, //this sets if the computation should end or not
+        compute: function(){
+          //this is the method for doing the computation for the equation
+        },
+        constraint: function(){
+          //this method puts a contraint on the object
+          return false;//returning false by default 
+        },
+        ended: function(){
+          //this method states if the computation plot has ended or not
+          this.end = true;//returning true by default ends the computation plot
+        },
+        increment: function(){
+          //this method defines how the values in the equation should be incremented
+        },
+        plot: function(){
+          //this method plots the points each time
+          this.compute();
+          if(this.xOrigin+this.x != this.parent.currentX || this.yOrigin+this.y != this.parent.currentY){
+            //checking if the origin + first values (x, y) is different from the parent origin so that we can set point to that origin else we live the xandra's current
+            //position where it is
+            this.parent.setPosition(this.xOrigin+this.x*this.xScale, this.yOrigin+this.y*this.yScale);
+          }
+          this.parent.penDown();
+          while(this.end === false){
+            if(this.constraint() == true){
+              //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
+              //a give constraint and when it is out for harmonic function, so it is best to do it this way to allow developers add
+              //such feature to they software while developing
+              if(this.type === 'line'){
+                //do things with point when it is line
+                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+              }else if(this.type === 'scatter'){
+                //do things when it is scatter ploting
+              }else if(this.type === 'horizontal-strip'){
+                //do things when it is a horizontal strip
+              }else if(this.type === 'vertical-strip'){
+                //do things when it is a vertical strip
+              } 
+            }
+            if(this.constraint() == false){
+              this.ended();
+            }
+            this.increment();
+            this.compute();
+          }
+        }
+      }
+
+      Object.assign(equation, obj);//copying the properties from the object given in parameter to the default objec, properties are overwritten
+      return equation;
+    }
+  }
+
   var initialPath =[{pathMethod:"moveTo", params:[this.currentX,this.currentY]}];
   PathObject.call(this, x, y, initialPath);
   this.world.addObject(this)
@@ -284,13 +352,13 @@ window.onload = function(){
   scene.playAnimation = false;
   
   
-  var pen = new Pen(scene, 200,200);
+  var pen = new Pen(scene, 200, 100);
   //pen.make();
   //pen.play = false;
   pen.props={
     fillStyle:"crimson",
     strokeStyle:"orange",
-    lineWidth:4
+    lineWidth:1
   }
   function test1(){
     pen.forward(200);
@@ -326,19 +394,19 @@ window.onload = function(){
   	}
   }
   function oneTwo(){
-    pen.penUp()
+    //pen.penUp()
     test1()
-    //pen.penUp();
+    pen.penUp();
     pen.setPosition(300, 300);
     pen.penDown()
     test2()
     pen.penUp()
-    pen.setPosition(300, 900);
+    pen.setPosition(300, 400);
     pen.penDown();
-    pen.setPosition(400,800)
-    pen.setPosition(200, 800)
+    pen.setPosition(400,300)
+    pen.setPosition(200, 300)
     pen.penUp();
-    pen.setPosition(300, 1000);
+    pen.setPosition(300, 500);
     pen.penDown();
     test2();
     
@@ -347,11 +415,32 @@ window.onload = function(){
     //pen.penDown();
     pen.arc(100, scene.radian(340));
   }
+  function plotEquation(){
+    //testing ploting of an equation
+    var equation = pen.equation({
+      type:'line',
+      xScale:15,
+      yScale:15,
+      x:-6,
+      compute: function(){
+        this.y = 0.15*this.x**3 + this.x**2 + this.x + 1;
+      },
+      constraint: function(){
+        return this.x <= 4.0001;
+      },
+      increment: function(){
+        this.x += 0.2;
+      }
+    });
+    equation.plot();
+  }
   pen.fragments = 11;
   pen.interval = 0;
   //drawPaths();
-  drawCircle(300,300, 200, pen);
+  //drawCircle(300,300, 200, pen);
   //oneTwo();
+  pen.penUp();
+  plotEquation();
   //pen.path.fillPath = true;
 
 }

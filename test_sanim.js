@@ -1,6 +1,4 @@
-import Sanim, {Scene, Camera, ButtonObject, TextObject, AudioObject, 
-	Integration, RectObject, PathObject, Player, Animation, AnimationInstance
-} from './sanim';
+
 window.onload = function(){
 	var canvas = document.getElementById('chart_canvas')
 	var ctx = canvas.getContext('2d');
