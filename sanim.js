@@ -240,6 +240,21 @@ function Animation(world){
 		this.addAnimationInstance(sleep);
 		return sleep;
 	}
+    this.instantly = function(func){
+        //performs an instant animation
+        var instance = new AnimationInstance({
+	        world:this.world,
+	        status:true,
+	        execute: function (){
+	        	func();
+	            this.status=false;
+	        },
+	        animationStatus: function (){
+	        	return status;
+	        }
+    	});
+     	this.addAnimationInstance(instance)
+    }
 	this.setInterval = function(params){
 		//this method set an interval for a loop
 		var animInstance = new AnimationInstance(Object.assign({

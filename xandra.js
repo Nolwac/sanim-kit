@@ -243,22 +243,6 @@ function Pen(scene, x, y, animation){
 
   }
   
-  var self = this.animation;
-  this.animation.instantly = function(func){
-    //performs an instant animation
-    var instance = new AnimationInstance({
-      world:self.world,
-      status:true,
-      execute: function (){
-        func();
-        this.status=false;
-      },
-      animationStatus: function (){
-        return status;
-      }
-    });
-    self.addAnimationInstance(instance)
-  }
   //--------------------equation---------------------------------------
   this.equation = function(obj){
     //this is the constructor function for the equation object
@@ -325,7 +309,13 @@ function Pen(scene, x, y, animation){
                 this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.yOrigin);
                 this.parent.penDown();
                 this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-              } 
+              }else if(this.type === 'vector'){
+                //things to implement when it is a vector plotting
+                this.parent.penUp();
+                this.parent.setPosition(this.xOrigin, this.yOrigin);
+                this.parent.penDown();
+                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+              }
             }
             if(this.constraint() == false){
               this.ended();
@@ -432,10 +422,10 @@ window.onload = function(){
     //testing ploting of an equation
     pen.fragments = 0;
     var equation = pen.equation({
-      type:'vertical-stripe',
+      type:'vector',
       xScale:20,
       yScale:20,
-      x:-6,
+      x:0,
       compute: function(){
         this.y = 2*Math.sin(this.x);
       },
