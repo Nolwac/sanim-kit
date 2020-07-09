@@ -297,7 +297,7 @@ function Pen(scene, x, y, animation){
             //position where it is
             this.parent.setPosition(this.xOrigin+this.x*this.xScale, this.yOrigin+this.y*this.yScale);
           }
-          this.parent.penDown();
+          //this.parent.penDown();
           while(this.end === false){
             if(this.constraint() == true){
               //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
@@ -305,13 +305,26 @@ function Pen(scene, x, y, animation){
               //such feature to they software while developing
               if(this.type === 'line'){
                 //do things with point when it is line
+                this.parent.penDown();
                 this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
               }else if(this.type === 'scatter'){
                 //do things when it is scatter ploting
-              }else if(this.type === 'horizontal-strip'){
+                this.parent.penUp();
+                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+                this.parent.penDown();
+                this.parent.arc(1, Math.PI*2);
+              }else if(this.type === 'horizontal-stripe'){
                 //do things when it is a horizontal strip
-              }else if(this.type === 'vertical-strip'){
+                this.parent.penUp();
+                this.parent.setPosition(this.xOrigin, this.y*this.yScale + this.yOrigin);
+                this.parent.penDown();
+                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+              }else if(this.type === 'vertical-stripe'){
                 //do things when it is a vertical strip
+                this.parent.penUp();
+                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.yOrigin);
+                this.parent.penDown();
+                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
               } 
             }
             if(this.constraint() == false){
@@ -358,7 +371,7 @@ window.onload = function(){
   pen.props={
     fillStyle:"crimson",
     strokeStyle:"orange",
-    lineWidth:1
+    lineWidth:2
   }
   function test1(){
     pen.forward(200);
@@ -417,24 +430,25 @@ window.onload = function(){
   }
   function plotEquation(){
     //testing ploting of an equation
+    pen.fragments = 0;
     var equation = pen.equation({
-      type:'line',
-      xScale:15,
-      yScale:15,
+      type:'vertical-stripe',
+      xScale:20,
+      yScale:20,
       x:-6,
       compute: function(){
-        this.y = 0.15*this.x**3 + this.x**2 + this.x + 1;
+        this.y = 2*Math.sin(this.x);
       },
       constraint: function(){
-        return this.x <= 4.0001;
+        return this.x <= 50.2001;
       },
       increment: function(){
-        this.x += 0.2;
+        this.x += 0.1;
       }
     });
     equation.plot();
   }
-  pen.fragments = 11;
+  //pen.fragments = 11;
   pen.interval = 0;
   //drawPaths();
   //drawCircle(300,300, 200, pen);

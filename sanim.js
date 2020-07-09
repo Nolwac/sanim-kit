@@ -1173,7 +1173,7 @@ function Scene(context){
 		// 	world.runAnimations();//running the computations for the animations in the scene.
 		// }
 		function animator(){
-			world.animationID = window.requestAnimationFrame(animator);
+			world.animationID = window.setTimeout(animator, 1);
 			//if(world.playAnimation){
 				world.runAnimations();//running the computations for the animations in the scene.
 			//}
@@ -1184,7 +1184,7 @@ function Scene(context){
 		//this cancels all the animations and frame rendering going on
 		this.playAnimation = false;
 		window.cancelAnimationFrame(this.frameID);
-		window.cancelAnimationFrame(this.animationID);
+		window.removeTimeout(this.animationID);
 	}
 	this.play = function(){
 		//this plays the animation by restarting it if it has stopped
