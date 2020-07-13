@@ -258,7 +258,9 @@ function Pen(scene, x, y, animation){
         x:0,
         y:0,
         type:'line',
-        end:false, //this sets if the computation should end or not
+        size:0.5,//size of the dot when ploted as a scatter diagram
+        ended:false, //this sets if the computation should end or not
+        delay:0.1,
         compute: function(){
           //this is the method for doing the computation for the equation
         },
@@ -266,14 +268,14 @@ function Pen(scene, x, y, animation){
           //this method puts a contraint on the object
           return false;//returning false by default 
         },
-        ended: function(){
+        end: function(){
           //this method states if the computation plot has ended or not
-          this.end = true;//returning true by default ends the computation plot
+          this.ended = true;//returning true by default ends the computation plot
         },
         increment: function(){
           //this method defines how the values in the equation should be incremented
         },
-        plot: function(){
+        setOrigin: function(){
           //this method plots the points each time
           this.compute();
           if(this.xOrigin+this.x != this.parent.currentX || this.yOrigin+this.y != this.parent.currentY){
@@ -281,49 +283,62 @@ function Pen(scene, x, y, animation){
             //position where it is
             this.parent.setPosition(this.xOrigin+this.x*this.xScale, this.yOrigin+this.y*this.yScale);
           }
-          //this.parent.penDown();
-          while(this.end === false){
-            if(this.constraint() == true){
-              //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
-              //a give constraint and when it is out for harmonic function, so it is best to do it this way to allow developers add
-              //such feature to they software while developing
-              if(this.type === 'line'){
-                //do things with point when it is line
-                this.parent.penDown();
-                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-              }else if(this.type === 'scatter'){
-                //do things when it is scatter ploting
-                this.parent.penUp();
-                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-                this.parent.penDown();
-                this.parent.arc(1, Math.PI*2);
-              }else if(this.type === 'horizontal-stripe'){
-                //do things when it is a horizontal strip
-                this.parent.penUp();
-                this.parent.setPosition(this.xOrigin, this.y*this.yScale + this.yOrigin);
-                this.parent.penDown();
-                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-              }else if(this.type === 'vertical-stripe'){
-                //do things when it is a vertical strip
-                this.parent.penUp();
-                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.yOrigin);
-                this.parent.penDown();
-                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-              }else if(this.type === 'vector'){
-                //things to implement when it is a vector plotting
-                this.parent.penUp();
-                this.parent.setPosition(this.xOrigin, this.yOrigin);
-                this.parent.penDown();
-                this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-              }
+        },
+        plot: function(){
+          this.setOrigin();
+          this.animation = new Animation(this.parent.world);//creating new animation for it to prevent lazy loading
+          this.animation.setInterval(this);
+          //add program statement to kikl the animation instance later on when the plotting is dine
+          //any animation on the xandra object will happen asynchronously with this, so if you want it to happen after this is done, then check to know when it is ended to execute the required animation s
+        },
+        loop: function (){
+          console.log("running!")
+          if(this.constraint() == true){
+            //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
+            //a give constraint and when it is out for harmonic function, so it is best to do it this way to allow developers add
+            //such feature to they software while developing
+            if(this.type === 'line'){
+              //do things with point when it is line
+              this.parent.penDown();
+              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+            }else if(this.type === 'scatter'){
+              //do things when it is scatter ploting
+              this.parent.penUp();
+              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+              this.parent.penDown();
+              this.parent.arc(this.size, Math.PI*2);
+            }else if(this.type === 'horizontal-stripe'){
+              //do things when it is a horizontal strip
+              this.parent.penUp();
+              this.parent.setPosition(this.xOrigin, this.y*this.yScale + this.yOrigin);
+              this.parent.penDown();
+              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+            }else if(this.type === 'vertical-stripe'){
+              //do things when it is a vertical strip
+              this.parent.penUp();
+              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.yOrigin);
+              this.parent.penDown();
+              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+            }else if(this.type === 'vector'){
+              //things to implement when it is a vector plotting
+              this.parent.penUp();
+              this.parent.setPosition(this.xOrigin, this.yOrigin);
+              this.parent.penDown();
+              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
             }
-            if(this.constraint() == false){
-              this.ended();
-            }
-            this.increment();
-            this.compute();
           }
+          if(this.constraint() == false){
+            this.end();
+            if(this.ended === true){
+              this.status = false;
+            }else{
+              this.status = true;
+            }
+          }
+          this.increment();
+          this.compute();
         }
+            
       }
 
       Object.assign(equation, obj);//copying the properties from the object given in parameter to the default objec, properties are overwritten
@@ -341,12 +356,6 @@ window.onload = function(){
   var context = canvas.getContext("2d");
   var scene = new Scene(context);
   scene.color = "black";
-  var rect = new PathObject (170,100,[{pathMethod:"arc", params:[0,0, 100, Math.PI*3/2, Math.PI*2+Math.PI/4,false]}], true, true);
-  rect.props={
-    fillStyle:"green",
-    lineWidth:4
-  }
-  scene.addObject(rect);
   scene.isParentWorld = true;
   
   scene.context.canvas.width = window.innerWidth;
@@ -355,8 +364,7 @@ window.onload = function(){
   scene.playAnimation = false;
   
   
-  var pen = new Pen(scene, 200, 100);
-  //pen.make();
+  var pen = new Pen(scene, 150, 150);
   //pen.play = false;
   pen.props={
     fillStyle:"crimson",
@@ -381,7 +389,7 @@ window.onload = function(){
     }
   }
   function drawCircle(x, y, radius, pen){
-  	if(radius>=5){
+  	if(radius>=1){
   		drawCircle(x-radius, y, radius/2, pen)
   		drawCircle(x+radius, y, radius/2, pen)
   		drawCircle(x, y-radius, radius/2, pen)
@@ -420,31 +428,67 @@ window.onload = function(){
   }
   function plotEquation(){
     //testing ploting of an equation
+    pen.x = -150;
+    pen.y = 150;
     pen.fragments = 0;
+    pen.props.lineWidth =1;
     var equation = pen.equation({
-      type:'vector',
-      xScale:20,
-      yScale:20,
-      x:0,
+      type:'scatter',
+      xScale:250,
+      yScale:250,
+      x:0.8,
+      y:0.2,
+      lam:4.0,
+      n:0,
+      size:1,
       compute: function(){
-        this.y = 2*Math.sin(this.x);
+        this.y = this.y*this.x*(1-this.y);
       },
       constraint: function(){
-        return this.x <= 50.2001;
+        return this.n <= 10050.2001;
       },
       increment: function(){
-        this.x += 0.1;
+        if(this.n%100==0 && this.x<4){
+            this.x+=0.01;
+        }else if(this.n%40==0 && this.x<3.53){
+          this.x += 0.01;
+          
+        }else if(this.n%20==0 && this.x<3.25){
+          this.x += 0.01;
+        }else if(this.x<3){
+          this.x+=0.01;
+        }
+        this.n += 1;
       }
     });
     equation.plot();
   }
-  //pen.fragments = 11;
+  function drawFibonnaci(n, scale=5){
+    var pen = new Pen(scene, 500, 500);
+    pen.fragments = 1;
+    pen.props={
+      fillStyle:"crimson",
+      strokeStyle:"crimson",
+      lineWidth:3
+    }
+    var nfib = [0, 1];
+    pen.penDown();
+    for(let i=1; i<=n; i++){
+      fib = nfib[i-1] + nfib[i];
+      nfib[i+1] = fib;
+      pen.arc(fib*scale, Math.PI/1.2);
+    };
+    return nfib;
+  }
+  //pen.animation.asynchronous = true;
+  pen.fragments = 0;
   pen.interval = 0;
   //drawPaths();
   //drawCircle(300,300, 200, pen);
   //oneTwo();
   pen.penUp();
   plotEquation();
+  //drawFibonnaci(10);
   //pen.path.fillPath = true;
 
 }

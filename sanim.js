@@ -270,7 +270,7 @@ function Animation(world){
             var self = this;
             if(this.isNotSet){
               this.interval = setInterval(() => {
-                if(self.world.playAnimation==false || self.animationStatus==false){
+                if(self.animationStatus==false){
                 	self.status = false;//making sure that it goes off the list of animations to be performed
                     clearInterval(self.interval);
                 }else{
