@@ -244,106 +244,60 @@ function Pen(scene, x, y, animation){
   }
   
   //--------------------equation---------------------------------------
-  this.equation = function(obj){
-    //this is the constructor function for the equation object
-    if(typeof obj != "object"){
-      throw('parameter must be an object to plot an equation');
-    }else{
-      var equation = {//default object
-        xOrigin:this.currentX,
-        yOrigin:this.currentY,
-        parent:this,
-        xScale:1, //this is the scale that will be used for the graphing on the x - axis
-        yScale:1, //this is the scale that will be used on the x-axis
-        x:0,
-        y:0,
-        type:'line',
-        size:0.5,//size of the dot when ploted as a scatter diagram
-        ended:false, //this sets if the computation should end or not
-        delay:0.1,
-        compute: function(){
-          //this is the method for doing the computation for the equation
-        },
-        constraint: function(){
-          //this method puts a contraint on the object
-          return false;//returning false by default 
-        },
-        end: function(){
-          //this method states if the computation plot has ended or not
-          this.ended = true;//returning true by default ends the computation plot
-        },
-        increment: function(){
-          //this method defines how the values in the equation should be incremented
-        },
-        setOrigin: function(){
-          //this method plots the points each time
-          this.compute();
-          if(this.xOrigin+this.x != this.parent.currentX || this.yOrigin+this.y != this.parent.currentY){
-            //checking if the origin + first values (x, y) is different from the parent origin so that we can set point to that origin else we live the xandra's current
-            //position where it is
-            this.parent.setPosition(this.xOrigin+this.x*this.xScale, this.yOrigin+this.y*this.yScale);
-          }
-        },
-        plot: function(){
-          this.setOrigin();
-          this.animation = new Animation(this.parent.world);//creating new animation for it to prevent lazy loading
-          this.animation.setInterval(this);
-          //add program statement to kikl the animation instance later on when the plotting is dine
-          //any animation on the xandra object will happen asynchronously with this, so if you want it to happen after this is done, then check to know when it is ended to execute the required animation s
-        },
-        loop: function (){
-          console.log("running!")
-          if(this.constraint() == true){
-            //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
-            //a give constraint and when it is out for harmonic function, so it is best to do it this way to allow developers add
-            //such feature to they software while developing
-            if(this.type === 'line'){
-              //do things with point when it is line
-              this.parent.penDown();
-              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-            }else if(this.type === 'scatter'){
-              //do things when it is scatter ploting
-              this.parent.penUp();
-              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-              this.parent.penDown();
-              this.parent.arc(this.size, Math.PI*2);
-            }else if(this.type === 'horizontal-stripe'){
-              //do things when it is a horizontal strip
-              this.parent.penUp();
-              this.parent.setPosition(this.xOrigin, this.y*this.yScale + this.yOrigin);
-              this.parent.penDown();
-              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-            }else if(this.type === 'vertical-stripe'){
-              //do things when it is a vertical strip
-              this.parent.penUp();
-              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.yOrigin);
-              this.parent.penDown();
-              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-            }else if(this.type === 'vector'){
-              //things to implement when it is a vector plotting
-              this.parent.penUp();
-              this.parent.setPosition(this.xOrigin, this.yOrigin);
-              this.parent.penDown();
-              this.parent.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-            }
-          }
-          if(this.constraint() == false){
-            this.end();
-            if(this.ended === true){
-              this.status = false;
-            }else{
-              this.status = true;
-            }
-          }
-          this.increment();
-          this.compute();
+  this.graph = function(equation){
+    //this method plots an equation by adding a plot property to the equation
+    var grapher = {
+      xOrigin:this.currentX,
+      yOrigin:this.currentY,
+      obj:this,
+      type:'line',
+      size:0.5,//size of the dot when ploted as a scatter diagram
+      setOrigin : function(){
+        //this method plots the points each time
+        this.compute();
+        if(this.xOrigin+this.x != this.obj.currentX || this.yOrigin+this.y != this.obj.currentY){
+          //checking if the origin + first values (x, y) is different from the obj origin so that we can set point to that origin else we live the xandra's current
+          //position where it is
+          this.obj.setPosition(this.xOrigin+this.x*this.xScale, this.yOrigin+this.y*this.yScale);
         }
-            
+      },
+      apply: function (){
+        if(this.type === 'line'){
+          //do things with point when it is line
+          this.obj.penDown();
+          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+        }else if(this.type === 'scatter'){
+          //do things when it is scatter ploting
+          this.obj.penUp();
+          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+          this.obj.penDown();
+          this.obj.arc(this.size, Math.PI*2);
+        }else if(this.type === 'horizontal-stripe'){
+          //do things when it is a horizontal strip
+          this.obj.penUp();
+          this.obj.setPosition(this.xOrigin, this.y*this.yScale + this.yOrigin);
+          this.obj.penDown();
+          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+        }else if(this.type === 'vertical-stripe'){
+          //do things when it is a vertical strip
+          this.obj.penUp();
+          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.yOrigin);
+          this.obj.penDown();
+          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+        }else if(this.type === 'vector'){
+          //things to implement when it is a vector plotting
+          this.obj.penUp();
+          this.obj.setPosition(this.xOrigin, this.yOrigin);
+          this.obj.penDown();
+          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+        }
       }
-
-      Object.assign(equation, obj);//copying the properties from the object given in parameter to the default objec, properties are overwritten
-      return equation;
     }
+    Object.assign(grapher, equation);
+    grapher.initialize =function(){
+      this.setOrigin();//setting the origin as initialization
+    }
+    return grapher;
   }
 
   var initialPath =[{pathMethod:"moveTo", params:[this.currentX,this.currentY]}];
@@ -351,6 +305,78 @@ function Pen(scene, x, y, animation){
   this.world.addObject(this)
 }
 
+function Equation(obj){
+  //this is the constructor function for the equation object
+  if(typeof obj != "object"){
+    throw('parameter must be an object to create an equation');
+  }
+  this.xOrigin = 0;//setting X and Y origins as 0
+  this.yOrigin = 0;
+  this.x = 0;
+  this.y = 0;
+  this.xScale = 1; //this is the scale that will be used for the graphing on the x - axis
+  this.yScale = 1; //this is the scale that will be used on the x-axis
+  this.ended = false; //this sets if the computation should end or not
+  this.delay = 100;
+  this.compute = function(){
+    //this is the method for doing the computation for the equation
+  }
+  this.constraint = function(){
+    //this method puts a contraint on the object
+    return false;//returning false by default 
+  }
+  this.end = function(){
+    //this method states if the computation plot has ended or not
+    this.ended = true;//returning true by default ends the computation plot
+  }
+  this.increment = function(){
+    //this method defines how the values in the equation should be incremented
+  }
+  this.initialize = function(){
+    //this is where initialization can be done before the loop starts
+  }
+  this.start = function(){
+    this.initialize();
+    this.animation = new Animation(this.obj.world);//creating new animation for it to prevent lazy loading
+    this.animation.setInterval(this);
+    //add program statement to kikl the animation instance later on when the plotting is dine
+    //any animation on the xandra object will happen asynchronously with this, so if you want it to happen after this is done, then check to know when it is ended to execute the required animation s
+  }
+  this.loop = function (){
+    if(this.constraint() == true){
+      //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
+      //a give constraint and when it is out for harmonic function, so it is best to do it this way to allow developers add
+      //such feature to they software while developing
+      this.apply();//applying the computation
+    }
+    if(this.constraint() == false){
+      this.end();
+      if(this.ended === true){
+        this.status = false;
+      }else{
+        this.status = true;
+      }
+    }
+    this.increment();
+    this.compute();
+  }
+  Object.assign(this, obj);//copying the properties from the object given in parameter to the default objec, properties are overwritten
+}
+CircleObject.prototype.motionPath = function(equation){
+    //this method moves the object in the canvas using the equation object
+    var mover = {
+      obj:this,
+      apply: function (){
+        console.log(this.yOrigin);
+        this.obj.x = this.xOrigin + this.x*this.xScale;
+        this.obj.y = this.yOrigin + this.y*this.yScale;
+      }
+    }
+    Object.assign(mover, equation);//assigning the equation
+    mover.xOrigin = this.x;//changing the origin to the origin of the object
+    mover.yOrigin = this.y;
+    return mover;
+  }
 window.onload = function(){
   var canvas = document.getElementById("canvas");
   var context = canvas.getContext("2d");
@@ -361,16 +387,50 @@ window.onload = function(){
   scene.context.canvas.width = window.innerWidth;
   scene.context.canvas.height = window.innerHeight;
   scene.render();
-  scene.playAnimation = false;
+  var testCircle = new CircleObject(500,300, 20, true);
+  testCircle.props = {
+    fillStyle:"lightgreen"
+  }
+  scene.addObject(testCircle);
+  scene.render();
+  //scene.playAnimation = false;
   
   
-  var pen = new Pen(scene, 150, 150);
+  var pen = new Pen(scene, 500, 300);
   //pen.play = false;
   pen.props={
     fillStyle:"crimson",
     strokeStyle:"orange",
     lineWidth:2
   }
+  function moveCircle(){
+    pen.fragments = 0;
+    pen.penUp();
+    var equation = new Equation ({
+      xScale:100,
+      yScale:50,
+      x:-4,
+      y:0,
+      delay:30,
+      type:"line",
+      size:2,
+      compute: function(){
+        this.y = this.x**2;
+      },
+      constraint: function(){
+        return this.x <= 4.002;
+      },
+      increment: function(){
+        this.x+=0.05;
+      }
+    });
+    var mover = testCircle.motionPath(equation);
+    mover.delay = 30;
+    var line = pen.graph(equation);
+    line.start();
+    mover.start();
+  }
+  moveCircle();
   function test1(){
     pen.forward(200);
     pen.left(scene.radian(90));
@@ -432,7 +492,7 @@ window.onload = function(){
     pen.y = 150;
     pen.fragments = 0;
     pen.props.lineWidth =1;
-    var equation = pen.equation({
+    var equation = new Equation({
       type:'scatter',
       xScale:250,
       yScale:250,
@@ -441,6 +501,7 @@ window.onload = function(){
       lam:4.0,
       n:0,
       size:1,
+      delay:1,
       compute: function(){
         this.y = this.y*this.x*(1-this.y);
       },
@@ -461,11 +522,12 @@ window.onload = function(){
         this.n += 1;
       }
     });
-    equation.plot();
+    var graph = pen.graph(equation);
+    graph.start();
   }
   function drawFibonnaci(n, scale=5){
     var pen = new Pen(scene, 500, 500);
-    pen.fragments = 1;
+    pen.fragments = 3;
     pen.props={
       fillStyle:"crimson",
       strokeStyle:"crimson",
@@ -476,7 +538,7 @@ window.onload = function(){
     for(let i=1; i<=n; i++){
       fib = nfib[i-1] + nfib[i];
       nfib[i+1] = fib;
-      pen.arc(fib*scale, Math.PI/1.2);
+      pen.arc(fib*scale, Math.PI*3);
     };
     return nfib;
   }
@@ -487,7 +549,7 @@ window.onload = function(){
   //drawCircle(300,300, 200, pen);
   //oneTwo();
   pen.penUp();
-  plotEquation();
+  //plotEquation();
   //drawFibonnaci(10);
   //pen.path.fillPath = true;
 
