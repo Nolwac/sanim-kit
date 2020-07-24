@@ -13,7 +13,7 @@ window.onload = function(){
 	camera.setProperties(0,0,0,1);
 	scene.setCamera(camera);//this sets the scene of the camera to the new camera that we just created;
 	window.scene = scene;
-	var obj1 = new ButtonObject(0,0, 80, 50, true);
+	var obj1 = new RectObject(0,0, 80, 50, true);
 	// var plr = new Player(obj1);
 	var obj2 = new RectObject(500, 30, 200, 140, true);
 	var text = new TextObject('Hello Sweetest Heart', 0, 100, true);
@@ -81,11 +81,11 @@ window.onload = function(){
 	// 	// audio.media.play();
 	// 	// scene.requestFullscreen();
 	// });
-	// text.addEvent('mousemove', function(e){
-	// 	var objt = e.canvasTargetObject;
-	// 	text.props.fillStyle = 'red';
-	// 	//scene.render();
-	// });
+	text.addEvent('click', function(e){
+		var objt = e.canvasTargetObject;
+		text.props.fillStyle = 'red';
+		//scene.render();
+	});
 	// obj4.addEvent('mousemove', function(e){
 	// 	var objt = e.canvasTargetObject;
 	// 	text.props.fillStyle = 'red';
@@ -93,7 +93,7 @@ window.onload = function(){
 	// 	//scene.render();
 	// });
 	function scaleObject(obj, amount){
-		var obj = new AnimationInstance({
+		var obj = new Task({
 			world:obj.world,
 			obj:obj,
 			scaled:0,
@@ -114,7 +114,7 @@ window.onload = function(){
 		return obj;
 	}
 
-	var scaleObjects2 = new AnimationInstance({
+	var scaleObjects2 = new Task({
 		world:obj2.world,
 		obj:obj2,
 		scaled:0,

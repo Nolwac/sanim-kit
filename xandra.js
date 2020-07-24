@@ -29,7 +29,7 @@ function Pen(scene, x, y, animation){
     var x = this.currentX;
     var y = this.currentY;
     
-      this.animation.instantly(function (){
+      this.animation.execute(function (){
         if(self.draw===true){
           func();
           if(self.world.playAnimation === false && self.play===true){
@@ -168,7 +168,7 @@ function Pen(scene, x, y, animation){
   this.penUp = function (){
     //this method triggers the raising of the pen
     var self = this;
-    this.animation.instantly(function (){
+    this.animation.execute(function (){
       self.draw = false;
     });//so that nothing gets drawn
   }
@@ -177,7 +177,7 @@ function Pen(scene, x, y, animation){
     var self = this;
     var x = this.currentX;
     var y = this.currentY;
-    this.animation.instantly(function (){
+    this.animation.execute(function (){
       self.draw = true;
     });
   }
@@ -261,7 +261,8 @@ function Pen(scene, x, y, animation){
           this.obj.setPosition(this.xOrigin+this.x*this.xScale, this.yOrigin+this.y*this.yScale);
         }
       },
-      apply: function (){
+      employ: function (){
+        //this method employs the data from the equation and uses it to perform some functions
         if(this.type === 'line'){
           //do things with point when it is line
           this.obj.penDown();
@@ -305,78 +306,6 @@ function Pen(scene, x, y, animation){
   this.world.addObject(this)
 }
 
-function Equation(obj){
-  //this is the constructor function for the equation object
-  if(typeof obj != "object"){
-    throw('parameter must be an object to create an equation');
-  }
-  this.xOrigin = 0;//setting X and Y origins as 0
-  this.yOrigin = 0;
-  this.x = 0;
-  this.y = 0;
-  this.xScale = 1; //this is the scale that will be used for the graphing on the x - axis
-  this.yScale = 1; //this is the scale that will be used on the x-axis
-  this.ended = false; //this sets if the computation should end or not
-  this.delay = 100;
-  this.compute = function(){
-    //this is the method for doing the computation for the equation
-  }
-  this.constraint = function(){
-    //this method puts a contraint on the object
-    return false;//returning false by default 
-  }
-  this.end = function(){
-    //this method states if the computation plot has ended or not
-    this.ended = true;//returning true by default ends the computation plot
-  }
-  this.increment = function(){
-    //this method defines how the values in the equation should be incremented
-  }
-  this.initialize = function(){
-    //this is where initialization can be done before the loop starts
-  }
-  this.start = function(){
-    this.initialize();
-    this.animation = new Animation(this.obj.world);//creating new animation for it to prevent lazy loading
-    this.animation.setInterval(this);
-    //add program statement to kikl the animation instance later on when the plotting is dine
-    //any animation on the xandra object will happen asynchronously with this, so if you want it to happen after this is done, then check to know when it is ended to execute the required animation s
-  }
-  this.loop = function (){
-    if(this.constraint() == true){
-      //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
-      //a give constraint and when it is out for harmonic function, so it is best to do it this way to allow developers add
-      //such feature to they software while developing
-      this.apply();//applying the computation
-    }
-    if(this.constraint() == false){
-      this.end();
-      if(this.ended === true){
-        this.status = false;
-      }else{
-        this.status = true;
-      }
-    }
-    this.increment();
-    this.compute();
-  }
-  Object.assign(this, obj);//copying the properties from the object given in parameter to the default objec, properties are overwritten
-}
-CircleObject.prototype.motionPath = function(equation){
-    //this method moves the object in the canvas using the equation object
-    var mover = {
-      obj:this,
-      apply: function (){
-        console.log(this.yOrigin);
-        this.obj.x = this.xOrigin + this.x*this.xScale;
-        this.obj.y = this.yOrigin + this.y*this.yScale;
-      }
-    }
-    Object.assign(mover, equation);//assigning the equation
-    mover.xOrigin = this.x;//changing the origin to the origin of the object
-    mover.yOrigin = this.y;
-    return mover;
-  }
 window.onload = function(){
   var canvas = document.getElementById("canvas");
   var context = canvas.getContext("2d");
@@ -415,7 +344,7 @@ window.onload = function(){
       type:"line",
       size:2,
       compute: function(){
-        this.y = this.x**2;
+        this.y = Math.pow(this.x, 2);
       },
       constraint: function(){
         return this.x <= 4.002;
@@ -535,11 +464,11 @@ window.onload = function(){
     }
     var nfib = [0, 1];
     pen.penDown();
-    for(let i=1; i<=n; i++){
+    for(var i=1; i<=n; i++){
       fib = nfib[i-1] + nfib[i];
       nfib[i+1] = fib;
       pen.arc(fib*scale, Math.PI*3);
-    };
+    }
     return nfib;
   }
   //pen.animation.asynchronous = true;

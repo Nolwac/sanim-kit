@@ -13,7 +13,7 @@ function Animation(world){
 	//the animation object sets the scene to be continually rerendering by creating a javascript animation frame that continually rerenders it
 	this.speedReference = 0.01;
 	window.sanimKitSpeedReference = this.speedReference;//setting the speed reference number gloabally;
-	this.animationInstances = new Array();
+	this.tasks = new Array();
 	
 	this.world = world;//setting the scene
 	this.animationOn = false;//property that will be used to put out animation and allow another object to start animation
@@ -44,7 +44,7 @@ function Animation(world){
 	this.linear = function(obj, direction, speed, easingFunction, length){
 		//this moves the object linearly towards to the right
 
-		var animationInstance = new AnimationInstance({
+		var task = new Task({
 			speed:speed,
 			direction:direction,
 			distanceControl:0,//distance control variable to check when we have reached the specified speed
@@ -99,8 +99,8 @@ function Animation(world){
 				}
 			}
 		});
-		self.addAnimationInstance(animationInstance);//adding the animation instance to the animation object
-		animationInstance.reset= function(param){
+		self.schedule(task);//adding the animation instance to the animation object
+		task.reset= function(param){
 			//this resets the animation instance so that the animation could take place again;
 			this.pauseAnimation = false;
 			this.animationStarted = false;
@@ -120,7 +120,7 @@ function Animation(world){
 			}
 			
 		}
-		return animationInstance;
+		return task;
 	}
 	this.fadeObject = function(obj, direction, speed, easingFunction){
 		//this is an animation to wipe an object
@@ -133,7 +133,7 @@ function Animation(world){
 		// if(initial_opacity==undefined){
 		// 	initial_opacity =1;
 		// }
-		var animationInstance = new AnimationInstance({
+		var task = new Task({
 			speed:speed,
 			direction:direction,
 			opacityControl:0,//distance control variable to check when we have reached the specified speed
@@ -186,8 +186,8 @@ function Animation(world){
 				}
 			},
 		});
-		self.addAnimationInstance(animationInstance);//adding the animation instance to the animation object
-		animationInstance.reset= function(param){
+		self.schedule(task);//adding the animation instance to the animation object
+		task.reset= function(param){
 			//this resets the animation instance so that the animation could take place again;
 			this.pauseAnimation = false;
 			this.animationStarted = false;
@@ -207,7 +207,7 @@ function Animation(world){
 			}
 				
 		}
-		animationInstance.executeOnStartOnly = function(){
+		task.executeOnStartOnly = function(){
 			//changing the execute on start only so as to make animation repeat iniitial executions possible from here possible from here
 			if(this.obj.direction == 'IN'){
 				this.obj.obj.props.globalAlpha = 0;
@@ -218,14 +218,14 @@ function Animation(world){
 			}
 			this.obj.executeOnStartOnly();
 		}
-		return animationInstance;
+		return task;
 
 	}
 
 	this.sleep = function(time){
 		//this method sleeps the animation with the animation object for a specified period of time in milliseconds
 		//this sleep is not windows animation frame based so will not pause while the user is not on tab on the webbrowser
-		var sleep = new AnimationInstance({
+		var sleep = new Task({
 			world:this.world,
 			status:true,
 			time:time,
@@ -237,12 +237,12 @@ function Animation(world){
 				window.setTimeout(function(){sleeper.status=false;}, sleeper.time);
 			}
 		});
-		this.addAnimationInstance(sleep);
+		this.schedule(sleep);
 		return sleep;
 	}
-    this.instantly = function(func){
+    this.execute = function(func){
         //performs an instant animation
-        var instance = new AnimationInstance({
+        var instance = new Task({
 	        world:this.world,
 	        status:true,
 	        execute: function (){
@@ -253,11 +253,11 @@ function Animation(world){
 	        	return status;
 	        }
     	});
-     	this.addAnimationInstance(instance)
+     	this.schedule(instance)
     }
 	this.setInterval = function(params){
 		//this method set an interval for a loop
-		var animInstance = new AnimationInstance(Object.assign({
+		var animInstance = new Task(Object.assign({
           isNotSet:true,
           delay:100,
           status:true,
@@ -285,7 +285,7 @@ function Animation(world){
           	//should be implemented in the loop method 
           }
         }, params)); 
-        this.addAnimationInstance(animInstance);
+        this.schedule(animInstance);
         return animInstance;
 	}
 	this.clearInterval = function(animInstance){
@@ -307,17 +307,17 @@ function Animation(world){
 			this.animationOn=false;
 			instance.pauseAnimation = true;
 			instance.animationStarted = false;
-			var instanceIndex = this.animationInstances.indexOf(instance);
-			this.animationInstances.splice(instanceIndex, 1);//removing the instance from the list to populating the list with unecessary intances
+			var instanceIndex = this.tasks.indexOf(instance);
+			this.tasks.splice(instanceIndex, 1);//removing the instance from the list to populating the list with unecessary intances
 			instance.added = false;//putting that the instance is no longer added since it has been removed from the animation object
 			instance.onEnded();//running something once the instance is finished
 		}
 	}
 	this.animateInstances = function(){
 		//this method executes a function as long as the animation frame is on
-		if(this.asynchronous===true || this.animationInstances.length<=0){
-			for(var i=0; this.animationInstances.length>i; i++){
-				var instance = this.animationInstances[i];
+		if(this.asynchronous===true || this.tasks.length<=0){
+			for(var i=0; this.tasks.length>i; i++){
+				var instance = this.tasks[i];
 				if((this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
 					this.animateInstance(instance);//animating the instance;
 					if(instance.obj.animationStatus()==false){
@@ -326,18 +326,18 @@ function Animation(world){
 				}
 			}
 		}else{
-			var instance = this.animationInstances[0];
+			var instance = this.tasks[0];
 			if((this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
 				this.animateInstance(instance);
 			}
 		}
 	}
 	
-	this.addAnimationInstance = function(animationInstance){
-		if(this.animationInstances.indexOf(animationInstance) < 0){
-			animationInstance.animationObject = this;
-			animationInstance.added = true;
-			this.animationInstances.push(animationInstance);
+	this.schedule = function(task){
+		if(this.tasks.indexOf(task) < 0){
+			task.animationObject = this;
+			task.added = true;
+			this.tasks.push(task);
 		}else{
 			throw('You are attempting to add an already existing animation instance');//making the developer aware of the mistake
 		}
@@ -347,13 +347,13 @@ function Animation(world){
 		//for(seq in sequence)
 	}
 }
-function AnimationInstance(obj){
+function Task(obj){
 	//this creates an animation instance to allow control of the animation timeline
 	this.obj = null;//note that this object could as well be an animation instance to
 	//this.repeatCheck = false;
 	if(obj != null){
 		this.obj = obj;
-		obj.animationInstance = this;//setting the animation instance of the object to be this
+		obj.task = this;//setting the animation instance of the object to be this
 		this.pauseAnimation=false;//setting that animation on that instance is not paused by default
 	}else{
 		throw('A JavaScript object must be provided to create an animation instance');
@@ -381,7 +381,7 @@ function AnimationInstance(obj){
 		Object.assign(newObj, this.obj);
 		newInstance.obj=newObj;
 		newInstance.reset(param);
-		this.animationObject.addAnimationInstance(newInstance);
+		this.animationObject.schedule(newInstance);
 	}
 	this.executeOnStartOnly = function(){
 		//this gets done the momement the animation instance starts
@@ -398,6 +398,7 @@ function AnimationInstance(obj){
 	}
 }
 function SanimObject(){
+	this.path2DObject = new Path2D();//this is the path2d object created for the path
 	this.lineWidth = 0.0000000000000001;//setting the lineWidth to a very low value so that the lines does not show by default
 	this.children  = []; //list of children embedded in the object
 	this.props = new Object();
@@ -424,9 +425,8 @@ function SanimObject(){
 	this.noAncestorTransformation = false;//with this set to true no parent or ancestor transformation is ever inherited
 	this.isInPath = function(x, y){
 		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
-		//the latest path is what isPointInPath looks at;
-		var status =  this.world.context.isPointInPath(x,y);
-		this.world.render();
+		//it uses the path2dobject of the object to know if it was pointed to;
+		var status =  this.world.context.isPointInPath(this.path2DObject, x, y);
 		return status;
 	}
 	this.setWorld = function(world){
@@ -541,6 +541,21 @@ function SanimObject(){
 		//this method removes the transformation that has been applied on the canvas so that other objects in the canvas will not be affected
 		this.world.context.restore();//restoring the state of the canvas
 	}
+	this.motionPath = function(equation){
+	  //this method moves the object in the canvas through a path using the equation object as a template for the motion path
+	  var mover = {
+	    obj:this,
+	    employ: function (){
+	      //this method employs the data from the equation and uses it to perform some functions
+	      this.obj.x = this.xOrigin + this.x*this.xScale;
+	      this.obj.y = this.yOrigin + this.y*this.yScale;
+	    }
+	  }
+	  Object.assign(mover, equation);//assigning the equation
+	  mover.xOrigin = this.x;//changing the origin to the origin of the object
+	  mover.yOrigin = this.y;
+	  return mover;
+	}
 	this.scale = function(x, y){
 		//the function execution here for scaling
 		//find out the mathematics behind the implementation of this and have it implemented
@@ -591,12 +606,16 @@ function SanimObject(){
 			[canvas api to draw paths];
 		*/
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
-		this.world.context.beginPath();
-		this.world.context.moveTo(this.renderingX, this.renderingY);
-		this.world.context.lineTo(this.renderingX, this.renderingY+this.renderingHeight);
-		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
-		this.world.context.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
-		this.world.context.closePath();
+		//this.world.context.beginPath();
+		//---------------------using the path2d object---------------------
+		delete this.path2DObject;//deleting the previous one so it does not stack the existing one to it
+		this.path2DObject = new Path2D();//creating new one
+
+		this.path2DObject.moveTo(this.renderingX, this.renderingY);
+		this.path2DObject.lineTo(this.renderingX, this.renderingY+this.renderingHeight);
+		this.path2DObject.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
+		this.path2DObject.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
+		this.path2DObject.closePath();
 		this.world.context.stroke();
 	}
 	this.setCanvasPropsForObject = function(){
@@ -702,17 +721,6 @@ function Player(obj){
 		this.world.render(); //re-rendering the scene after adjustments
 	}
 }
-function ButtonObject(x, y, width, height, fillRect = false){
-	RectObject.call(this, x, y, width, height, fillRect);
-	this.implementAfterAddedToScene = function(){
-		var cursor = this.world.context.canvas.style.cursor;
-		this.addEvent('mousemove', function(e){
-				e.target.style.cursor = 'pointer';
-		}, function(e){
-			e.target.style.cursor = cursor;
-		});
-	}
-}
 function TextObject(text, x, y, fillText= false){
 	//this is a text object
 	//note that at this point camera features does not affect the text properties like width and height
@@ -750,11 +758,11 @@ function TextObject(text, x, y, fillText= false){
 		}
 		this.applyTransformationOrigin();
 		this.applyTransformation();//applyiing transformation properties
-		if(this.fillBox==true){
-			this.world.context.fillRect(this.renderingX, this.renderingY, this.renderingWidth, this.renderingHeight);
-		}
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
 		this.drawPath();
+		if(this.fillBox==true){
+			this.world.context.fill(this.path2DObject);
+		}
 		this.setCanvasPropsForObject();//reseting again to apply text properties
 		this.renderFont();
 		this.renderText();
@@ -817,11 +825,11 @@ function RectObject(x, y, width, height, fillRect = false){
 		this.applyTransformationOrigin();
 		//next is to apply transformation on the object before rendering
 		this.applyTransformation();
-		if(this.fillRect==true){
-			this.world.context.fillRect(this.renderingX, this.renderingY, this.renderingWidth, this.renderingHeight);
-		}
 		//next is to draw a path round the object for event listening purpose
 		this.drawPath();
+		if(this.fillRect==true){
+			this.world.context.fill(this.path2DObject);
+		}
 		//finally we remove the transformation on the object
 		this.removeTransformation();//removing setted transformation properties so it does not affect the next object
 		
@@ -881,9 +889,11 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 		//remove the rest of the general properties that where not used here
 		this.applyTransformationOrigin();
 		this.applyTransformation();
-		if(this.newPath == true){
-      this.world.context.beginPath();
-		}
+		// if(this.newPath == true){
+		// 	this.world.context.beginPath();
+		// }
+		delete this.path2DObject;//deleting the existing path2d object
+		this.path2DObject = new Path2D();//creating a new one
 		for(var i = 0;i<this.paths.length;i++){
 			/* Trying to add the origin to the neccessary parameters of the path methods */
 			if(this.paths[i].pathMethod == 'lineTo' || this.paths[i].pathMethod == 'moveTo'){
@@ -941,26 +951,26 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 				this.renderingPaths[i].params = new Array(...this.paths[i].params);
 			}
 			if(this.paths[i].pathMethod == 'moveTo'){
-				this.world.context.moveTo(...this.renderingPaths[i].params);
+				this.path2DObject.moveTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathMethod == 'lineTo'){
-				this.world.context.lineTo(...this.renderingPaths[i].params);
+				this.path2DObject.lineTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathMethod == 'arcTo'){
-				this.world.context.arcTo(...this.renderingPaths[i].params);
+				this.path2DObject.arcTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathMethod == 'bezierCurveTo'){
-				this.world.context.bezierCurveTo(...this.renderingPaths[i].params);
+				this.path2DObject.bezierCurveTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathMethod == 'quadraticCurveTo'){
-				this.world.context.quadraticCurveTo(...this.renderingPaths[i].params);
+				this.path2DObject.quadraticCurveTo(...this.renderingPaths[i].params);
 			}else if(this.paths[i].pathMethod == 'arc'){
-				this.world.context.arc(...this.renderingPaths[i].params);
+				this.path2DObject.arc(...this.renderingPaths[i].params);
 			}
 		}
 		if(this.closePath==true){
-			this.world.context.closePath();
+			this.path2DObject.closePath();
 
 		}
-		this.world.context.stroke();
+		this.world.context.stroke(this.path2DObject);
 		if(this.fillPath==true){
-			this.world.context.fill()
+			this.world.context.fill(this.path2DObject)
 		}
 		//this.world.context.translate(-this.renderingX, -this.renderingY);//returning back to the origin of the canvas
 		this.removeTransformation();//removing the transformation applied on the object
@@ -1329,6 +1339,63 @@ function Integration(element, x, y, width, height){
 	delete this.rotationAngle;
 }
 
+function Equation(obj){
+  //this is the constructor function for the equation object
+  if(typeof obj != "object"){
+    throw('parameter must be an object to create an equation');
+  }
+  this.xOrigin = 0;//setting X and Y origins as 0
+  this.yOrigin = 0;
+  this.x = 0;
+  this.y = 0;
+  this.xScale = 1; //this is the scale that will be used for the graphing on the x - axis
+  this.yScale = 1; //this is the scale that will be used on the x-axis
+  this.ended = false; //this sets if the computation should end or not
+  this.delay = 100;
+  this.compute = function(){
+    //this is the method for doing the computation for the equation
+  }
+  this.constraint = function(){
+    //this method puts a contraint on the object
+    return false;//returning false by default 
+  }
+  this.end = function(){
+    //this method states if the computation plot has ended or not
+    this.ended = true;//returning true by default ends the computation plot
+  }
+  this.increment = function(){
+    //this method defines how the values in the equation should be incremented
+  }
+  this.initialize = function(){
+    //this is where initialization can be done before the loop starts
+  }
+  this.start = function(){
+    this.initialize();
+    this.animation = new Animation(this.obj.world);//creating new animation for it to prevent lazy loading
+    this.animation.setInterval(this);
+    //add program statement to kikl the animation instance later on when the plotting is dine
+    //any animation on the xandra object will happen asynchronously with this, so if you want it to happen after this is done, then check to know when it is ended to execute the required animation s
+  }
+  this.loop = function (){
+    if(this.constraint() == true){
+      //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
+      //a give constraint and when it is out for harmonic function, so it is best to do it this way to allow developers add
+      //such feature to they software while developing
+      this.employ();//employ the data from the coomputation of the equation. Utilize the method to use the data
+    }
+    if(this.constraint() == false){
+      this.end();
+      if(this.ended === true){
+        this.status = false;
+      }else{
+        this.status = true;
+      }
+    }
+    this.increment();
+    this.compute();
+  }
+  Object.assign(this, obj);//copying the properties from the object given in parameter to the default objec, properties are overwritten
+}
 /*
 Exporting the modules for use below
 */
@@ -1339,14 +1406,14 @@ var Sanim = {
 		SanimObject:SanimObject,
 		PathObject:PathObject,
 		RectObject:RectObject,
-		ButtonObject:ButtonObject,
 		TextObject:TextObject,
 		ImageObject:ImageObject,
 		VideoObject:VideoObject,
 		AudioObject:AudioObject,
 		Integration:Integration,
 		Animation:Animation,
-		AnimationInstance:AnimationInstance
+		Task:Task,
+		Equation:Equation
 	}
 if(typeof exports != undefined){//checking to be sure it is not being used from a script tag
 	exports.default = Sanim;
@@ -1356,12 +1423,12 @@ if(typeof exports != undefined){//checking to be sure it is not being used from 
 	exports.SanimObject = SanimObject;
 	exports.PathObject = PathObject;
 	exports.RectObject = RectObject;
-	exports.ButtonObject = ButtonObject;
 	exports.TextObject = TextObject;
 	exports.ImageObject  = ImageObject;
 	exports.VideoObject = VideoObject;
 	exports.AudioObject = AudioObject;
 	exports.Integration = Integration;
 	exports.Animation = Animation;
-	exports.AnimationInstance = AnimationInstance;
+	exports.Task = Task;
+	exports.Equation = Equation;
 }
