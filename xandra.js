@@ -316,7 +316,7 @@ window.onload = function(){
   scene.context.canvas.width = window.innerWidth;
   scene.context.canvas.height = window.innerHeight;
   scene.render();
-  var testCircle = new CircleObject(500,300, 20, true);
+  var testCircle = new CircleObject(100,100, 20, true);
   testCircle.props = {
     fillStyle:"lightgreen"
   }
@@ -325,7 +325,7 @@ window.onload = function(){
   //scene.playAnimation = false;
   
   
-  var pen = new Pen(scene, 500, 300);
+  var pen = new Pen(scene, 100, 100);
   //pen.play = false;
   pen.props={
     fillStyle:"crimson",
@@ -335,9 +335,11 @@ window.onload = function(){
   function moveCircle(){
     pen.fragments = 0;
     pen.penUp();
+    pen.x = scene.width/2, pen.y=scene.height/2;
+    testCircle.x = scene.width/2, testCircle.y = scene.height/2;
     var equation = new Equation ({
       xScale:100,
-      yScale:50,
+      yScale:-50,
       x:-4,
       y:0,
       delay:30,
@@ -353,11 +355,13 @@ window.onload = function(){
         this.x+=0.05;
       }
     });
-    var mover = testCircle.motionPath(equation);
-    mover.delay = 30;
-    var line = pen.graph(equation);
-    line.start();
-    mover.start();
+    pen.animation.execute(function (){
+      var mover = testCircle.motionPath(equation);
+      mover.delay = 30;
+      var line = pen.graph(equation);
+      line.start();
+      mover.start();
+    });
   }
   moveCircle();
   function test1(){
@@ -481,5 +485,31 @@ window.onload = function(){
   //plotEquation();
   //drawFibonnaci(10);
   //pen.path.fillPath = true;
+  
+ var gd = scene.createGrid(100, 50);
+  // gd.grid.posXNum = 3;
+  // gd.grid.negXNum = 3;
+  // gd.grid.posYNum = 3;
+  // gd.grid.negYNum = 3;
+  gd.grid.createAndRender();
+  gd.gridScene.render();
+  var gridBox = gd.grid.getBox(1, 5);
+  if (gridBox){
+    gridBox.props.fillStyle = "green";
+    gridBox.fillRect = true;
+    //gridbox.scale(10, 10)
+    //gd.gridScene.render();
+  }
+  gd.grid.point(-2, 6, 10);
+  var calib = gd.grid.getCalibration(-2, 0);
+  if(calib){
+    calib.scale(3, 3);
+  }
+  var box = gd.grid.getBox(-1, 5);
+  gd.grid.removeBox(box);
+  var calib2 = gd.grid.getCalibration(-1, 0);
+  gd.grid.removeCalibration(calib2);
+  //gd.grid.place(testCircle, 3.3, 4);
+  gd.gridScene.render();
 
 }

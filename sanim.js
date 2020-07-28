@@ -424,7 +424,6 @@ function SanimObject(){
 	this.noTransformationWithParent = false;//with this set to true no parent transformation is ever inherited
 	this.noAncestorTransformation = false;//with this set to true no parent or ancestor transformation is ever inherited
 	this.isInPath = function(x, y){
-		this.render(); // we have to re-render for the canvas context to catch this as the latest rendering since
 		//it uses the path2dobject of the object to know if it was pointed to;
 		var status =  this.world.context.isPointInPath(this.path2DObject, x, y);
 		return status;
@@ -616,7 +615,7 @@ function SanimObject(){
 		this.path2DObject.lineTo(this.renderingX+this.renderingWidth, this.renderingY+this.renderingHeight);
 		this.path2DObject.lineTo(this.renderingX+this.renderingWidth, this.renderingY);
 		this.path2DObject.closePath();
-		this.world.context.stroke();
+		this.world.context.stroke(this.path2DObject);
 	}
 	this.setCanvasPropsForObject = function(){
 		//this method sets the canvas props to the objects rendering properties
@@ -1105,8 +1104,12 @@ function Scene(context){
 			if(this.isParentWorld===true){//fit to the screen provided this is the parent world;this.context.canvas.position = 'absolute';
 				fitCanvasToScreen(this.context);
 			}
+			Object.assign(this.context, this.canvasContextProperties)
 			this.context.fillStyle = this.color;
-			this.context.fillRect(0,0,this.context.canvas.width, this.context.canvas.height);
+			this.context.clearRect(0,0,this.context.canvas.width, this.context.canvas.height);
+      this.context.fillRect(0,0,this.context.canvas.width, this.context.canvas.height);
+			this.width = this.context.canvas.width;
+			this.height = this.context.canvas.height;
 		}
 		this.executeOnRender();
 		if(this.player){
@@ -1119,6 +1122,35 @@ function Scene(context){
 			var obj = this.objects[i];
 			obj.render();
 		}
+	}
+	this.createGrid = function (xScale, yScale){
+	  //this method creates a grid and puts it on top the scene. it does this using the grid object
+    var canvas = document.createElement("canvas");//creating the grid scene canvas
+    this.context.canvas.parentElement.appendChild(canvas);//appending the canvas to the parent element of the scene canvas element.This will make them sibblings
+    var context = canvas.getContext("2d");//creating context for the grid scene
+    var integration = new Integration(context.canvas, 0, 0, window.innerWidth, window.innerHeight);//creating an integration object for the grid scene
+    this.addChild(integration);
+    var gridScene = new Scene(context);//creating a new scene to render the grid
+    //gridScene.integration = integration;//assigning the integration to it for easy accessibility later on.
+    this.render();//rendering the scene at least once so as to make sure that the width and height are set before assigning them to the grid scene context
+    context.canvas.width = this.width;
+    context.canvas.height = this.height;
+    gridScene.canvasContextProperties.globalAlpha = 0;//setting the global alpha to 0 so that it will be completely transparent
+    gridScene.render();//rendering the grid scene for height and width property to be set before adding the grid object to it
+    
+    var grid = new Grid(gridScene, gridScene, xScale, yScale);//creating the grid object
+    
+    gridScene.color = "black";//giving it default background color of black
+    // this.grid.createGridBoxes();//creating the grid boxes
+    // this.grid.createAxis();//creating the axis of the grid
+    // this.grid.calibrateAxis();//calibrating the grid
+    gridScene.render();//rendering the grid scene
+    gridScene.playAnimation = false;//making that animation is paused on the grid scene so that the whole world is not overloaded with activities
+    return {
+      grid:grid, 
+      gridScene:gridScene,
+      integration:integration
+    }
 	}
 	this.runAnimations = function(){
 		//this runs the animations that has been scheduled
@@ -1297,6 +1329,9 @@ function Integration(element, x, y, width, height){
 		this.element.style.top = this.renderingY + 'px';
 		this.element.style.left = this.renderingX + 'px';
 		this.renderFont();
+		
+		// this.element.width = this.renderingWidth;
+		// this.element.height = this.renderingHeight;
 	}
 	
 	this.applyTransformation = function(){
@@ -1395,6 +1430,211 @@ function Equation(obj){
     this.compute();
   }
   Object.assign(this, obj);//copying the properties from the object given in parameter to the default objec, properties are overwritten
+}
+
+function Grid(parent, scene, xScale, yScale){
+  this.parent = parent;
+  this.width = parent.width;
+  this.height = parent.height;
+  this.world = scene;//Note that the scene can also be the parent housing the grid
+  this.gridBoxes = new Array();//the grid boxes
+  this.calibrations = new Array();//this holds the calibrations
+  this.xScale = xScale;//scale to be used on x-axis
+  this.yScale = yScale;//scale on y-axis
+  //the above means that each box is a 20*20 pixel box
+  /*Note to change the direction of any axis make the scale on that axis negative of the current scale
+  e.g this.xScale = -100
+  */
+  this.xOrigin = parent.width/2;//the x Origin of the grid
+  this.yOrigin = parent.height/2;//the y origin of tge grid
+  this.posXNum = Math.ceil(this.xOrigin/Math.abs(this.xScale));//number of grid boxes in a single row in the positive x direction measuring from the origin, it is equivalent to number of grid lines in the positive x axis.
+  this.negXNum = this.posXNum;//negative part of the above.
+  this.posYNum = Math.ceil(this.yOrigin/Math.abs(this.yScale));//the above for y
+  this.negYNum = this.posYNum;
+  this.xAxis = null;//the x axis
+  this.yAxis = null;//the y axis
+  this.props = {
+    lineWidth:1,
+    fillStyle:"white",
+    strokeStyle:"white",
+    globalAlpha:0.4
+  }
+  this.createGridBoxes = function (){
+    //this method creates the grid boxes from the parameter of the grid object
+    delete this.gridBoxes;//deleting the previous array
+    this.gridBoxes = new Array();//creating new one
+    for(var x = 0; x<this.posXNum; x++){
+      //for (x, y)
+      for(var y = 0; y<this.posYNum; y++){
+        this.createGridBox(x, y);
+      }
+      //for (x, -y)
+      for(var y = 1; y<=this.negYNum; y++){
+        this.createGridBox(x, -y);
+      }
+      
+    }
+    for(var x = 1; x<=this.negXNum; x++){
+      //for (-x, y)
+      for(var y = 0; y<this.posYNum; y++){
+        this.createGridBox(-x, y);
+      }
+      //for (-x, -y)
+      for(var y = 1; y<=this.negYNum; y++){
+        this.createGridBox(-x, -y);
+      }
+      
+    }
+  }
+  this.createAxis = function (){
+    //this method draws the axis on of the grid
+    this.xAxis = new StraightLineObject(0, this.yOrigin, this.width, this.yOrigin);
+    this.xAxis.props = {
+      lineWidth:4,
+      strokeStyle:"lightgreen",
+      globalAlpha:0.5
+    }
+    
+    this.yAxis = new StraightLineObject(this.xOrigin, 0, this.xOrigin, this.height);
+    this.yAxis.props = {
+      lineWidth:4,
+      strokeStyle:"lightgreen",
+      globalAlpha:0.4
+    }
+    
+    this.parent.addChild(this.xAxis);
+    this.parent.addChild(this.yAxis);
+  }
+  this.calibrateAxis = function (){
+    //this method calibrates the axis
+    //for +x direction
+    for(var x=0; x<=this.posXNum; x++){
+      this.calibrate(x, 0, x);
+    }
+    //for -x direction
+    for(var x=1; x<=this.negXNum; x++){
+      this.calibrate(-x, 0, -x);
+    }
+    //for +y direction 
+    for(var y=0; y<=this.posYNum; y++){
+      this.calibrate(0, y, y);
+    }
+   //for -y direction 
+    for(var y=1; y<=this.negYNum; y++){
+      this.calibrate(0, -y, -y);
+    }
+  }
+  this.calibrate = function (x, y, value){
+    //this method calibrates any point in the grid, given x, y.
+    var calib = new TextObject(value, this.xOrigin + x*this.xScale, this.yOrigin + y*this.yScale, true);
+    
+    this.calibrations.push(calib);
+    calib.xCord = x;
+    calib.yCord = y;
+    calib.value = value;
+    
+    this.parent.addChild(calib);
+    Object.assign(calib.props, this.props);
+    
+    calib.props.font = Math.ceil((Math.abs(this.xScale)+Math.abs(this.yScale))/7) + "px " + "bold italic";
+  }
+  this.createGridBox = function (x, y){
+    //this method takes cordinate parameter on the grid and creates a grid box on that cordinate
+    var box = new RectObject(this.xOrigin + x*this.xScale, this.yOrigin + y*this.yScale, this.xScale, this.yScale);
+    this.gridBoxes.push(box);
+    box.xCord = x;
+    box.yCord = y;
+    this.parent.addChild(box);
+    Object.assign(box.props, this.props);
+  }
+  this.renderBoxes = function(){
+    for(var i=0; i<this.gridBoxes.length; i++){//this will render all the gride boxes
+      this.gridBoxes[i].render();
+    }
+  }
+  this.renderCalibrations = function(){
+    //this method renders the calibrations
+    for(var i=0; i<this.calibrations.length; i++){//this will render all the gride boxes
+      this.calibrations[i].render();
+    }
+  }
+  this.createAndRender = function(axis=true, calibration=true){
+    //this method creates the gridBoxes and the axis with it's calibration and renders it depending on parameter given
+    this.createGridBoxes();
+    this.renderBoxes();
+    if(axis===true){
+      this.createAxis();
+      this.xAxis.render();
+      this.yAxis.render();
+    }
+    if(calibration ===true){
+      this.calibrateAxis();
+      this.renderCalibrations();
+    }
+  }
+  this.render = function (){
+    this.renderBoxes();
+    if(this.xAxis){
+      this.xAxis.render();
+    }
+    if(this.yAxis){
+      this.yAxis.render();
+    }
+    this.renderCalibrations();
+    
+  }
+  this.getBox = function(x, y){
+    //this method gets a box based on it x, y position
+    for(var i = 0; i<this.gridBoxes.length; i++){
+      var box = this.gridBoxes[i];
+      if(box.xCord == x && box.yCord == y){
+        
+        return box;
+        //break;
+      }
+    }
+    return null;
+  }
+  this.getCalibration = function(x, y){
+    for(var i = 0; i<this.calibrations.length; i++){
+      var calib = this.calibrations[i];
+      if(calib.xCord == x && calib.yCord == y){
+        return calib;
+      }
+    }
+    return null;
+  }
+  this.removeBox = function(box){
+    //this method removes the box from the grid.
+    this.parent.removeChild(box);//removes it from the parent object
+    var index = this.gridBoxes.indexOf(box);
+    this.gridBoxes.splice(index, 1);//removing it from the grid boxes array
+    //delete box;//deleting the box object
+  }
+  this.removeCalibration = function(calib){
+    //this method removes the calibration from the grid
+    this.parent.removeChild(calib);//removes it from the parent object
+    var index = this.calibrations.indexOf(calib);
+    this.calibrations.splice(index, 1);//removing it from the calibrations array
+  }
+  this.point = function(x, y, radius = 5){
+    //this reveals a point on the grid
+    var point = new CircleObject(this.xOrigin + x*this.xScale, this.yOrigin + y*this.yScale, radius, true );
+    this.parent.addChild(point);
+    Object.assign(point.props, this.props);
+    point.render();
+    return point;
+  }
+  this.place = function(obj, x, y){
+    //this method places a sanim Object at a particular point on the grid
+    var pX=0, pY=0;//parent X and Y position
+    if(this.parent.x){
+      pX = this.parent.x;
+      pY = this.parent.y;
+    }
+    obj.x = this.xOrigin + x*this.xScale + pX;
+    obj.y = this.yOrigin + y*this.yScale + pY;
+  }
 }
 /*
 Exporting the modules for use below
