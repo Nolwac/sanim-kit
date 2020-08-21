@@ -23,15 +23,15 @@ const users = [
 const siteConfig = {
   title: 'Sanim Kit', // Title for your website.
   tagline: 'Simulation and Animation on the web',
-  url: 'https://sanimkit.nwafor.org', // Your website URL
-  baseUrl: '/', // Base URL for your project */
+  url: 'https://Nolwac.github.io', // Your website URL
+  baseUrl: '/sanim-kit/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
-  projectName: 'Sanim',
-  organizationName: 'Sanim-Kit',
+  projectName: 'sanim-kit',
+  organizationName: 'Nolwac',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
