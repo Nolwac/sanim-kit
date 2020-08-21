@@ -363,7 +363,7 @@ window.onload = function(){
       mover.start();
     });
   }
-  moveCircle();
+  //moveCircle();
   function test1(){
     pen.forward(200);
     pen.left(scene.radian(90));
@@ -511,5 +511,24 @@ window.onload = function(){
   gd.grid.removeCalibration(calib2);
   //gd.grid.place(testCircle, 3.3, 4);
   gd.gridScene.render();
+  testCircle.fadeOut(pen.animation, 1000);
+  pen.animation.sleep(1000);
+  testCircle.fadeIn(pen.animation, 1000);
+  var text = new TextObject("How are you doing dear friend", 100, 100, true);
+  text.props = {
+    font: "40px bold arial"
+  }
+  scene.addObject(text);
+  text.fadeOut(pen.animation, 100);
+  text.fadeIn(pen.animation, 1000);
+  text.write(pen.animation, 2000);
+  var text2 = new TextObject("2", 200, 200, true);
+  text2.props = {
+    font: "120px san-serif",
+    fillStyle: "orange"
+  }
+  scene.addObject(text2);
+  text2.superscript('5', 4/10);
+  text2.subscript('10', 1/3);
 
 }

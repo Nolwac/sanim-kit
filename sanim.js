@@ -19,208 +19,6 @@ function Animation(world){
 	this.animationOn = false;//property that will be used to put out animation and allow another object to start animation
 	this.asynchronous = true;//this allows the animations to occur at same time for all the object and not one at a time, then the other
 	world.animationObjects.push(this)//pushing the animation to the scene so that it can take effect
-	this.animationEasingFunction = {
-		//this object will hold animation easing functions like quadratic
-		quadraticFast: function(counter, value){
-			//returns the exponential of given value
-			counter+=window.sanimKitSpeedReference;
-			value = counter*counter;
-			return [counter, value];
-		},
-		constant: function(counter, value){
-			//returns the value given
-			return [counter, value];
-		}
-	}
-
-	this.AEF = this.animationEasingFunction;//for the sake of convenience using the framework as the later is very long
-	var self = this;
-	this.setSpeedReference = function(value){
-		//this method sets the speed animation speed reference number
-		this.speedReference = value;
-		window.sanimKitSpeedReference = this.speedReference;//setting it globally as well
-	}
-
-	this.linear = function(obj, direction, speed, easingFunction, length){
-		//this moves the object linearly towards to the right
-
-		var task = new Task({
-			speed:speed,
-			direction:direction,
-			distanceControl:0,//distance control variable to check when we have reached the specified speed
-			initialSpeed:speed,
-			easingControl:1, 
-			counter: 1,//this is for applying easing to the animation;
-			length: length,
-			obj:obj,
-			world:obj.world,
-			easingFunction:easingFunction,
-			execute: function(){
-					this.speed = this.initialSpeed*window.sanimKitSpeedReference*this.easingControl;//setting the speed with reference to the speed reference of the Animation object
-					//by placing the above line of code inside the animate function instead of above it, it means that changing the world speed reference affects
-					//the speed of the object while the animation is still ongoing
-					var execFunc = this.easingFunction(this.counter, this.easingControl);//updating the easing controller to apply easing effect
-					this.counter = execFunc[0], this.easingControl = execFunc[1];
-					if(this.length){
-						if(this.distanceControl >= this.length){
-							if(this.direction=='LEFT'){
-								this.obj.x=this.obj.xInitial - this.length;
-							}else if(this.direction=='RIGHT'){
-								this.obj.x=this.obj.xInitial + this.length;
-							}else if(this.direction=='UP'){
-								this.obj.y=this.obj.yInitial - this.length;
-							}else if(this.direction=='DOWN'){
-								this.obj.y=this.obj.yInitial + this.length;
-							}
-						}
-						this.distanceControl += this.speed;
-					}
-					if(this.direction=='LEFT'){
-						this.obj.x-=this.speed;
-					}else if(this.direction=='RIGHT'){
-						this.obj.x+=this.speed;
-					}else if(this.direction=='UP'){
-						this.obj.y-=this.speed;
-					}else if(direction=='DOWN'){
-						this.obj.y+=this.speed;
-					}
-					//obj.world.render();
-			}, 
-			animationStatus: function(){
-				if(this.length){
-					if(this.distanceControl >= this.length){
-						return false;//putting off the animationn for another animation to take place
-					}else{
-						return true;
-					}
-					//this.distanceControl += this.speed;
-				}else{
-					return true;
-				}
-			}
-		});
-		self.schedule(task);//adding the animation instance to the animation object
-		task.reset= function(param){
-			//this resets the animation instance so that the animation could take place again;
-			this.pauseAnimation = false;
-			this.animationStarted = false;
-			Object.assign(this.obj, {
-				distanceControl:0,
-				easingControl:1, 
-				counter: 1
-			});
-			if(param){
-				Object.assign(this.obj, param);
-				if(param.speed){
-					this.obj.initialSpeed = param.speed;
-				}
-				if(param.obj){
-					this.obj.world = param.obj.world;
-				}
-			}
-			
-		}
-		return task;
-	}
-	this.fadeObject = function(obj, direction, speed, easingFunction){
-		//this is an animation to wipe an object
-		// var initial_opacity = obj.props.globalAlpha;
-		if(direction == 'IN'){
-			obj.props.globalAlpha = 0;
-		}else if(direction=='OUT'){
-			obj.props.globalAlpha = 1;
-		}
-		// if(initial_opacity==undefined){
-		// 	initial_opacity =1;
-		// }
-		var task = new Task({
-			speed:speed,
-			direction:direction,
-			opacityControl:0,//distance control variable to check when we have reached the specified speed
-			initialSpeed:speed,
-			easingControl:1, 
-			counter: 1,//this is for applying easing to the animation;
-			opacity: 1,
-			obj:obj,
-			world:obj.world,
-			easingFunction:easingFunction,
-			execute: function(){
-					this.speed = this.initialSpeed*window.sanimKitSpeedReference*this.easingControl;//setting the speed with reference to the speed reference of the Animation object
-					//by placing the above line of code inside the animate function instead of above it, it means that changing the world speed reference affects
-					//the speed of the object while the animation is still ongoing
-					var execFunc = this.easingFunction(this.counter, this.easingControl);//updating the easing controller to apply easing effect
-					this.counter = execFunc[0], this.easingControl = execFunc[1];
-					if(this.opacity){
-						if(this.direction=='IN'){
-							if(this.opacityControl >= this.opacity){
-								this.obj.props.globalAlpha=this.opacity;
-							}
-							this.opacityControl += this.speed;
-						}else if(this.direction=='OUT'){
-							if(this.opacityControl <= this.opacity){
-								this.obj.props.globalAlpha=this.opacity;
-							}
-							this.opacityControl -= this.speed;
-						}
-					}
-					if(this.direction=='IN'){
-						this.obj.props.globalAlpha+=this.speed;
-					}else if(this.direction=='OUT'){
-						this.obj.props.globalAlpha-=this.speed;
-					}
-					//obj.world.render();
-			}, 
-			animationStatus: function(){
-				if(this.direction=='IN'){
-					if(this.opacityControl >= this.opacity){
-						return false;
-					}else{
-						return true;
-					}
-				}else if(this.direction=='OUT'){
-					if(this.opacityControl <= this.opacity){
-						return false;
-					}else{
-						return true;
-					}
-				}
-			},
-		});
-		self.schedule(task);//adding the animation instance to the animation object
-		task.reset= function(param){
-			//this resets the animation instance so that the animation could take place again;
-			this.pauseAnimation = false;
-			this.animationStarted = false;
-			Object.assign(this.obj, {
-				opacityControl:0,
-				easingControl:1, 
-				counter: 1
-			});
-			if(param){
-				Object.assign(this.obj, param);
-				if(param.speed){
-					this.obj.initialSpeed = param.speed;
-				}
-				if(param.obj){
-					this.obj.world = param.obj.world;
-				}
-			}
-				
-		}
-		task.executeOnStartOnly = function(){
-			//changing the execute on start only so as to make animation repeat iniitial executions possible from here possible from here
-			if(this.obj.direction == 'IN'){
-				this.obj.obj.props.globalAlpha = 0;
-				this.obj.opacity =1;
-			}else if(this.obj.direction == 'OUT'){
-				this.obj.obj.props.globalAlpha = 1;
-				this.obj.opacity =0;
-			}
-			this.obj.executeOnStartOnly();
-		}
-		return task;
-
-	}
 
 	this.sleep = function(time){
 		//this method sleeps the animation with the animation object for a specified period of time in milliseconds
@@ -270,8 +68,7 @@ function Animation(world){
             var self = this;
             if(this.isNotSet){
               this.interval = setInterval(() => {
-                if(self.animationStatus==false){
-                	self.status = false;//making sure that it goes off the list of animations to be performed
+                if(self.animationStatus()==false){
                     clearInterval(self.interval);
                 }else{
                   self.loop();
@@ -293,7 +90,7 @@ function Animation(world){
 		animInstance.obj.status = false;//and that is all that is needed to clear it, finished
 	}
 
-	this.animateInstance = function(instance){
+	this.animateTask = function(instance){
 		//this method animates a single instance
 		if(instance.animationStarted==false){
 			//instance.obj.executeOnStartOnly();
@@ -313,22 +110,22 @@ function Animation(world){
 			instance.onEnded();//running something once the instance is finished
 		}
 	}
-	this.animateInstances = function(){
+	this.animateTasks = function(){
 		//this method executes a function as long as the animation frame is on
 		if(this.asynchronous===true || this.tasks.length<=0){
 			for(var i=0; this.tasks.length>i; i++){
 				var instance = this.tasks[i];
 				if((this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
-					this.animateInstance(instance);//animating the instance;
+					this.animateTask(instance);//animating the instance;
 					if(instance.obj.animationStatus()==false){
-						break;//breaking the loop since an item in the list of animation instances is being removed, check animateInstance method
+						break;//breaking the loop since an item in the list of animation instances is being removed, check animateTask method
 					}
 				}
 			}
 		}else{
 			var instance = this.tasks[0];
 			if((this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
-				this.animateInstance(instance);
+				this.animateTask(instance);
 			}
 		}
 	}
@@ -451,8 +248,8 @@ function SanimObject(){
 			//this will throw an error as there is no world related to the parent object
 			throw("can not add child object to parent as the parent have not been added to a world(scene)");
 		}else{
-			obj.x = obj.xInitial + this.x;//setting the origin of the child object to be with respect to the origin of the parent object
-			obj.y = obj.yInitial + this.y;//we are using the initial settings because it is tamper proof;
+			obj.x = obj.initialX + this.x;//setting the origin of the child object to be with respect to the origin of the parent object
+			obj.y = obj.initialY + this.y;//we are using the initial settings because it is tamper proof;
 			this.children.push(obj);//adding the child object to the list of children to the parent object
 			this.world.addObject(obj);//also adding it to the list of objects in the scene
 			obj.parentObject = this;//setting the parent object of the added object to this object
@@ -499,6 +296,42 @@ function SanimObject(){
 	this.show = function(){
 		//this method shows the object in the canvas
 		this.props.globalAlpha = 1;
+	}
+	this.fadeOut = function(anim, time){
+		//this method takes an animation object as parameter
+		return anim.setInterval({
+			obj:this,
+			delay:time/100,
+			loop: function(){
+				if(this.obj.props.globalAlpha === undefined){
+					this.obj.props.globalAlpha = this.obj.world.canvasContextProperties.globalAlpha;
+				}
+				if(this.obj.props.globalAlpha <= 0.01){
+					this.status = false;
+					this.obj.props.globalAlpha = 0;
+				}else{
+					this.obj.props.globalAlpha -= 0.01;
+				}
+			}
+		});
+	}
+	this.fadeIn = function(anim, time){
+		//this method takes an animation object as parameter
+		return anim.setInterval({
+			obj:this,
+			delay:time/100,
+			loop: function(){
+				if(this.obj.props.globalAlpha === undefined){//checking if the global alpha property exist
+					this.obj.props.globalAlpha = this.obj.world.canvasContextProperties.globalAlpha;//assigning the default value;
+				}
+				if(this.obj.props.globalAlpha >= 0.99){
+					this.status = false;
+					this.obj.props.globalAlpha = 1;
+				}else{
+					this.obj.props.globalAlpha += 0.01;
+				}
+			}
+		});
 	}
 	this.applyTransformation = function(child={
 		transformWithParent:true, scaleWithParent:true, translateWithParent:true, rotateWithParent:true,
@@ -599,13 +432,7 @@ function SanimObject(){
 	}
 	this.drawPath = function(){
 		//this method draws a path round th object for event listening purposes
-		/*  
-			Path2D could serve the purpose but it is not stable yet so could have issue running in some browsers
-			var path = new Path2D();
-			[canvas api to draw paths];
-		*/
 		//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
-		//this.world.context.beginPath();
 		//---------------------using the path2d object---------------------
 		delete this.path2DObject;//deleting the previous one so it does not stack the existing one to it
 		this.path2DObject = new Path2D();//creating new one
@@ -626,8 +453,8 @@ function SanimObject(){
 		//this method sets the rendering origin parameter of the object to align with the parent object
 		if(this.parentObject){
 			//checking if the object has parent, so we could readjust to fit to the parent object
-			this.x = this.xInitial + this.parentObject.x;
-			this.y = this.yInitial + this.parentObject.y;
+			this.x = this.initialX + this.parentObject.x;
+			this.y = this.initialY + this.parentObject.y;
 		}
 
 	}
@@ -733,7 +560,7 @@ function TextObject(text, x, y, fillText= false){
 	this.text = text;
 	this.textMeasurement = null;
 	this.boxProps = {paddingX:0, paddingY:0};
-	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.initialX = this.x, this.initialY = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.setTransformationOriginToCenter=true;
 	this.fontSize=10;
 	this.renderingFontSize = this.fontSize;
@@ -744,10 +571,8 @@ function TextObject(text, x, y, fillText= false){
 			//trying the extract the width property of the text from the font information that was given
 			this.fontSize = this.props.font.substring(this.props.font.search(/[0-9]+px/), this.props.font.search(/[0-9]px/)+1);// this finds extracts the fontSize of the text from the text
 		}
-		this.renderFont();
-		this.textMeasurement = this.world.context.measureText(this.text);
-		this.width = this.textMeasurement.width;
-		this.height = this.renderingFontSize*(36/50);
+		this.measureFont();
+		this.measureText();
 		this.alignOriginWithParent();
 		this.setRenderingParameters();
 		Object.assign(this.world.context, this.world.canvasContextProperties);//reseting the change so that the changes for the text box itself could be applied
@@ -763,13 +588,19 @@ function TextObject(text, x, y, fillText= false){
 			this.world.context.fill(this.path2DObject);
 		}
 		this.setCanvasPropsForObject();//reseting again to apply text properties
-		this.renderFont();
+		this.measureFont();
 		this.renderText();
 		this.removeTransformation();//removing setted transformation properties so it does not affect the next object
 
 	}
-	this.renderFont = function(){
-		//takes care of rendering the font of the integration
+	this.measureText = function(){
+		//-----taking care of measuring the dimension of the text
+		this.textMeasurement = this.world.context.measureText(this.text);
+		this.width = this.textMeasurement.width;
+		this.height = this.renderingFontSize*(36/50);
+	}
+	this.measureFont = function(){
+		//takes care of measuring the font of the text
 		if(this.world.camera){
 			this.renderingFontSize = this.fontSize*this.world.camera.zoom;
 		}else{
@@ -780,7 +611,53 @@ function TextObject(text, x, y, fillText= false){
 		if(this.world.camera && this.props.lineWidth){
 			this.world.context.lineWidth = this.world.context.lineWidth*this.world.camera.zoom;
 		}
+		
 
+	}
+	this.write = function(anim, time, sound=false){
+	//this method write the text word by word
+		return anim.setInterval({
+			text:this.text,
+			position:0,//positon of text splice at each time
+			obj:this,
+			sound:sound,
+			delay:time/this.text.length,//the interval of time
+			loop:function(){
+				//this is the execution
+				this.obj.text = this.text.slice(0, this.position);//assigning the spliced text to the text object
+				if(this.sound){//checking if they is a sound to play
+					if(this.sound.media.paused == true){
+						this.sound.media.play();//playing the sound if the sound is paused
+					}
+				}
+				if(this.position >= this.text.length){
+					this.status = false;//ending the interval
+					if(this.sound){
+						this.sound.media.pause();//pausing the sound if the sound is still playing
+					}
+				}
+				this.position++;
+			}
+		});
+	}
+	this.superscript = function(text, ratio){
+		//this method creates a text object that positions itself like a subscript to the current text object.
+		this.render();
+		var obj = new TextObject(text, this.width, 2);//putting 2 in the y position to account for canvas offset on text 
+		obj.fontSize = parseInt(this.fontSize*ratio);//setting the fontsize to be a fraction of the ration and converting to integer
+		Object.assign(obj.props, this.props);//making it's property equal to the parent object
+		obj.props.font = this.props.font.replace(String(this.fontSize), String(obj.fontSize));//changing the actual font property
+		obj.fillText = this.fillText;//setting the fillText opition to equal the fillText of the parent;
+		this.addChild(obj);//adding it to the parent
+		return obj;
+	}
+	this.subscript = function(text, ratio){
+		//this method creates a text object that positions itself like a subscript to the current text object.
+		obj = this.superscript(text, ratio);
+		obj.render();//rendering object so as to use properties calculated during rendering to make adjustments to position
+		obj.initialY = this.height-obj.height+2;//making adjustment to the position
+		obj.y = obj.initialY;
+		return obj;
 	}
 	this.renderText = function(){
 		//this method renders the actual text to the canvas
@@ -809,7 +686,7 @@ function RectObject(x, y, width, height, fillRect = false){
 	//this constructor function is for the rectangle object, this takes care of the operations that has to do with the objects in the canvas
 	SanimObject.call(this);
 	this.x = x, this.y = y, this.width = width, this.height = height, this.fillRect = fillRect;
-	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.initialX = this.x, this.initialY = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.renderingX = this.x, this.renderingY = this.y, this.renderingWidth = this.width, this.renderingHeight= this.height;
 	this.setTransformationOriginToCenter=true;
 	this.render = function(){
@@ -841,7 +718,7 @@ function PathObject(x, y, paths, closePath=true, fillPath=false){
 	This object gives more functionality to the canvas path, it literally make the path an object instead of just a path.
 	*/
 	this.x = x, this.y = y, this.fillPath = fillPath, this.closePath = this.closePath;
-	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.initialX = this.x, this.initialY = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.newPath = true;//stating that the object js a new path and not the continuation of another.
 	this.paths = paths;
 	this.renderingX = this.x, this.renderingY = this.y;
@@ -1156,7 +1033,7 @@ function Scene(context){
 		//this runs the animations that has been scheduled
 		for(var i=0; this.animationObjects.length>i; i++){
 			var animation = this.animationObjects[i];
-			animation.animateInstances();//making the animations that have been added to the scene
+			animation.animateTasks();//making the animations that have been added to the scene
 		}
 	}
 	this.radian = function(angleInDegree){
@@ -1258,7 +1135,7 @@ function ImageObject(filePath, x, y, width, height){
 	//the hack is that the video is placed on the canvas as an image so as the canvas rerenders the frames of the video is being displayed
 	//while the audio of the video is being played by the browser as the video is element itself is hidden
 	this.x = x, this.y = y, this.width = width, this.height = height;
-	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.initialX = this.x, this.initialY = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.renderingX = this.x, this.renderingY = this.y, this.renderingWidth = this.width, this.renderingHeight= this.height;
 	this.filePath = filePath, this.media = new Image();
 	this.media.src = filePath;
@@ -1310,7 +1187,7 @@ function Integration(element, x, y, width, height){
 	//this allows you integrate a new drawing canvas to an existing drawing canvas to be used with sanim or any other canvas drawing library
 	SanimObject.call(this);
 	this.x = x, this.y = y, this.width = width, this.height = height,
-	this.xInitial = this.x, this.yInitial = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+	this.initialX = this.x, this.initialY = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 	this.renderingX = this.x, this.renderingY = this.y, this.renderingWidth = this.width, this.renderingHeight= this.height;
 	this.element = element;//stating the context property of the embed
 	this.scaleMatrix = [1, 1];
