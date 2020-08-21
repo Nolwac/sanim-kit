@@ -23,8 +23,8 @@ const users = [
 const siteConfig = {
   title: 'Sanim Kit', // Title for your website.
   tagline: 'Simulation and Animation on the web',
-  url: 'https://Nolwac.github.io', // Your website URL
-  baseUrl: '/sanim-kit/', // Base URL for your project */
+  url: 'https://sanim-kit.nwafor.org', // Your website URL
+  baseUrl: '/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
