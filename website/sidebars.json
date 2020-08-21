@@ -1,0 +1,38 @@
+{
+  "docs": {
+    "Quick Start": [
+    	"quick-start",
+    	{
+    		"type": "subcategory",
+    		"label": "Quick Tutorials",
+    		"ids": [
+    			"quick-tutorial",
+    			"working-with-xandra-path"
+    		]
+    	}
+    ],
+    "The Scene and it's properties ": [
+    	"scene",
+    	"scene-grid",
+    	"camera-and-player"
+    ],
+    "Animation References": [
+    	"animation",
+    	"task"
+    ],
+    "Object References     ": [
+    	"sanim-object",
+    	"path-object",
+    	"circle-object",
+    	"straight-line-object",
+    	"rect-object",
+    	"text-object",
+    	"media-references"
+    ],
+    "Integrating third party libraries": [
+    	"integration-object",
+    	"example-integration-with-threejs",
+    	"example-integration-with-chartjs"
+    ]
+  }
+}
