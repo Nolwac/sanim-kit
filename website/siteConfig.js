@@ -35,7 +35,8 @@ const siteConfig = {
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
-
+  // Adding cname property on settings
+  cname: 'sanim-kit.nwafor.org',
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
     {doc: 'quick-start', label: 'Docs'},
