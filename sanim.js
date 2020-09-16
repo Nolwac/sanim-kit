@@ -441,7 +441,7 @@ var Sanim = (function(){
 				this.x = this.initialX + this.parentObject.x;
 				this.y = this.initialY + this.parentObject.y;
 			}
-
+		
 		}
 		this.applyTransformationOrigin = function(){
 			//this method applies the transformation origin ready for rendering
