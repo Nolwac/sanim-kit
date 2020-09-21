@@ -16,11 +16,9 @@ window.onload = function(){
   }
   scene.addObject(testCircle);
   scene.render();
-  //scene.playAnimation = false;
   
   
   var pen = new Sanim.Xandra(scene, 100, 100);
-  //pen.play = false;
   pen.props={
     fillStyle:"crimson",
     strokeStyle:"orange",
@@ -224,5 +222,5 @@ window.onload = function(){
   scene.addObject(text2);
   text2.superscript('5', 4/10);
   text2.subscript('10', 1/3);
-
+  scene.play();//playing the frames
 }
