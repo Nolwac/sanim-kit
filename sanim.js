@@ -8,9 +8,13 @@ var Sanim = (function(){
 		
 		this.world = world;//setting the scene
 		this.animationOn = false;//property that will be used to put out animation and allow another object to start animation
-		this.asynchronous = true;//this allows the animations to occur at same time for all the object and not one at a time, then the other
+		this.asynchronous = false;//this allows the animations to occur at same time for all the object and not one at a time, then the other
 		world.animationObjects.push(this)//pushing the animation to the scene so that it can take effect
-
+		this.setAsynchronous = function(booleanValue){
+			//this method sets the asynchronous property to boolean value provided as a scheduled task, hence it will be part of the timeline
+			var self = this;//a hack to make the object accessible in the function
+			this.execute(function(){self.asynchronous = booleanValue;});
+		}
 		this.sleep = function(time){
 			//this method sleeps the animation with the animation object for a specified period of time in milliseconds
 			//this sleep is not windows animation frame based so will not pause while the user is not on tab on the webbrowser
@@ -106,7 +110,7 @@ var Sanim = (function(){
 			if(this.asynchronous===true || this.tasks.length<=0){
 				for(var i=0; this.tasks.length>i; i++){
 					var instance = this.tasks[i];
-					if((this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
+					if(instance.pauseAnimation==false){
 						this.animateTask(instance);//animating the instance;
 						if(instance.obj.animationStatus()==false){
 							break;//breaking the loop since an item in the list of animation instances is being removed, check animateTask method
@@ -115,7 +119,7 @@ var Sanim = (function(){
 				}
 			}else{
 				var instance = this.tasks[0];
-				if((this.animationOn==false || instance.animationStarted==true || this.asynchronous==true) && instance.pauseAnimation==false){
+				if(instance.pauseAnimation==false){
 					this.animateTask(instance);
 				}
 			}
@@ -129,10 +133,6 @@ var Sanim = (function(){
 			}else{
 				throw('You are attempting to add an already existing animation instance');//making the developer aware of the mistake
 			}
-		}
-		this.animationSequence = function(sequence){
-			//this method executes an animation sequence. what this means is that it executes animation one after the other as specified by the user
-			//for(seq in sequence)
 		}
 	}
 	function Task(obj){
@@ -274,50 +274,179 @@ var Sanim = (function(){
 		this.implementAfterAddedToScene = function(){
 			return null;//doing nothing at this point
 		}
-		this.hide = function(){
+		this.alignCenter = function(origin=false){
+			/*
+			This method places an object at the center of the parent.
+			if origin is set to true, then the objects starting x is what is placed at the center and not the object's center.
+			Note: for an object whose parent has no width, nothing will be done. And for an object with no width, it's center is
+			the starting origin, so setting origin to false will make no difference
+			*/
+			this.setCanvasPropsForObject();//making sure that all the canvas properties for object are set to normal
+			if(this.measureText){//measuring the width and height of text objects before applying
+				this.measureText();
+			}
+			if(this.parentObject){//checking if the object has a parent object
+				if(this.parentObject.width){//checking if the parent object has a width
+					if(this.width && origin == false){//checking if the object has a width and if it is the object's center that is meant to be aligned to the parent's middle
+						this.initialX = (this.parentObject.width - this.width)/2;//aligning the object's center to the parent's center
+					}else{
+						this.initialX = this.parentObject.width/2;//aligning the object origin to parent center
+					}
+				}
+			}else{
+				if(this.width && origin == false){
+					this.initialX = (this.world.context.canvas.width - this.width)/2;//aligning the object's center to the world's center
+				}else{
+					this.initialX = this.world.context.canvas.width/2;//aligning the object's origin to world's center
+				}
+				this.x = this.initialX;//making sure that the x value has same value as the initialX
+			}
+		}
+		this.alignMiddle = function(origin=false){
+			/*
+			This method places an object at the middle of the parent.
+			if origin is set to true, then the objects starting y is what is placed at the middle and not the object's middle.
+			Note: for an object whose parent has no height, nothing will be done. And for an object with no height, it's middle is
+			the starting origin, so setting origin to false will make no difference
+			*/
+			this.setCanvasPropsForObject();
+			if(this.measureText){
+				this.measureText();
+			}
+			if(this.parentObject){//checking if the object has a parent object
+				if(this.parentObject.height){//checking if the parent object has a height
+					if(this.height && origin == false){//checking if the object has a height and if it is the object's middle that is meant to be aligned to the parent's middle
+						this.initialY = (this.parentObject.height - this.height)/2;//aligning the object's middle to the parent's middle
+					}else{
+						this.initialY = this.parentObject.height/2;//aligning the object origin to the parent's middle
+					}
+				}
+			}else{
+				if(this.height && origin == false){
+					this.initialY = (this.world.context.canvas.height - this.height)/2;//aligning the object's middle to the world's middle
+				}else{
+					this.initialY = this.world.context.canvas.height/2;//aligning the object origin to world's middle
+				}
+				this.y = this.initialY;//making sure that the y value has same value as the initialY
+			}
+		}
+		this.hide = function(children = false){
 			//this method hides an object in the canvas
+			//setting the children to true, will make it to also hide the children
 			this.props.globalAlpha = 0;//setting the global alpha to zero make it invisible
+			if(children == true){
+				for(var i = 0; i<this.children.length; i++){
+					//here now I am trying to hide the children as well
+					this.children[i].hide(true);
+				}
+			}
 		}
-		this.show = function(){
+		this.show = function(children = false){
 			//this method shows the object in the canvas
+			//setting the children to true, will make it to also show the children
 			this.props.globalAlpha = 1;
+			if(children == true){
+				for(var i = 0; i<this.children.length; i++){
+					//here now I am trying to showing the children as well
+					this.children[i].show(true);
+				}
+			}
 		}
-		this.fadeOut = function(anim, time){
+		this.fadeOut = function(anim, time, children = false){
 			//this method takes an animation object as parameter
+			//setting the children to true will make it to also fadeOut the children
+			if(children == true){
+				var initialAsynchronousState = anim.asynchronous;//holding the inital state of the asynchronous property of anim
+				anim.execute(function(){anim.asynchronous = true});//setting it to be asynchronous so that the task will happen synchronously
+				for(var i = 0; i<this.children.length; i++){
+					//here now I am trying to showing the children as well
+					this.children[i].fadeOut(anim, time, true);
+					if(i==this.children.length - 1){//checking if this is the last depth of the iteration
+						anim.execute(function(){anim.asynchronous = initialAsynchronousState});//setting the asynchronous to initial value
+					}
+				}
+			}
 			return anim.setInterval({
 				obj:this,
-				delay:time/100,
+				delay:time/10,
 				loop: function(){
 					if(this.obj.props.globalAlpha === undefined){
 						this.obj.props.globalAlpha = this.obj.world.canvasContextProperties.globalAlpha;
 					}
-					if(this.obj.props.globalAlpha <= 0.01){
+					if(this.obj.props.globalAlpha <= 0.1){
 						this.status = false;
 						this.obj.props.globalAlpha = 0;
 					}else{
-						this.obj.props.globalAlpha -= 0.01;
+						this.obj.props.globalAlpha -= 0.1;
 					}
 				}
 			});
 		}
-		this.fadeIn = function(anim, time){
+		this.fadeIn = function(anim, time, children){
 			//this method takes an animation object as parameter
+			//setting the children to true will make it to also fadeIn the children
+			if(children == true){
+				var initialAsynchronousState = anim.asynchronous;//holding the inital state of the asynchronous property of anim
+				anim.execute(function(){anim.asynchronous = true});//setting it to be asynchronous so that the task will happen synchronously
+				for(var i = 0; i<this.children.length; i++){
+					//here now I am trying to showing the children as well
+					this.children[i].fadeIn(anim, time, true);
+					if(i==this.children.length - 1){//checking if this is the last depth of the iteration
+						anim.execute(function(){anim.asynchronous = initialAsynchronousState});//setting the asynchronous to initial value
+					}
+				}
+			}
 			return anim.setInterval({
 				obj:this,
-				delay:time/100,
+				delay:time/10,
 				loop: function(){
 					if(this.obj.props.globalAlpha === undefined){//checking if the global alpha property exist
 						this.obj.props.globalAlpha = this.obj.world.canvasContextProperties.globalAlpha;//assigning the default value;
 					}
-					if(this.obj.props.globalAlpha >= 0.99){
+					if(this.obj.props.globalAlpha >= 0.9){
 						this.status = false;
 						this.obj.props.globalAlpha = 1;
 					}else{
-						this.obj.props.globalAlpha += 0.01;
+						this.obj.props.globalAlpha += 0.1;
 					}
 				}
 			});
 		}
+		this.grow = function(anim, scaleAmount, time){
+			var scaleFactor = 1.1;
+		    /*
+		    the scale amount is the amount in which the object should be grown to
+		    time is the time to spent while it is attempting to grow
+		    let F = scaling factor each time int the loop
+		    F^x = scaleAmount
+		    hence it means that we will need to call the scale method with the scaling factor x times before it reaches the amount wanted
+		    mathematically x is given by:
+		           ln(scaleAmount)/ln(F) where ln = natural logarithm of numbers
+		    the delay time like as done with fade in and fade out, is giveb by:
+		            time/n
+		    */
+		    if(scaleAmount < 1){
+		      scaleFactor = 0.90;
+		    }
+		    var n = Math.floor(Math.log(scaleAmount)/Math.log(scaleFactor));
+		    return anim.setInterval({
+		      n:Math.abs(n),
+		      objectInitialScale: [this.scaleMatrix[0], this.scaleMatrix[1]],
+		      scaleAmount:scaleAmount,
+		      delay:time/Math.abs(n),
+		      obj:this,
+		      loop:function(){
+		        if(this.n <= 0){
+		          this.status = false;
+		          this.obj.scaleMatrix = [this.objectInitialScale[0]*this.scaleAmount, this.objectInitialScale[1]*this.scaleAmount];
+		        }else{
+		          this.obj.scale(scaleFactor, scaleFactor);
+		        }
+		        this.n--;//decreasing n, to know when the multiplication power has been reached
+		      }
+		    })
+		}
+		
 		this.applyTransformation = function(child={
 			transformWithParent:true, scaleWithParent:true, translateWithParent:true, rotateWithParent:true,
 			skewWithParent:true, noTransformationWithParent:false, noAncestorTransformation:false
@@ -358,17 +487,17 @@ var Sanim = (function(){
 			//this method removes the transformation that has been applied on the canvas so that other objects in the canvas will not be affected
 			this.world.context.restore();//restoring the state of the canvas
 		}
-		this.motionPath = function(equation){
-		  //this method moves the object in the canvas through a path using the equation object as a template for the motion path
+		this.motionPath = function(func){
+		  //this method moves the object in the canvas through a path using the Function object as a template for the motion path
 		  var mover = {
 		    obj:this,
 		    employ: function (){
-		      //this method employs the data from the equation and uses it to perform some functions
+		      //this method employs the data from the Function and uses it to perform some functions
 		      this.obj.x = this.xOrigin + this.x*this.xScale;
 		      this.obj.y = this.yOrigin + this.y*this.yScale;
 		    }
 		  }
-		  Object.assign(mover, equation);//assigning the equation
+		  Object.assign(mover, func);//assigning the Function Expression
 		  mover.xOrigin = this.x;//changing the origin to the origin of the object
 		  mover.yOrigin = this.y;
 		  return mover;
@@ -438,6 +567,12 @@ var Sanim = (function(){
 			//this method sets the rendering origin parameter of the object to align with the parent object
 			if(this.parentObject){
 				//checking if the object has parent, so we could readjust to fit to the parent object
+				/*
+				NOTE: Once the object is added to a parent we can no longer use the x and y properties of the object to
+				adjust its position. But we can use the initialX and initialY properties. hence it is safer to use the 
+				initialX and initialY properties to make adjustment to object positions if we want them to reflect when added
+				to a parent object.
+				*/
 				this.x = this.initialX + this.parentObject.x;
 				this.y = this.initialY + this.parentObject.y;
 			}
@@ -568,7 +703,7 @@ var Sanim = (function(){
 			this.applyTransformationOrigin();
 			this.applyTransformation();//applyiing transformation properties
 			//The below lines is trying to create a path for the rect object so as to be able to trace when they is a point in the path and alternative way that it can be done is make a check to know if when the point is within the area of the rect object 
-			this.drawPath();
+			this.drawPath();//drawing the path for the path2DObject
 			if(this.fillBox==true){
 				this.world.context.fill(this.path2DObject);
 			}
@@ -609,6 +744,7 @@ var Sanim = (function(){
 				delay:time/this.text.length,//the interval of time
 				loop:function(){
 					//this is the execution
+					this.obj.props.globalAlpha = 1;
 					this.obj.text = this.text.slice(0, this.position);//assigning the spliced text to the text object
 					if(this.sound){//checking if they is a sound to play
 						if(this.sound.media.paused == true){
@@ -638,7 +774,7 @@ var Sanim = (function(){
 		}
 		this.subscript = function(text, ratio){
 			//this method creates a text object that positions itself like a subscript to the current text object.
-			obj = this.superscript(text, ratio);
+			var obj = this.superscript(text, ratio);
 			obj.render();//rendering object so as to use properties calculated during rendering to make adjustments to position
 			obj.initialY = this.height-obj.height+2;//making adjustment to the position
 			obj.y = obj.initialY;
@@ -650,6 +786,9 @@ var Sanim = (function(){
 			if(this.world.camera && (this.boxProps.paddingX>0 || this.boxProps.paddingY>0)){
 				paddingX = this.boxProps.paddingX*this.world.camera.zoom;
 				paddingY = this.boxProps.paddingY*this.world.camera.zoom;
+			}else if(this.boxProps.paddingX>0 || this.boxProps.paddingY>0){
+				paddingX = this.boxProps.paddingX;
+				paddingY = this.boxProps.paddingY;
 			}
 			if(this.fillText==true){
 				this.world.context.fillText(this.text, this.renderingX+paddingX, this.renderingY+this.renderingHeight-paddingY);
@@ -657,7 +796,7 @@ var Sanim = (function(){
 			this.world.context.strokeText(this.text, this.renderingX+paddingX, this.renderingY+this.renderingHeight-paddingY);
 		}
 		this.setRenderingParameters = function(){
-			//setting the rendering parameters for the button object different from the way others where set
+			//setting the rendering parameters for the text object different from the way others where set
 			if(this.world.camera){
 				this.renderingX = (this.x*this.world.camera.zoom)-this.world.camera.x, this.renderingY = (this.y*this.world.camera.zoom)-this.world.camera.y;//this is defines the starting poisiton of the path to be drawn
 				this.renderingWidth = (this.width+this.boxProps.paddingX*2)*this.world.camera.zoom, this.renderingHeight = (this.height+this.boxProps.paddingY*2)*this.world.camera.zoom; //this tries to apply the camera effect if the camera is added to the scene, so we are dividing by the world camera's zoom
@@ -702,8 +841,8 @@ var Sanim = (function(){
 		This is the definition for a canvas path object.
 		This object gives more functionality to the canvas path, it literally make the path an object instead of just a path.
 		*/
-		this.x = x, this.y = y, this.fillPath = fillPath, this.closePath = this.closePath;
-		this.initialX = this.x, this.initialY = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
+		this.x = x; this.y = y; this.fillPath = fillPath; this.closePath = closePath;
+		this.initialX = this.x; this.initialY = this.y;//tamper proofing so as to get back to initial value if object is added and removed from another
 		this.newPath = true;//stating that the object js a new path and not the continuation of another.
 		this.paths = paths;
 		this.renderingX = this.x, this.renderingY = this.y;
@@ -1041,6 +1180,11 @@ var Sanim = (function(){
 			//this method converts an angle from degree to radian
 			return (Math.PI/180)*angleInDegree;
 		}
+		this.measureText = function(text, font){
+			//this method measures the width and some other properties of the specified text taking into acount the font provided with it
+			this.context.font = font;
+			return this.context.measureText(text);	
+		}
 		this.requestFullscreen = function(){
 			//this function requests full screen for the whole canvas
 			var canvas = this.context.canvas.parentElement; //targetting the parent element of the canvas
@@ -1259,12 +1403,13 @@ var Sanim = (function(){
 		delete this.rotationMatrix;
 		delete this.skewMatrix;
 		delete this.rotationAngle;
+		delete this.grow;
 	}
 
-	function Equation(obj){
-	  //this is the constructor function for the equation object
+	function Function(obj){
+	  //this is the constructor function for the Function object
 	  if(typeof obj != "object"){
-	    throw('parameter must be an object to create an equation');
+	    throw('parameter must be an object to create an Function Expression');
 	  }
 	  this.xOrigin = 0;//setting X and Y origins as 0
 	  this.yOrigin = 0;
@@ -1275,7 +1420,7 @@ var Sanim = (function(){
 	  this.ended = false; //this sets if the computation should end or not
 	  this.delay = 100;
 	  this.compute = function(){
-	    //this is the method for doing the computation for the equation
+	    //this is the method for doing the computation for the Function Expression
 	  }
 	  this.constraint = function(){
 	    //this method puts a contraint on the object
@@ -1286,12 +1431,13 @@ var Sanim = (function(){
 	    this.ended = true;//returning true by default ends the computation plot
 	  }
 	  this.increment = function(){
-	    //this method defines how the values in the equation should be incremented
+	    //this method defines how the values in the Function should be incremented
 	  }
 	  this.initialize = function(){
 	    //this is where initialization can be done before the loop starts
 	  }
 	  this.start = function(){
+	  	//It is safer to define all properties for the function expression before calling this method
 	    this.initialize();
 	    this.animation = new Animation(this.obj.world);//creating new animation for it to prevent lazy loading
 	    this.animation.setInterval(this);
@@ -1303,18 +1449,33 @@ var Sanim = (function(){
 	      //do the ploting only when it is within the constraint, since it may be desired to plot the value when it is within
 	      //a give constraint and when it is out for harmonic function, so it is best to do it this way to allow developers add
 	      //such feature to they software while developing
-	      this.employ();//employ the data from the coomputation of the equation. Utilize the method to use the data
+	      this.employ();//employ the data from the computation of the Function. Utilize the method to use the data
 	    }
-	    if(this.constraint() == false){
+	    if(this.constraint() != true){
 	      this.end();
-	      if(this.ended === true){
-	        this.status = false;
+	      if(this.ended === true){//checking if the graphing has been set to ended so as to stop the animation interval
+	        this.status = false;//setting the status of the interval to be false, meaning that it should be terminated
+	        if(this.onEnded){
+	        	if(this.isGraphingInstance === true){
+		        	//checking if the Function expression is for ploting a graph using Xandra path object, since it is only graphing function
+		        	//expression that has a property of isGraphingInstance
+		        	var self = this;
+		        	this.obj.animation.execute(function(){self.onEnded()});//scheduling the onEnded callback for the Xandra path object
+
+	        	}else{
+	        		this.onEnded();//calling the onEnded method if it is set. this method does something when the graphing is done
+	        	}
+	        }
 	      }else{
 	        this.status = true;
 	      }
 	    }
-	    this.increment();
-	    this.compute();
+	    if(this.increment){
+	    	this.increment();
+	    }
+	    if(this.compute){
+	    	this.compute();
+	    }
 	  }
 	  Object.assign(this, obj);//copying the properties from the object given in parameter to the default objec, properties are overwritten
 	}
@@ -1610,10 +1771,6 @@ var Sanim = (function(){
 		this.turn = function(angle){
 			//this method turns by the provided angle
 			this.turnAngle += angle;
-			var self = this;
-			this.execute(function (){
-			  
-			});
 		}
 		this.left = function (angle){
 			//this implements the left turn algorithm
@@ -1677,7 +1834,8 @@ var Sanim = (function(){
 		}
 		this.arc = function(radius, angle, concave=false){
 			//this method draws the arc
-			//radius = Math.abs(radius);
+			radius = Math.abs(radius);
+			angle = Math.abs(angle);
 			var self = this;
 			this.fragments = Math.floor(Math.abs(this.fragments));
 			angle = angle/(this.fragments + 1);
@@ -1795,71 +1953,76 @@ var Sanim = (function(){
 			var self = this;
 			this.execute(function(){//scheduling the arrow to be added to the Xandra path
 				self.addChild(arrowHead);//adding the arrow head to the parent object
+				if(self.world.playAnimation != true && self.play == true){
+					arrowHead.render();//rendering the arrowhead if the Xandra path is rendering without the scene animation frame playing
+				}
 			});
 			return arrowHead;//returning the arrow head so that developer can use it if need be
 		}
 	  
-	  //--------------------graphing---------------------------------------
-	  this.graph = function(equation){
-	    //this method plots an equation by adding a plot property to the equation
-	    var grapher = {
-	      xOrigin:this.currentX,
-	      yOrigin:this.currentY,
-	      obj:this,
-	      type:'line',
-	      size:0.5,//size of the dot when ploted as a scatter diagram
-	      setOrigin : function(){
-	        //this method plots the points each time
-	        this.compute();
-	        if(this.xOrigin+this.x != this.obj.currentX || this.yOrigin+this.y != this.obj.currentY){
-	          //checking if the origin + first values (x, y) is different from the obj origin so that we can set point to that origin else we live the xandra's current
-	          //position where it is
-	          this.obj.setPosition(this.xOrigin+this.x*this.xScale, this.yOrigin+this.y*this.yScale);
-	        }
-	      },
-	      employ: function (){
-	        //this method employs the data from the equation and uses it to perform some functions
-	        if(this.type === 'line'){
-	          //do things with point when it is line
-	          this.obj.penDown();
-	          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-	        }else if(this.type === 'scatter'){
-	          //do things when it is scatter ploting
-	          this.obj.penUp();
-	          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-	          this.obj.penDown();
-	          this.obj.arc(this.size, Math.PI*2);
-	        }else if(this.type === 'horizontal-stripe'){
-	          //do things when it is a horizontal strip
-	          this.obj.penUp();
-	          this.obj.setPosition(this.xOrigin, this.y*this.yScale + this.yOrigin);
-	          this.obj.penDown();
-	          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-	        }else if(this.type === 'vertical-stripe'){
-	          //do things when it is a vertical strip
-	          this.obj.penUp();
-	          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.yOrigin);
-	          this.obj.penDown();
-	          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-	        }else if(this.type === 'vector'){
-	          //things to implement when it is a vector plotting
-	          this.obj.penUp();
-	          this.obj.setPosition(this.xOrigin, this.yOrigin);
-	          this.obj.penDown();
-	          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
-	        }
-	      }
-	    }
-	    Object.assign(grapher, equation);
-	    grapher.initialize =function(){
-	      this.setOrigin();//setting the origin as initialization
-	    }
-	    return grapher;
-	  }
+		//--------------------graphing---------------------------------------
+		this.graph = function(func){
+		    //this method plots an Function Expression by adding a plot property to the following properties to the func
+		    var grapher = {
+		      xOrigin:this.currentX,
+		      yOrigin:this.currentY,
+		      obj:this,
+		      type:'line',
+		      isGraphingInstance:true,
+		      size:0.5,//size of the dot when ploted as a scatter diagram
+		      setOrigin : function(){
+		        //this method plots the points each time
+		        this.compute();
+		        if(this.xOrigin+this.x != this.obj.currentX || this.yOrigin+this.y != this.obj.currentY){
+		          //checking if the origin + first values (x, y) is different from the obj origin so that we can set point to that origin else we live the xandra's current
+		          //position where it is
+		          this.obj.setPosition(this.xOrigin+this.x*this.xScale, this.yOrigin+this.y*this.yScale);
+		        }
+		      },
+		      employ: function (){
+		        //this method employs the data from the Function Expression and uses it to perform some functions
+		        if(this.type === 'line'){
+		          //do things with point when it is line
+		          this.obj.penDown();
+		          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+		        }else if(this.type === 'scatter'){
+		          //do things when it is scatter ploting
+		          this.obj.penUp();
+		          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+		          this.obj.penDown();
+		          this.obj.arc(this.size, Math.PI*2);
+		        }else if(this.type === 'horizontal-stripe'){
+		          //do things when it is a horizontal strip
+		          this.obj.penUp();
+		          this.obj.setPosition(this.xOrigin, this.y*this.yScale + this.yOrigin);
+		          this.obj.penDown();
+		          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+		        }else if(this.type === 'vertical-stripe'){
+		          //do things when it is a vertical strip
+		          this.obj.penUp();
+		          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.yOrigin);
+		          this.obj.penDown();
+		          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+		        }else if(this.type === 'vector'){
+		          //things to implement when it is a vector plotting
+		          this.obj.penUp();
+		          this.obj.setPosition(this.xOrigin, this.yOrigin);
+		          this.obj.penDown();
+		          this.obj.setPosition(this.x*this.xScale + this.xOrigin, this.y*this.yScale + this.yOrigin);
+		        }
+		      }
+		    }
+		    Object.assign(grapher, func);
+		    grapher.initialize =function(){
+		      this.setOrigin();//setting the origin as initialization
+		    }
+		    return grapher;
+		}
 
 	  var initialPath =[{pathMethod:"moveTo", params:[this.currentX,this.currentY]}];
 	  PathObject.call(this, x, y, initialPath);
-	  this.world.addObject(this)
+	  this.world.addObject(this);
+	  this.closePath=false;
 	}
 
 	return {
@@ -1881,7 +2044,7 @@ var Sanim = (function(){
 		Integration:Integration,
 		Animation:Animation,
 		Task:Task,
-		Equation:Equation,
+		Function:Function,
 	}
 })();
 
