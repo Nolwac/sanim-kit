@@ -4,14 +4,23 @@
   "description": "A Javascript library for performing simulations and animations on a HTML5 canvas",
   "main": "sanim.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No test specified\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Nolwac/sanim-kit.git"
   },
   "keywords": [
-    "Sanim", "Sanim-Kit", "Xandra", "Python Turtle graphics in JavaScript", "JavaScript 2d graphics library" "Nwafor", "Livinus", "Anayo", "Simulation", "Animation", "HTML5 Canvas library", "JavaScript Games", "browser games", "web games", "simulation on browser"
+    "Sanim",
+    "Sanim-Kit",
+    "Xandra",
+    "Python Turtle graphics in JavaScript",
+    "JavaScript 2d graphics library" "Nwafor",
+    "Livinus", "Anayo", "Simulation",
+    "Animation", "HTML5 Canvas library",
+    "JavaScript Games", "browser games",
+    "web games",
+    "simulation on browser"
   ],
   "author": "Nwafor Livinus Anayo",
   "license": "MIT",
