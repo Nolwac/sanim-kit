@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanim-kit.nwafor.org/blog</id>
     <title>Sanim Kit Blog</title>
-    <updated>2017-10-24T06:00:00.000Z</updated>
+    <updated>2021-09-04T06:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://sanim-kit.nwafor.org/blog"/>
     <subtitle>The best place to stay up-to-date with the latest Sanim Kit news and events.</subtitle>
@@ -10,9 +10,9 @@
     <rights>Copyright © 2021 Nwafor.org</rights>
     <entry>
         <title type="html"><![CDATA[New Version 1.0.0]]></title>
-        <id>https://sanim-kit.nwafor.org/blog/2017/10/24/new-version-1.0.0.html</id>
-        <link href="https://sanim-kit.nwafor.org/blog/2017/10/24/new-version-1.0.0.html"/>
-        <updated>2017-10-24T06:00:00.000Z</updated>
+        <id>https://sanim-kit.nwafor.org/blog/2021/09/04/new-version-1.0.0.html</id>
+        <link href="https://sanim-kit.nwafor.org/blog/2021/09/04/new-version-1.0.0.html"/>
+        <updated>2021-09-04T06:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>Whatever documentation you see in this website is for the latest release of the sanim-kit library</p> ]]></summary>
         <author>
             <name>Nwafor Livinus Anayo</name>
