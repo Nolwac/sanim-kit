@@ -1,0 +1,200 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>sanim-kit-docs/The scene and it&#x27;s properties/The Scene · Sanim Kit</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## The Scene"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="sanim-kit-docs/The scene and it&#x27;s properties/The Scene · Sanim Kit"/><meta property="og:type" content="website"/><meta property="og:url" content="https://sanim-kit.nwafor.org/"/><meta property="og:description" content="## The Scene"/><meta property="og:image" content="https://sanim-kit.nwafor.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://sanim-kit.nwafor.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/sanim_logo.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/darcula.min.css"/><link rel="alternate" type="application/atom+xml" href="https://sanim-kit.nwafor.org/blog/atom.xml" title="Sanim Kit Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://sanim-kit.nwafor.org/blog/feed.xml" title="Sanim Kit Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/sanim_logo.png" alt="Sanim Kit"/><h2 class="headerTitleWithLogo">Sanim Kit</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/docs/quick-start" target="_self">Docs</a></li><li class=""><a href="/help" target="_self">Help</a></li><li class=""><a href="/blog/" target="_self">Blog</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">sanim-kit-docs/The scene and it&#x27;s properties/The Scene</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="the-scene"></a><a href="#the-scene" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The Scene</h2>
+<p>The Scene is the graphical term that describes the world of our graphics project.</p>
+<p>To add new Scene use <em>Sanim.Scene</em> constructor with a canvas 2d context property.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> Sanim <span class="hljs-keyword">from</span> <span class="hljs-string">"sanim-kit"</span>;
+
+<span class="hljs-keyword">let</span> canvas = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"canvas"</span>);
+<span class="hljs-keyword">let</span> context = canvas.getContext(<span class="hljs-string">"2d"</span>);
+<span class="hljs-keyword">var</span> scene = <span class="hljs-keyword">new</span> Sanim.Scene(context);
+</code></pre>
+<p>Then you can start drawing your graphics unto the scene</p>
+<h2><a class="anchor" aria-hidden="true" id="references"></a><a href="#references" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>References</h2>
+<h3><a class="anchor" aria-hidden="true" id="scenecolor"></a><a href="#scenecolor" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.color</h3>
+<p>This property of the scene sets the background color of the scene.</p>
+<pre><code class="hljs css language-js">scene.color = <span class="hljs-string">"green"</span>;
+<span class="hljs-comment">//Will give the scene background color of green</span>
+</code></pre>
+<p>The color schemes that are acceptable include.</p>
+<ul>
+<li>RGB color scheme</li>
+<li>Hexadecimal color scheme</li>
+<li>And specifying the color by the name</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="scenecontext"></a><a href="#scenecontext" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.context</h3>
+<p>This property of the Scene holds the canvas drawing context.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">let</span> canvas = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"canvas"</span>);
+<span class="hljs-keyword">let</span> context = canvas.getContext(<span class="hljs-string">"2d"</span>);
+<span class="hljs-keyword">var</span> scene = <span class="hljs-keyword">new</span> Sanim.Scene(context);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sceneisparentworld"></a><a href="#sceneisparentworld" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.isParentWorld</h3>
+<p>This property of the scene hold a boolean value which specifies if the scene is the parent scene or a child scene.
+This is very useful in cases where we have more than one drawing canvas. You can assign one of the canvas to a parent scene and the rest assigned to child scene objects.</p>
+<pre><code class="hljs css language-js">scene.isParentWorld = <span class="hljs-literal">true</span>;
+<span class="hljs-comment">//Will make the scene a parent.</span>
+</code></pre>
+<p>By default the property is set to <em>false</em></p>
+<h3><a class="anchor" aria-hidden="true" id="sceneclearbeforerender"></a><a href="#sceneclearbeforerender" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.clearBeforeRender</h3>
+<p>This property sets if the previous frame of the scene should be cleared before another is frame is rendered. The value is a boolean value.</p>
+<pre><code class="hljs css language-js">scene.clearBeforeRender = <span class="hljs-string">"false"</span>;
+<span class="hljs-comment">//Will make each new frame render on top the previous frame.</span>
+</code></pre>
+<p>The default value is <em>true</em></p>
+<h3><a class="anchor" aria-hidden="true" id="sceneobjects"></a><a href="#sceneobjects" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.objects</h3>
+<p>This property holds the array of objects added to the Scene.
+The array is empty if no object has been added to the scene.</p>
+<h3><a class="anchor" aria-hidden="true" id="sceneanimationobjects"></a><a href="#sceneanimationobjects" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.animationObjects</h3>
+<p>This property holds the array of animation objects tied to the scene.</p>
+<h3><a class="anchor" aria-hidden="true" id="scenewidth"></a><a href="#scenewidth" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.width</h3>
+<p>This property holds the width property of the scene, hence it defines the width of the scene.</p>
+<pre><code class="hljs css language-js">scene.width = <span class="hljs-number">600</span>;
+<span class="hljs-comment">//Gives the scene width of 600 pixels in dimension.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sceneheight"></a><a href="#sceneheight" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.height</h3>
+<p>This property holds the height of the scene, hence it defines the height of the scene.</p>
+<pre><code class="hljs css language-js">scene.height = <span class="hljs-number">500</span>;
+<span class="hljs-comment">//Gives the scene height of 500 pixels in dimension.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="scenecanvascontextproperties"></a><a href="#scenecanvascontextproperties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.canvasContextProperties</h3>
+<p>This property holds and defines the default rendering properties for objects to be rendered on the scene.</p>
+<pre><code class="hljs css language-js">scene.canvasContextProperties.globalApha = <span class="hljs-number">0</span>;
+<span class="hljs-comment">//Will make scene objects completely transparent by default</span>
+</code></pre>
+<p>Below is the default value of the property.</p>
+<pre><code class="hljs css language-js">Scene.canvasContextProperties = {
+        <span class="hljs-attr">globalAlpha</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">globalCompositeOperation</span>: <span class="hljs-string">"source-over"</span>,
+        <span class="hljs-attr">filter</span>: <span class="hljs-string">"none"</span>,
+        <span class="hljs-attr">imageSmoothingEnabled</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">imageSmoothingQuality</span>: <span class="hljs-string">"low"</span>,
+        <span class="hljs-attr">strokeStyle</span>: <span class="hljs-string">"#a52a2a"</span>,
+        <span class="hljs-attr">fillStyle</span>: <span class="hljs-string">"#ffffff"</span>,
+        <span class="hljs-attr">shadowOffsetX</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">shadowOffsetY</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">shadowBlur</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">shadowColor</span>: <span class="hljs-string">"rgba(0, 0, 0, 0)"</span>,
+        <span class="hljs-attr">lineWidth</span>:<span class="hljs-number">1.0000000168623835e-16</span>,
+        <span class="hljs-attr">lineCap</span>: <span class="hljs-string">"butt"</span>,
+        <span class="hljs-attr">lineJoin</span>: <span class="hljs-string">"miter"</span>,
+        <span class="hljs-attr">miterLimit</span>: <span class="hljs-number">10</span>,
+        <span class="hljs-attr">lineDashOffset</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">font</span>: <span class="hljs-string">"10px sans-serif"</span>,
+        <span class="hljs-attr">textAlign</span>: <span class="hljs-string">"start"</span>,
+        <span class="hljs-attr">textBaseline</span>: <span class="hljs-string">"alphabetic"</span>,
+        <span class="hljs-attr">direction</span>: <span class="hljs-string">"ltr"</span>
+    }
+</code></pre>
+<p>The HTML 2d rendering context properties for reference on the properties above.</p>
+<h3><a class="anchor" aria-hidden="true" id="sceneplayanimation"></a><a href="#sceneplayanimation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.playAnimation</h3>
+<p>This property is a boolean value which specifies if the frames of the scene should be rendered or not.
+The default value is <em>true</em></p>
+<h3><a class="anchor" aria-hidden="true" id="sceneplayinterval"></a><a href="#sceneplayinterval" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.play(interval)</h3>
+<p>This method creates and starts animation loop for rendering on the scene.</p>
+<pre><code class="hljs css language-js">scene.play(<span class="hljs-number">100</span>);
+<span class="hljs-comment">//Creates a rendering loop at an interval of 100 milliseconds.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="scenepause"></a><a href="#scenepause" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.pause()</h3>
+<p>This method stops an existing animation loop on the scene if any.</p>
+<pre><code class="hljs css language-js">scene.pause();
+<span class="hljs-comment">//Stops the loop and clears the interval/setTimeout</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sceneaddobject"></a><a href="#sceneaddobject" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.addObject()</h3>
+<p>This method adds an object to the scene for rendering.
+An object will not appear on the scene if it is not added to the scene.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">let</span> rect = <span class="hljs-keyword">new</span> Sanim.RectObject(<span class="hljs-number">100</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>, <span class="hljs-number">200</span>, <span class="hljs-literal">true</span>);<span class="hljs-comment">//creates object</span>
+scene.addObject(rect);<span class="hljs-comment">//adding object to the scene </span>
+</code></pre>
+<p>It takes a parameter of object to be added to scene.</p>
+<h3><a class="anchor" aria-hidden="true" id="sceneremoveobject"></a><a href="#sceneremoveobject" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.removeObject()</h3>
+<p>This method removes an object from the scene.</p>
+<pre><code class="hljs css language-js">scene.removeObject(rect);
+<span class="hljs-comment">//removes the rect object</span>
+</code></pre>
+<p>It takes a parameter of the object to be removed.</p>
+<h3><a class="anchor" aria-hidden="true" id="sceneaddchild"></a><a href="#sceneaddchild" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.addChild()</h3>
+<p>This method works exactly as <em>Scene.addObject()</em> method.</p>
+<h3><a class="anchor" aria-hidden="true" id="sceneremovechild"></a><a href="#sceneremovechild" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.removeChild()</h3>
+<p>This method works exactly as <em>Scene.removeObject()</em> method</p>
+<h3><a class="anchor" aria-hidden="true" id="scenecamera"></a><a href="#scenecamera" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.camera</h3>
+<p>This property holds the camera object that is tied to the scene. The default value is <em>null</em>, signifying that there is no camera on the scene.</p>
+<h3><a class="anchor" aria-hidden="true" id="scenesetcamera"></a><a href="#scenesetcamera" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.setCamera()</h3>
+<p>This method sets the camera of the scene</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">var</span> cam = <span class="hljs-keyword">new</span> Sanim.Camera();
+scene.setCamera(cam);
+</code></pre>
+<p>It takes a parameter of the camera object to be set on the scene</p>
+<h3><a class="anchor" aria-hidden="true" id="sceneplayer"></a><a href="#sceneplayer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.player</h3>
+<p>This property holds player object that is tied to the scene.
+The default value is <em>null</em>, signifying that there is no player on the scene.</p>
+<h3><a class="anchor" aria-hidden="true" id="scenesetplayer"></a><a href="#scenesetplayer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.setPlayer()</h3>
+<p>This method sets the player for the scene.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">let</span> rect = <span class="hljs-keyword">new</span> Sanim.RectObject(<span class="hljs-number">100</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>, <span class="hljs-number">200</span>, <span class="hljs-literal">true</span>);<span class="hljs-comment">//creates object</span>
+scene.addObject(rect);<span class="hljs-comment">//adding object to the scene</span>
+<span class="hljs-keyword">let</span> player = <span class="hljs-keyword">new</span> Sanim.Player(rect);<span class="hljs-comment">//creates a player using object created</span>
+scene.setPlayer(player);<span class="hljs-comment">//sets the player</span>
+</code></pre>
+<p>The takes a parameter of the player object to be set for the scene.</p>
+<h3><a class="anchor" aria-hidden="true" id="scenecreategrid"></a><a href="#scenecreategrid" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.createGrid()</h3>
+<p>This method creates a grid and adds it to the scene. The grid created will fit perfectly on the scene</p>
+<p>It takes two parameters which are the <em>xScale</em> and <em>yScale</em> of the grid to be created.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">let</span> grid = scene.createGrid(<span class="hljs-number">100</span>, <span class="hljs-number">100</span>);
+<span class="hljs-comment">//Creates a grid that fits to the scene</span>
+</code></pre>
+<p>It returns an object which has 3 properties.</p>
+<ul>
+<li>the grid create, <em>grid</em></li>
+<li>the actual scene of the grid created, <em>gridScene</em></li>
+<li>the integration object for the canvas tied to the gridScene, <em>integration</em></li>
+</ul>
+<p>The grid create does not render on the scene from which the <em>createGrid</em> method is called. This is because of performance purposes.
+The grid is rendered on a new Scene object, hence a new canvas is usually created, and an <em>Integration</em> object is created for the canvas.</p>
+<h3><a class="anchor" aria-hidden="true" id="scenerender"></a><a href="#scenerender" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.render()</h3>
+<p>This method renders the objects added to the scene unto the canvas when called.</p>
+<pre><code class="hljs css language-js">scene.render();
+<span class="hljs-comment">//renders the scene objects</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="scenerunanimation"></a><a href="#scenerunanimation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.runAnimation()</h3>
+<p>This method runs the animation objects that is tied to the scene when called.</p>
+<pre><code class="hljs css language-js">scene.runAnimation();
+<span class="hljs-comment">//Runs the animation objects tied to the scene</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sceneradian"></a><a href="#sceneradian" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.radian()</h3>
+<p>This method takes a parameter of angle in degrees and returns angle in radian.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">let</span> halfPi = scene.radian(<span class="hljs-number">90</span>);
+<span class="hljs-comment">//halfPi will be PI divided by 2</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="scenerequestfullscreen"></a><a href="#scenerequestfullscreen" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.requestFullscreen()</h3>
+<p>This method requests fullscreen with focus on the <em>parentElement</em> of the scene canvas when called.</p>
+<pre><code class="hljs css language-js">scene.requestFullscreen();
+<span class="hljs-comment">//request fullscreen on the browser window</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="scenecancelrequestfullscreen"></a><a href="#scenecancelrequestfullscreen" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.cancelRequestFullscreen()</h3>
+<p>This method cancels the request for full screen, hence it will remove fullscreen on the browser window.</p>
+<pre><code class="hljs css language-js">scene.cancelRequestFullscreen();
+<span class="hljs-comment">//Removes fullscreen on browser window.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sceneflush"></a><a href="#sceneflush" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.flush()</h3>
+<p>This method flushes the scene of it's objects and animations when called.
+This will make the <em>objects</em> array and <em>animationObjects</em> array properties of the scene empty.</p>
+<pre><code class="hljs css language-js">scene.flush();
+<span class="hljs-comment">//removes the objects on the scene including animation objects.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sceneflushobjects"></a><a href="#sceneflushobjects" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.flushObjects()</h3>
+<p>This method flushes the scene of it's objects only and does not remove the animation objects.</p>
+<pre><code class="hljs css language-js">scene.flushObjects();
+<span class="hljs-comment">//flushes the objects added to the scene</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sceneflushanimations"></a><a href="#sceneflushanimations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.flushAnimations()</h3>
+<p>This method flushes the scene of it's animation objects only and does not remove the objects added to the scene.</p>
+<pre><code class="hljs css language-js">scene.flushAnimations();
+<span class="hljs-comment">//Flushes the animation objects added to the scene.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sceneexecuteonrender"></a><a href="#sceneexecuteonrender" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scene.executeOnRender()</h3>
+<p>This method gets executed each time the  render method of the scene is called.
+By default the method is not set.</p>
+<p>But you can overwrite the method to add a custom functionality that you would want to execute whenever the render method is called.</p>
+<pre><code class="hljs css language-js">scene.executeOnRender = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>{
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Scene has just be rendered"</span>);
+<span class="hljs-comment">//Put block of code to be executed each time the render method is called.</span>
+}
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#the-scene">The Scene</a></li><li><a href="#references">References</a><ul class="toc-headings"><li><a href="#scenecolor">Scene.color</a></li><li><a href="#scenecontext">Scene.context</a></li><li><a href="#sceneisparentworld">Scene.isParentWorld</a></li><li><a href="#sceneclearbeforerender">Scene.clearBeforeRender</a></li><li><a href="#sceneobjects">Scene.objects</a></li><li><a href="#sceneanimationobjects">Scene.animationObjects</a></li><li><a href="#scenewidth">Scene.width</a></li><li><a href="#sceneheight">Scene.height</a></li><li><a href="#scenecanvascontextproperties">Scene.canvasContextProperties</a></li><li><a href="#sceneplayanimation">Scene.playAnimation</a></li><li><a href="#sceneplayinterval">Scene.play(interval)</a></li><li><a href="#scenepause">Scene.pause()</a></li><li><a href="#sceneaddobject">Scene.addObject()</a></li><li><a href="#sceneremoveobject">Scene.removeObject()</a></li><li><a href="#sceneaddchild">Scene.addChild()</a></li><li><a href="#sceneremovechild">Scene.removeChild()</a></li><li><a href="#scenecamera">Scene.camera</a></li><li><a href="#scenesetcamera">Scene.setCamera()</a></li><li><a href="#sceneplayer">Scene.player</a></li><li><a href="#scenesetplayer">Scene.setPlayer()</a></li><li><a href="#scenecreategrid">Scene.createGrid()</a></li><li><a href="#scenerender">Scene.render()</a></li><li><a href="#scenerunanimation">Scene.runAnimation()</a></li><li><a href="#sceneradian">Scene.radian()</a></li><li><a href="#scenerequestfullscreen">Scene.requestFullscreen()</a></li><li><a href="#scenecancelrequestfullscreen">Scene.cancelRequestFullscreen()</a></li><li><a href="#sceneflush">Scene.flush()</a></li><li><a href="#sceneflushobjects">Scene.flushObjects()</a></li><li><a href="#sceneflushanimations">Scene.flushAnimations()</a></li><li><a href="#sceneexecuteonrender">Scene.executeOnRender()</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/sanim_logo.png" alt="Sanim Kit" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/quick-start.html">Getting Started</a><a href="/docs/en/quick-tutorial.html">Guides</a></div><div><h5>Community</h5><a href="https://twitter.com/sanim" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/Nolwac/sanim-kit">GitHub</a></div></section><a href="https://sanimkit.nwafor.org/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/sanim_logo_text.png" alt="Sanim Kit" width="184" height="89"/></a><section class="copyright">Created by <a style="font-weight:bold;font-size:20px" href="https://linktr.ee/nwafor">Nwafor Livinus Anayo</a><br/><h1></h1>Copyright © 2021 Nwafor.org</section></footer></div></body></html>

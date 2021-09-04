@@ -1,0 +1,251 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>sanim-kit-docs/References/SanimObject · Sanim Kit</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## SanimObject"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="sanim-kit-docs/References/SanimObject · Sanim Kit"/><meta property="og:type" content="website"/><meta property="og:url" content="https://sanim-kit.nwafor.org/"/><meta property="og:description" content="## SanimObject"/><meta property="og:image" content="https://sanim-kit.nwafor.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://sanim-kit.nwafor.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/sanim_logo.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/darcula.min.css"/><link rel="alternate" type="application/atom+xml" href="https://sanim-kit.nwafor.org/blog/atom.xml" title="Sanim Kit Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://sanim-kit.nwafor.org/blog/feed.xml" title="Sanim Kit Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/sanim_logo.png" alt="Sanim Kit"/><h2 class="headerTitleWithLogo">Sanim Kit</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/docs/quick-start" target="_self">Docs</a></li><li class=""><a href="/help" target="_self">Help</a></li><li class=""><a href="/blog/" target="_self">Blog</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">sanim-kit-docs/References/SanimObject</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="sanimobject"></a><a href="#sanimobject" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject</h2>
+<p>All the objects that can be added to the scene inherit from <em>Sanim.SanimObject</em> constructor.</p>
+<p>It holds all the features that can help you create your own custom object to be added to the scene.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> Sanim <span class="hljs-keyword">from</span> <span class="hljs-string">"sanim-kit"</span>;
+
+<span class="hljs-keyword">let</span> canvas = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"canvas"</span>);<span class="hljs-comment">//creating the canvas element.</span>
+<span class="hljs-keyword">let</span> context = canvas.getContext(<span class="hljs-string">"2d"</span>);<span class="hljs-comment">//getting the drawing context</span>
+
+<span class="hljs-keyword">let</span> scene = <span class="hljs-keyword">new</span> Scene(context);<span class="hljs-comment">//creating the scene</span>
+<span class="hljs-keyword">let</span> rect = <span class="hljs-keyword">new</span> RectObject(<span class="hljs-number">100</span>, <span class="hljs-number">50</span>, <span class="hljs-number">50</span>, <span class="hljs-number">50</span>, <span class="hljs-literal">true</span>); <span class="hljs-comment">//creating a rectangle</span>
+scene.addObject(rect);<span class="hljs-comment">//adding the created rectangle</span>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">typeof</span> rect);
+scene.play();<span class="hljs-comment">//playing the scene animation frame</span>
+</code></pre>
+<p>The above block of code creates a rectangle from a <em>Sanim.RectObject</em> which inherits from <em>Sanim.SanimObject</em> constructor as can be seen from the console log.</p>
+<h2><a class="anchor" aria-hidden="true" id="sanimobject-references"></a><a href="#sanimobject-references" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject References</h2>
+<p>Here are the properties and methods accessible in <em>Sanim.SanimObject</em></p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectpath2dobject"></a><a href="#sanimobjectpath2dobject" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.path2DObject</h3>
+<p>This property holds the canvas rendering context <em>Path2D</em> object created for rendering the object.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectchildren"></a><a href="#sanimobjectchildren" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.children</h3>
+<p>This property holds the array of children objects added to a given <em>Sanim.SanimObject</em></p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectprops"></a><a href="#sanimobjectprops" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.props</h3>
+<p>This property is an object that defines the properties for rendering a <em>Sanim.SanimObject</em>.</p>
+<p>The property names are to be used as is with the <em>HTML5 2d rendering context properties</em>.</p>
+<p>You can define the rendering properties individually by accessing the property names individually.</p>
+<pre><code class="hljs css language-js">rect.props.lineWidth = <span class="hljs-number">10</span>;<span class="hljs-comment">//giving the stroke line a width of 10px</span>
+rect.props.strokeStyle = <span class="hljs-string">"crimson"</span>;<span class="hljs-comment">//giving it the stroke color of crimson</span>
+</code></pre>
+<p>Or you can define them collectively through the <em>SanimObject.props</em> property.
+But this will change the object entirely.</p>
+<pre><code class="hljs css language-js">rect.props = {
+    <span class="hljs-attr">lineWidth</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-attr">strokeStyle</span>: <span class="hljs-string">"crimson"</span>
+}
+</code></pre>
+<p>The best way to set the properties would be to use the Javascript <em>Object.assign</em> method. Doing it this way will keep whatever property that has been set earlier and will only overwrite the properties that has been modified.</p>
+<pre><code class="hljs css language-js"><span class="hljs-built_in">Object</span>.assign(rect.props, {<span class="hljs-attr">lineWidth</span>:<span class="hljs-number">10</span>, <span class="hljs-attr">strokeStyle</span>:<span class="hljs-string">"crimson"</span>});
+</code></pre>
+<p>If a value is not set for a given property then the Sanim-kit will use the value set for the property on <em>Sanim.Scene.canvasContextProperties</em>.</p>
+<p>The default values for the properties are shown below.</p>
+<pre><code class="hljs css language-js">Scene.canvasContextProperties = {
+        <span class="hljs-attr">globalAlpha</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">globalCompositeOperation</span>: <span class="hljs-string">"source-over"</span>,
+        <span class="hljs-attr">filter</span>: <span class="hljs-string">"none"</span>,
+        <span class="hljs-attr">imageSmoothingEnabled</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">imageSmoothingQuality</span>: <span class="hljs-string">"low"</span>,
+        <span class="hljs-attr">strokeStyle</span>: <span class="hljs-string">"#a52a2a"</span>,
+        <span class="hljs-attr">fillStyle</span>: <span class="hljs-string">"#ffffff"</span>,
+        <span class="hljs-attr">shadowOffsetX</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">shadowOffsetY</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">shadowBlur</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">shadowColor</span>: <span class="hljs-string">"rgba(0, 0, 0, 0)"</span>,
+        <span class="hljs-attr">lineWidth</span>:<span class="hljs-number">1.0000000168623835e-16</span>,
+        <span class="hljs-attr">lineCap</span>: <span class="hljs-string">"butt"</span>,
+        <span class="hljs-attr">lineJoin</span>: <span class="hljs-string">"miter"</span>,
+        <span class="hljs-attr">miterLimit</span>: <span class="hljs-number">10</span>,
+        <span class="hljs-attr">lineDashOffset</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">font</span>: <span class="hljs-string">"10px sans-serif"</span>,
+        <span class="hljs-attr">textAlign</span>: <span class="hljs-string">"start"</span>,
+        <span class="hljs-attr">textBaseline</span>: <span class="hljs-string">"alphabetic"</span>,
+        <span class="hljs-attr">direction</span>: <span class="hljs-string">"ltr"</span>
+    }
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectparentobject"></a><a href="#sanimobjectparentobject" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.parentObject</h3>
+<p>This property holds the parent of an object. If the object was not added to the scene as a child object to another object, then the value will be <em>null</em></p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjecttranslationmatrix"></a><a href="#sanimobjecttranslationmatrix" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.translationMatrix</h3>
+<p>This property holds an array of values consisting of the <em>x</em> and <em>y</em> parameters for object translation.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectskewmatrix"></a><a href="#sanimobjectskewmatrix" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.skewMatrix</h3>
+<p>This property holds an array of values consisting of the <em>x</em> and <em>y</em> parameters for performing skewing transformation on object.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectscalematrix"></a><a href="#sanimobjectscalematrix" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.scaleMatrix</h3>
+<p>This property holds an array of values consisting of the <em>x</em> and <em>y</em> parameters for performing scaling transformation on object.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjecttransformationmatrix"></a><a href="#sanimobjecttransformationmatrix" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.transformationMatrix</h3>
+<p>This property holds an array of values consisting of the 6 parameters for perform transformation on object.
+The parameters required are:</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectrotationangle"></a><a href="#sanimobjectrotationangle" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.rotationAngle</h3>
+<p>This property holds the rotation angle of an object in radians. This value is used in applying rotational transformation on object.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjecttransformationorigin"></a><a href="#sanimobjecttransformationorigin" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.transformationOrigin</h3>
+<p>This property defines the transformation origin for an object</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectrenderingtransformationorigin"></a><a href="#sanimobjectrenderingtransformationorigin" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.renderingTransformationOrigin</h3>
+<p><em>SanimObject.transformationOrigin</em> is not used for rendering the object to scene, it only holds the integrity of the desired rendering origin. So this property provides the rendering transformation origin.</p>
+<p><em>This property may change as the object is rendered. Hence make no attempt to set your transformation origin using this property, use renderingTransformationOrigin instead</em></p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjecttransformwithparent"></a><a href="#sanimobjecttransformwithparent" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.transformWithParent</h3>
+<p>This property holds a boolean value that defines if an object should transform with it's parent whenever a transformation is applied on it's parent object.
+The default value is <em>true</em>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjecttranslatewithparent"></a><a href="#sanimobjecttranslatewithparent" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.translateWithParent</h3>
+<p>This property holds a boolean value that defines if an object should translate with it's parent whenever a translation transformation is applied on it's parent object.
+The default value is <em>true</em>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectskewwithparent"></a><a href="#sanimobjectskewwithparent" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.skewWithParent</h3>
+<p>This property holds a boolean value that defines if an object should skew with it's parent whenever a skewing transformation is applied on it's parent object.
+The default value is <em>true</em>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectscalewithparent"></a><a href="#sanimobjectscalewithparent" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.scaleWithParent</h3>
+<p>This property holds a boolean value that defines if an object should scale with it's parent whenever a scaling transformation is applied on it's parent object.
+The default value is <em>true</em>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectrotatewithparent"></a><a href="#sanimobjectrotatewithparent" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.rotateWithParent</h3>
+<p>This property holds a boolean value that defines if an object should rotate with it's parent whenever a rotation transformation is applied on it's parent object.
+The default value is <em>true</em>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectnotransformationwithparent"></a><a href="#sanimobjectnotransformationwithparent" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.noTransformationWithParent</h3>
+<p>This property holds a boolean value that defines if an object should not transform with it's immediate parent object whenever a transformation is applied on it's immediate parent object.
+The default value is <em>false</em>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectnoancestortransformation"></a><a href="#sanimobjectnoancestortransformation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.noAncestorTransformation</h3>
+<p>This property holds a boolean value that defines if an object should not transform with it's ancestors objects and not it's immediate parent object whenever a transformation is applied on any of it's ancestor objects.
+The default value is <em>false</em>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectisinpath"></a><a href="#sanimobjectisinpath" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.isInPath()</h3>
+<p>This method checks if an <em>x</em>, <em>y</em> coordinate (a point) is within the path of an object.
+The method returns a boolean value.
+It returns <em>true</em> if the point is in the path and <em>false</em> if otherwise.</p>
+<pre><code class="hljs css language-js">rect.isInPath(<span class="hljs-number">200</span>, <span class="hljs-number">300</span>);<span class="hljs-comment">//will return false since the point  200, 300 is not within the  rectangle area.</span>
+</code></pre>
+<p><em>Note that, the method does not take into consideration transformations done on object. So always consider that while calling the method.</em></p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectaddevent"></a><a href="#sanimobjectaddevent" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.addEvent()</h3>
+<p>This method associates a browser-user event with the object.
+Use this method to add events (click, mousemove, drag, etc) as you would do with <em>HTML DOM addEventListener</em> method.</p>
+<p>It takes 3 parameters.</p>
+<ul>
+<li>the event type</li>
+<li>the event callback function when the specified event type is being performed on the object.</li>
+<li>(optional) the event callback function when the specified event type is not being performed on the object</li>
+</ul>
+<pre><code class="hljs css language-js">rect.addEvent(<span class="hljs-string">"click"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+    e.canvasTargetObject.props.fillStyle = <span class="hljs-string">"orange"</span>;
+});<span class="hljs-comment">//changes the background color to orange when object is clicked on</span>
+</code></pre>
+<p>The above code snippet will change the background color of the rect object to orange when it is clicked on.</p>
+<p>In a case where we want to perform some task if the specified event type is being performed on the canvas, but not on the object, we add a third parameter to the method.</p>
+<pre><code class="hljs css language-js">rect.addEvent(<span class="hljs-string">"click"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+    e.canvasTargetObject.props.fillStyle = <span class="hljs-string">"orange"</span>;
+}, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+    e.canvasTargetObject.props.fillStyle = <span class="hljs-string">"crimson"</span>;
+});<span class="hljs-comment">//changes the background color to orange when object is clicked on and to crimson when the click is not on the object.</span>
+</code></pre>
+<p>Just as you would do with <em>HTML DOM events</em> you can put the <em>event object</em> argument in your callback functions and use it to access the <em>event object</em> parameter passed to the callback function by the web browser.</p>
+<p>As you can see from the code snippet above, you can access the object the event is tied to using the <em>canvasTargetObject</em> property of the event object.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectaddchild"></a><a href="#sanimobjectaddchild" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.addChild()</h3>
+<p>This method adds an object as a child object to the object through which the method is called.
+It takes a parameter of the object to be added as a child.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">let</span> childRect = <span class="hljs-keyword">new</span> Sanim.RectObject(<span class="hljs-number">10</span>, <span class="hljs-number">10</span>, <span class="hljs-number">20</span>, <span class="hljs-number">20</span>, <span class="hljs-literal">true</span>);
+rect.addChild(childRect);<span class="hljs-comment">//adding the childRect </span>
+</code></pre>
+<p>When adding an object as child to another object, make sure to remove it from the previous parent, if it has been added to an object or the scene initially.</p>
+<p>Note that the x and y positions of the object is relative to it's parent object. What this means is that if the parent object x and y position is (200, 300) and the child object x and y position is (50, 100) then. Then the actual rendering position of the object is a sum total of it's position with that of it's parent, <em>(200+50, 300+100) = (250, 400)</em>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectremovechild"></a><a href="#sanimobjectremovechild" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.removeChild()</h3>
+<p>This method removes a child object from the object through which the method is called.
+It takes one parameter of the object to be removed.</p>
+<p>This method does not delete the child object, hence the child object can be added to another object or to the scene directly.</p>
+<pre><code class="hljs css language-js">rect.removeChild(childRect);<span class="hljs-comment">//removes the childRect from the rect </span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectflushchildren"></a><a href="#sanimobjectflushchildren" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.flushChildren()</h3>
+<p>This method removes all the children objects in added to this object when called.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectimplementafteraddedtoscene"></a><a href="#sanimobjectimplementafteraddedtoscene" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.implementAfterAddedToScene()</h3>
+<p>This method is called the moment an object is being added to the scene, but not on render.
+Overwrite this method to add a custom code block to be executed when the object is being added to the scene.</p>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjecthide"></a><a href="#sanimobjecthide" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.hide()</h3>
+<p>This method hides the object when called.</p>
+<pre><code class="hljs css language-js">rect.hide();<span class="hljs-comment">//hides the rect</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectshow"></a><a href="#sanimobjectshow" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.show()</h3>
+<p>This method shows the object when called.</p>
+<pre><code class="hljs css language-js">rect.show();<span class="hljs-comment">//shows the object if hidden</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectfadeout"></a><a href="#sanimobjectfadeout" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.fadeOut()</h3>
+<p>This method fades out the object when called. What this means is that the object gradually disappears with time and not instantaneously.</p>
+<p>It takes 2 parameters.</p>
+<ul>
+<li>the animation object to be used.</li>
+<li>the time it should take for the object fade out (disappear).</li>
+</ul>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">let</span> anim = <span class="hljs-keyword">new</span> Sanim.Animation(scene);<span class="hljs-comment">//creating animation object to be used</span>
+rect.fadeOut(anim, <span class="hljs-number">3000</span>);<span class="hljs-comment">//fades out the object in 3 seconds.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectfadein"></a><a href="#sanimobjectfadein" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.fadeIn()</h3>
+<p>This method fades in the object when called. What this means is that the object appears gradually and not instantaneously, if it was hidden.
+It takes 2 parameters.</p>
+<ul>
+<li>the animation object to use</li>
+<li>the time it should take for the object to fade in.</li>
+</ul>
+<pre><code class="hljs css language-js">rect.fadeIn(anim, <span class="hljs-number">1000</span>);<span class="hljs-comment">//fades in within a second.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectscale"></a><a href="#sanimobjectscale" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.scale()</h3>
+<p>This method scales the object.
+It takes 2 parameters.</p>
+<ul>
+<li>the scaling factor on the x direction</li>
+<li>the scaling factor on the y direction</li>
+</ul>
+<pre><code class="hljs css language-js">rect.scale(<span class="hljs-number">1.5</span>, <span class="hljs-number">0.5</span>);<span class="hljs-comment">//scale the object by 1.5 on the x direction and by 0.5 on the y direction</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectrotate"></a><a href="#sanimobjectrotate" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.rotate()</h3>
+<p>This method rotates the object by a specified angle.
+It takes a parameter of the angle of rotation in radians.</p>
+<pre><code class="hljs css language-js">rect.rotate(scene.radian(<span class="hljs-number">45</span>));<span class="hljs-comment">//rotates the rect 45 degrees</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjecttranslate"></a><a href="#sanimobjecttranslate" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.translate()</h3>
+<p>This method translates the object by the specified amount.
+It takes 2 parameters.</p>
+<ul>
+<li>the amount of translation on the x direction in pixels.</li>
+<li>the amount of translation on the y direction in pixels.</li>
+</ul>
+<pre><code class="hljs css language-js">rect.translate(<span class="hljs-number">50</span>, <span class="hljs-number">-40</span>);<span class="hljs-comment">//translates the object 50 pixels on the x direction and -40 pixels on the y direction.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectskew"></a><a href="#sanimobjectskew" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.skew()</h3>
+<p>This method skews the object by the angles specified.
+It takes 2 parameters.</p>
+<ul>
+<li>the skewing angle on the x direction in radian</li>
+<li>the skewing angle on the y direction in radian</li>
+</ul>
+<pre><code class="hljs css language-js">rect.skew(scene.radian(<span class="hljs-number">45</span>), scene.radian(<span class="hljs-number">60</span>));<span class="hljs-comment">//skews the object 45 degrees on x and 60 degrees on y directions.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjecttransform"></a><a href="#sanimobjecttransform" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.transform()</h3>
+<p>This method performs a transformation on the object using transformation parameters provided.
+It takes 6 parameters.</p>
+<ul>
+<li>the blablablabla</li>
+<li>the blablabla</li>
+<li>the blabla</li>
+<li>the bla</li>
+<li>the amount of translation on the x direction</li>
+<li>the amount of translation on the y direction.</li>
+</ul>
+<pre><code class="hljs css language-js">Show some code example 
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectmotionpath"></a><a href="#sanimobjectmotionpath" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.motionPath()</h3>
+<p>This method creates an instance to move the object through a path on the scene using <em>Sanim.Function</em> object as a template that provides the path of motion.
+It takes a parameter of the <em>Sanim.Function</em> object to use.</p>
+<p>The method returns a copy of the <em>Sanim.Function</em> object passed to it, with few modifications.
+To start the motion, you need to call the <em>start</em> method of the object returned.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">let</span> func = <span class="hljs-keyword">new</span> Sanim.Function ({
+      <span class="hljs-attr">xScale</span>:<span class="hljs-number">25</span>,
+      <span class="hljs-attr">yScale</span>:<span class="hljs-number">-25</span>,
+      <span class="hljs-attr">x</span>:<span class="hljs-number">-4</span>,
+      <span class="hljs-attr">y</span>:<span class="hljs-number">0</span>,
+      <span class="hljs-attr">delay</span>:<span class="hljs-number">30</span>,
+      <span class="hljs-attr">compute</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+        <span class="hljs-keyword">this</span>.y = <span class="hljs-built_in">Math</span>.pow(<span class="hljs-keyword">this</span>.x, <span class="hljs-number">2</span>);
+      },
+      <span class="hljs-attr">constraint</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x &lt;= <span class="hljs-number">4.002</span>;
+      },
+      <span class="hljs-attr">increment</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+        <span class="hljs-keyword">this</span>.x+=<span class="hljs-number">0.05</span>;
+      }
+});<span class="hljs-comment">//defining the Function object</span>
+
+<span class="hljs-keyword">let</span> path = rect.motionPath(func);<span class="hljs-comment">//creates an instance to move the object through a path on the scene.</span>
+path.start();<span class="hljs-comment">//starting the motion</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="sanimobjectrender"></a><a href="#sanimobjectrender" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SanimObject.render()</h3>
+<p>This method renders the object to the scene when called.</p>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#sanimobject">SanimObject</a></li><li><a href="#sanimobject-references">SanimObject References</a><ul class="toc-headings"><li><a href="#sanimobjectpath2dobject">SanimObject.path2DObject</a></li><li><a href="#sanimobjectchildren">SanimObject.children</a></li><li><a href="#sanimobjectprops">SanimObject.props</a></li><li><a href="#sanimobjectparentobject">SanimObject.parentObject</a></li><li><a href="#sanimobjecttranslationmatrix">SanimObject.translationMatrix</a></li><li><a href="#sanimobjectskewmatrix">SanimObject.skewMatrix</a></li><li><a href="#sanimobjectscalematrix">SanimObject.scaleMatrix</a></li><li><a href="#sanimobjecttransformationmatrix">SanimObject.transformationMatrix</a></li><li><a href="#sanimobjectrotationangle">SanimObject.rotationAngle</a></li><li><a href="#sanimobjecttransformationorigin">SanimObject.transformationOrigin</a></li><li><a href="#sanimobjectrenderingtransformationorigin">SanimObject.renderingTransformationOrigin</a></li><li><a href="#sanimobjecttransformwithparent">SanimObject.transformWithParent</a></li><li><a href="#sanimobjecttranslatewithparent">SanimObject.translateWithParent</a></li><li><a href="#sanimobjectskewwithparent">SanimObject.skewWithParent</a></li><li><a href="#sanimobjectscalewithparent">SanimObject.scaleWithParent</a></li><li><a href="#sanimobjectrotatewithparent">SanimObject.rotateWithParent</a></li><li><a href="#sanimobjectnotransformationwithparent">SanimObject.noTransformationWithParent</a></li><li><a href="#sanimobjectnoancestortransformation">SanimObject.noAncestorTransformation</a></li><li><a href="#sanimobjectisinpath">SanimObject.isInPath()</a></li><li><a href="#sanimobjectaddevent">SanimObject.addEvent()</a></li><li><a href="#sanimobjectaddchild">SanimObject.addChild()</a></li><li><a href="#sanimobjectremovechild">SanimObject.removeChild()</a></li><li><a href="#sanimobjectflushchildren">SanimObject.flushChildren()</a></li><li><a href="#sanimobjectimplementafteraddedtoscene">SanimObject.implementAfterAddedToScene()</a></li><li><a href="#sanimobjecthide">SanimObject.hide()</a></li><li><a href="#sanimobjectshow">SanimObject.show()</a></li><li><a href="#sanimobjectfadeout">SanimObject.fadeOut()</a></li><li><a href="#sanimobjectfadein">SanimObject.fadeIn()</a></li><li><a href="#sanimobjectscale">SanimObject.scale()</a></li><li><a href="#sanimobjectrotate">SanimObject.rotate()</a></li><li><a href="#sanimobjecttranslate">SanimObject.translate()</a></li><li><a href="#sanimobjectskew">SanimObject.skew()</a></li><li><a href="#sanimobjecttransform">SanimObject.transform()</a></li><li><a href="#sanimobjectmotionpath">SanimObject.motionPath()</a></li><li><a href="#sanimobjectrender">SanimObject.render()</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/sanim_logo.png" alt="Sanim Kit" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/quick-start.html">Getting Started</a><a href="/docs/en/quick-tutorial.html">Guides</a></div><div><h5>Community</h5><a href="https://twitter.com/sanim" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/Nolwac/sanim-kit">GitHub</a></div></section><a href="https://sanimkit.nwafor.org/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/sanim_logo_text.png" alt="Sanim Kit" width="184" height="89"/></a><section class="copyright">Created by <a style="font-weight:bold;font-size:20px" href="https://linktr.ee/nwafor">Nwafor Livinus Anayo</a><br/><h1></h1>Copyright © 2021 Nwafor.org</section></footer></div></body></html>

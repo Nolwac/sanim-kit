@@ -1,0 +1,193 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Integrating DOM elements in the scene · Sanim Kit</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# Integrating ChartJS"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Integrating DOM elements in the scene · Sanim Kit"/><meta property="og:type" content="website"/><meta property="og:url" content="https://sanim-kit.nwafor.org/"/><meta property="og:description" content="# Integrating ChartJS"/><meta property="og:image" content="https://sanim-kit.nwafor.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://sanim-kit.nwafor.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/sanim_logo.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/darcula.min.css"/><link rel="alternate" type="application/atom+xml" href="https://sanim-kit.nwafor.org/blog/atom.xml" title="Sanim Kit Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://sanim-kit.nwafor.org/blog/feed.xml" title="Sanim Kit Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/sanim_logo.png" alt="Sanim Kit"/><h2 class="headerTitleWithLogo">Sanim Kit</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/quick-start" target="_self">Docs</a></li><li class=""><a href="/help" target="_self">Help</a></li><li class=""><a href="/blog/" target="_self">Blog</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Integrating third party libraries</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Quick Start<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/quick-start">Installation and Setup</a></li><div class="navGroup subNavGroup"><h4 class="navGroupSubcategoryTitle">Quick Tutorials</h4><ul><li class="navListItem"><a class="navItem" href="/docs/quick-tutorial">Quick Tutorial</a></li><li class="navListItem"><a class="navItem" href="/docs/working-with-xandra-path">Quick tutorial on the Xandra Path Object</a></li></ul></div></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">The Scene and it&#x27;s properties <span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/scene">The Scene</a></li><li class="navListItem"><a class="navItem" href="/docs/scene-grid">Adding Grid</a></li><li class="navListItem"><a class="navItem" href="/docs/camera-and-player">Adding Camera and Player</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Object References     <span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/xandra-pen-path">Xandra Path References</a></li><li class="navListItem"><a class="navItem" href="/docs/task-and-animation">Task and Animation</a></li><li class="navListItem"><a class="navItem" href="/docs/sanim-object">SanimObject</a></li><li class="navListItem"><a class="navItem" href="/docs/path-object">PathObject</a></li><li class="navListItem"><a class="navItem" href="/docs/circle-object">Circle Object</a></li><li class="navListItem"><a class="navItem" href="/docs/straight-line-object">StraightLineObject</a></li><li class="navListItem"><a class="navItem" href="/docs/rect-object">Rect Object</a></li><li class="navListItem"><a class="navItem" href="/docs/text-object">TextObject</a></li><li class="navListItem"><a class="navItem" href="/docs/arrow-head-object">ArrowHeadObject</a></li><li class="navListItem"><a class="navItem" href="/docs/image-object">ImageObject</a></li><li class="navListItem"><a class="navItem" href="/docs/video-object">VideoObject</a></li><li class="navListItem"><a class="navItem" href="/docs/audio-object">AudioObject</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Integrating third party libraries<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/integration-object">Integration Object</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/example-integration-with-chartjs">Example integration with ChartJS</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Integrating DOM elements in the scene</h1></header><article><div><span><h1><a class="anchor" aria-hidden="true" id="integrating-chartjs"></a><a href="#integrating-chartjs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Integrating ChartJS</h1>
+<p>ChartJS is a statistical chart library in Javascript, it is quite easy to use and also lightweight. This is an example on how to use ChartJS with Sanim-Kit. The steps illustrated in this example can as well be followed to integrate other canvas 2D and 3D drawing libraries with Sanim-Kit.</p>
+<p>The first thing to do is to create the HTML file for the project. In the HTML file, we link to the ChartJS library code, <em>chart.min.js</em>. We will also link to Sanim-Kit's <em>sanim.js</em> file, which is the library code. Finally we will have to link to our own custom Javascript file where we want to write our Javascript code at the bottom.
+Note: <em>the choice of which library to place at the top before the other, is left to the developer. Also if you are using NodeJS and its package managers with some module bundlers, you might not want to link to any library file but instead install the libraries and import them from you custom Javascript file.</em></p>
+<h3><a class="anchor" aria-hidden="true" id="indexhtml"></a><a href="#indexhtml" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><em>index.html</em></h3>
+<pre><code class="hljs css language-html">
+<span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Integration with ChartJS<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"utf-8"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"sanim.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"chart.min.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">style</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/css"</span>&gt;</span><span class="css">
+        <span class="hljs-selector-tag">body</span>{
+            <span class="hljs-attribute">margin</span>:<span class="hljs-number">0px</span>;
+            <span class="hljs-attribute">padding</span>:<span class="hljs-number">0px</span>;
+            <span class="hljs-attribute">overflow</span>: hidden;
+        }
+    </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">canvas</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"canvas"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">canvas</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"chart-holder"</span>&gt;</span>
+        <span class="hljs-comment">&lt;!-- wrapping the chart canvas inside a div which will be extended to an integration object
+        The reason for this is to make the chart responsive --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">canvas</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"chart"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">canvas</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"index.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p>In the Javascript file, we do all the initial setups required by Sanim-Kit. Then what we would want to do is to make <em>chart-holder</em> HTML element a pseudo SanimObject using the <em>Sanim.Integration</em> constructor. You can checkout how the constructor is used also the methods and properties that come with the object. The purpose of this is so that we can use Sanim-Kit to control ChartJS drawing canvas, we can perform scaling, rotation, pushing, translate and do some other cool stuffs to the canvas once it is made an Integration object. As you will soon see, one will barely notice that the chart is not a core part of the functionalities of Sanim-Kit. By this way you can make your application robust and flexible. You can use as may graphics drawing libraries (be it canvas, svg or direct DOM) together at once with this feature and still have some interactivity between them and Sanim-Kit.</p>
+<p>As can be seen in the HTML code, the drawing canvas for ChartJS was wrapped in <em>chart-holder</em> HTML element, this is to make the chart response when it is drawn as illustrated by ChartJS in their documentation. You can bypass the wrapper on your own and make the chart canvas the Integration object directly to see the difference. Once that is done we write our ChartJS chart program, and we are good to go.</p>
+<h3><a class="anchor" aria-hidden="true" id="indexjs"></a><a href="#indexjs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><em>index.js</em></h3>
+<pre><code class="hljs css language-js">
+<span class="hljs-keyword">let</span> canvas = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"canvas"</span>);
+<span class="hljs-keyword">let</span> context = canvas.getContext(<span class="hljs-string">"2d"</span>);
+<span class="hljs-keyword">const</span> scene = <span class="hljs-keyword">new</span> Sanim.Scene(context);<span class="hljs-comment">//creating scene</span>
+<span class="hljs-comment">//making it take entire dimension of the screen</span>
+scene.context.canvas.height = <span class="hljs-built_in">window</span>.innerHeight;
+scene.context.canvas.width = <span class="hljs-built_in">window</span>.innerWidth;
+scene.color = <span class="hljs-string">"black"</span>;<span class="hljs-comment">//setting the color to black</span>
+
+<span class="hljs-comment">// getting the chart canvas wrapper</span>
+<span class="hljs-keyword">const</span> chartElem = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"chart-holder"</span>);
+
+<span class="hljs-comment">//creating the integration object for the chart canvas wrapper</span>
+<span class="hljs-keyword">let</span> chartObj = <span class="hljs-keyword">new</span> Sanim.Integration(chartElem, <span class="hljs-number">100</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>, <span class="hljs-number">300</span>);
+scene.addObject(chartObj);<span class="hljs-comment">//adding the object to the scene</span>
+
+<span class="hljs-comment">//---------------- ChartJS --------------------------</span>
+<span class="hljs-keyword">let</span> chartContext = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"chart"</span>).getContext(<span class="hljs-string">'2d'</span>);
+<span class="hljs-comment">// creating the ChartJS chart on the chart canvas</span>
+<span class="hljs-keyword">const</span> chart = <span class="hljs-keyword">new</span> Chart(chartContext, {
+    <span class="hljs-attr">type</span>: <span class="hljs-string">'line'</span>,
+    <span class="hljs-attr">data</span>: {
+        <span class="hljs-attr">labels</span>: [<span class="hljs-string">"Red"</span>, <span class="hljs-string">"Blue"</span>, <span class="hljs-string">"Yellow"</span>, <span class="hljs-string">"Green"</span>, <span class="hljs-string">"Purple"</span>, <span class="hljs-string">"Orange"</span>],
+        <span class="hljs-attr">datasets</span>: [{
+            <span class="hljs-attr">label</span>: <span class="hljs-string">'# of Votes'</span>,
+            <span class="hljs-attr">data</span>: [<span class="hljs-number">12</span>, <span class="hljs-number">19</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>],
+            <span class="hljs-attr">backgroundColor</span>: [
+                <span class="hljs-string">'rgba(255, 99, 132, 0.2)'</span>,
+                <span class="hljs-string">'rgba(54, 162, 235, 0.2)'</span>,
+                <span class="hljs-string">'rgba(255, 206, 86, 0.2)'</span>,
+                <span class="hljs-string">'rgba(75, 192, 192, 0.2)'</span>,
+                <span class="hljs-string">'rgba(153, 102, 255, 0.2)'</span>,
+                <span class="hljs-string">'rgba(255, 159, 64, 0.2)'</span>
+            ],
+            <span class="hljs-attr">borderColor</span>: [
+                <span class="hljs-string">'rgba(255,99,132,1)'</span>,
+                <span class="hljs-string">'rgba(54, 162, 235, 1)'</span>,
+                <span class="hljs-string">'rgba(255, 206, 86, 1)'</span>,
+                <span class="hljs-string">'rgba(75, 192, 192, 1)'</span>,
+                <span class="hljs-string">'rgba(153, 102, 255, 1)'</span>,
+                <span class="hljs-string">'rgba(255, 159, 64, 1)'</span>
+            ],
+            <span class="hljs-attr">borderWidth</span>: <span class="hljs-number">1</span>
+        }]
+    },
+    <span class="hljs-attr">options</span>: {
+        <span class="hljs-attr">scales</span>: {
+            <span class="hljs-attr">yAxes</span>: [{
+                <span class="hljs-attr">ticks</span>: {
+                    <span class="hljs-attr">beginAtZero</span>:<span class="hljs-literal">true</span>
+                }
+            }]
+        }
+    }
+});
+
+scene.play();<span class="hljs-comment">//playing the scene animation frame</span>
+
+
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="result"></a><a href="#result" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Result:</h3>
+<iframe src="/demo/example-integration-with-chartjs/index.html" id="demo-frame-1" style="width:100%; height: 300px; background-color: black;"></iframe><br/>
+<button onclick="document.getElementById('demo-frame-1').contentDocument.location.reload(true);">Reload</button>
+<p>Let's try to scale and move the chart for you to have a feel of what can be done with this. Add the below Javascript code snippet to the already existing one.</p>
+<pre><code class="hljs css language-js">
+<span class="hljs-keyword">let</span> anim = <span class="hljs-keyword">new</span> Sanim.Animation(scene);<span class="hljs-comment">//creating animation object</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">animate</span>(<span class="hljs-params"></span>)</span>{
+    chartObj.height = chartObj.height*<span class="hljs-number">1.2</span>; 
+    chartObj.width = chartObj.width*<span class="hljs-number">1.2</span>;
+    chartObj.x = chartObj.x+<span class="hljs-number">10</span>;
+    chartObj.y = chartObj.y+<span class="hljs-number">30</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reverse</span>(<span class="hljs-params"></span>)</span>{
+    chartObj.height = chartObj.height/<span class="hljs-number">1.2</span>; 
+    chartObj.width = chartObj.width/<span class="hljs-number">1.2</span>;
+    chartObj.x = chartObj.x<span class="hljs-number">-10</span>;
+    chartObj.y = chartObj.y<span class="hljs-number">-30</span>;
+}
+
+anim.execute(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{chartObj.x = <span class="hljs-number">0</span>; chartObj.y = <span class="hljs-number">50</span>;});
+anim.sleep(<span class="hljs-number">2000</span>);<span class="hljs-comment">// 2 seconds delay</span>
+
+<span class="hljs-keyword">const</span> n = <span class="hljs-number">10</span>;
+<span class="hljs-keyword">const</span> delay = <span class="hljs-number">100</span>;
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i=<span class="hljs-number">0</span>; i&lt;n; i++){
+    anim.execute(animate);<span class="hljs-comment">// repeating n times</span>
+    anim.sleep(delay);<span class="hljs-comment">// delay</span>
+}
+
+anim.sleep(<span class="hljs-number">2000</span>);<span class="hljs-comment">// 2 seconds delay</span>
+
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i=<span class="hljs-number">0</span>; i&lt;n; i++){
+    anim.execute(reverse);<span class="hljs-comment">// repeating n times</span>
+    anim.sleep(delay);<span class="hljs-comment">// delay</span>
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="result-1"></a><a href="#result-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Result:</h3>
+<iframe src="/demo/example-integration-with-chartjs/animate-chart.html" id="demo-frame-2" style="width:100%; height: 500px; background-color: black;"></iframe><br/>
+<button onclick="document.getElementById('demo-frame-2').contentDocument.location.reload(true);">Reload</button>
+<p>And that is how you can use ChartJS and any other Javascript drawing library with Sanim-Kit.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/integration-object"><span class="arrow-prev">← </span><span>Integration Object</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/sanim_logo.png" alt="Sanim Kit" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/quick-start.html">Getting Started</a><a href="/docs/en/quick-tutorial.html">Guides</a></div><div><h5>Community</h5><a href="https://twitter.com/sanim" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/Nolwac/sanim-kit">GitHub</a></div></section><a href="https://sanimkit.nwafor.org/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/sanim_logo_text.png" alt="Sanim Kit" width="184" height="89"/></a><section class="copyright">Created by <a style="font-weight:bold;font-size:20px" href="https://linktr.ee/nwafor">Nwafor Livinus Anayo</a><br/><h1></h1>Copyright © 2021 Nwafor.org</section></footer></div></body></html>
