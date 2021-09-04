@@ -16,22 +16,22 @@
     	"scene-grid",
     	"camera-and-player"
     ],
-    "Animation References": [
-    	"animation",
-    	"task"
-    ],
     "Object References     ": [
+        "xandra-pen-path",
+        "task-and-animation",
     	"sanim-object",
     	"path-object",
     	"circle-object",
     	"straight-line-object",
     	"rect-object",
     	"text-object",
-    	"media-references"
+        "arrow-head-object",
+        "image-object",
+        "video-object",
+        "audio-object"
     ],
     "Integrating third party libraries": [
     	"integration-object",
-    	"example-integration-with-threejs",
     	"example-integration-with-chartjs"
     ]
   }

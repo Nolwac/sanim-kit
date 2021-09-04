@@ -43,7 +43,7 @@ function Help(props) {
           <header className="postHeader">
             <h1>Need help?</h1>
           </header>
-          <p>This project is maintained by a dedicated group of people.</p>
+          <p>This project was developed and currently being maintained by <a href="https://linktr.ee/nwafor" target="_blank">Nwafor Livinus Anayo</a>. If you are in love with the purpose of the project and wish to contribute to the project kindly contact him </p>
           <GridBlock contents={supportLinks} layout="threeColumn" />
         </div>
       </Container>

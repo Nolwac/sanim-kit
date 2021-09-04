@@ -96,8 +96,8 @@ class Index extends React.Component {
       <div
         className="productShowcaseSection paddingBottom"
         style={{textAlign: 'center'}}>
-        <h2>Feature Callout</h2>
-        <MarkdownBlock>These are features of this project</MarkdownBlock>
+        <h2>Just a little amount of programming knowledge is required</h2>
+        <MarkdownBlock>Created with beginners in mind.</MarkdownBlock>
       </div>
     );
 
@@ -106,12 +106,10 @@ class Index extends React.Component {
         {[
           {
             content:
-              'To make your landing page more attractive, use illustrations! Check out ' +
-              '[**unDraw**](https://undraw.co/) which provides you with customizable illustrations which are free to use. ' +
-              'The illustrations you see on this page are from unDraw.',
-            image: `${baseUrl}img/undraw_code_review.svg`,
+              'Create wonderful animation and simulation graphics that render on both mobile and desktop browser interfaces',
+            image: `${baseUrl}img/undraw_progressive_app_m9ms.svg`,
             imageAlign: 'left',
-            title: 'Wonderful SVG Illustrations',
+            title: 'Animate and Simulate',
           },
         ]}
       </Block>
@@ -122,10 +120,10 @@ class Index extends React.Component {
         {[
           {
             content:
-              'This is another description of how this project is useful',
+              'Write less code and achieve much. Sanim-kit saves you time and stress by doing all the hard work for you.',
             image: `${baseUrl}img/undraw_note_list.svg`,
             imageAlign: 'right',
-            title: 'Description',
+            title: 'Spend less time on implementation',
           },
         ]}
       </Block>
@@ -136,10 +134,10 @@ class Index extends React.Component {
         {[
           {
             content:
-              'Each new Docusaurus project has **randomly-generated** theme colors.',
-            image: `${baseUrl}img/undraw_youtube_tutorial.svg`,
+              'Work with developer friendly documentation and blog posts to achieve your simulation and animation goals.',
+            image: `${baseUrl}img/undraw_code_review.svg`,
             imageAlign: 'right',
-            title: 'Randomly Generated Theme Colors',
+            title: 'Comprehensive guide and documentation',
           },
         ]}
       </Block>
@@ -149,16 +147,16 @@ class Index extends React.Component {
       <Block layout="fourColumn">
         {[
           {
-            content: 'This is the content of my feature',
-            image: `${baseUrl}img/undraw_react.svg`,
+            content: 'Create similar graphics as with the Turtle graphics library in Python',
+            image: `${baseUrl}img/python_logo.png`,
             imageAlign: 'top',
-            title: 'Feature One',
+            title: 'Python Turtle graphic features available',
           },
           {
-            content: 'The content of my second feature',
-            image: `${baseUrl}img/undraw_operating_system.svg`,
+            content: 'Integrate with third party libraries',
+            image: `${baseUrl}img/undraw_JavaScript_frameworks_8qpc.svg`,
             imageAlign: 'top',
-            title: 'Feature Two',
+            title: 'Use other libraries',
           },
         ]}
       </Block>
@@ -202,7 +200,6 @@ class Index extends React.Component {
           <LearnHow />
           <TryOut />
           <Description />
-          <Showcase />
         </div>
       </div>
     );

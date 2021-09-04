@@ -4,14 +4,48 @@ title: Drawing Straight Lines with the StraightLineObject
 sidebar_label: StraightLineObject
 ---
 
-Check the [documentation](https://docusaurus.io) for how to use Docusaurus.
+## StraightLineObject
+Sanim-kit provides *Sanim.StraightLineObject* which allows drawing of straight lines on the scene.
+It inherits directly from *Sanim.PathObject*.
+*Sanim.StraightLineObject* constructor takes 4 parameters.
+  - the x starting position of the line in pixels.
+  - the y starting position of the line in pixels.
+   - the x ending position of the line in pixels.
+  - the y ending position of the line in pixels.
 
-## Lorem
+```js
+import Sanim from "sanim-kit";
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum massa eget nulla aliquet sagittis. Proin odio tortor, vulputate ut odio in, ultrices ultricies augue. Cras ornare ultrices lorem malesuada iaculis. Etiam sit amet libero tempor, pulvinar mauris sed, sollicitudin sapien.
+let canvas = document.getElementById("canvas");
+let context = canvas.getContext("2d");
+const scene = new Sanim.Scene(context);//creating scene
+//making it take entire dimension of the screen
+scene.context.canvas.height = window.innerHeight;
+scene.context.canvas.width = window.innerWidth;
+scene.color = "black";//setting the color to black
 
-## Mauris In Code
-
+let line = new Sanim.StraightLineObject(100, 100, 500, 300);//creating the line
+line.props = {
+    lineWidth:5,
+    strokeStyle:"crimson",
+}//defining the properties of the line
+scene.addObject(line);//adding the created line to scene.
+scene.play();//playing the scene animation frame
 ```
-Mauris vestibulum ullamcorper nibh, ut semper purus pulvinar ut. Donec volutpat orci sit amet mauris malesuada, non pulvinar augue aliquam. Vestibulum ultricies at urna ut suscipit. Morbi iaculis, erat at imperdiet semper, ipsum nulla sodales erat, eget tincidunt justo dui quis justo. Pellentesque dictum bibendum diam at aliquet. Sed pulvinar, dolor quis finibus ornare, eros odio facilisis erat, eu rhoncus nunc dui sed ex. Nunc gravida dui massa, sed ornare arcu tincidunt sit amet. Maecenas efficitur sapien neque, a laoreet libero feugiat ut.
-```
+
+### Result:
+<iframe src="/demo/straight-line-object/index.html" id="demo-frame-1" style="width:100%; height: 400px; background-color: black;"></iframe><br/>
+<button onclick="document.getElementById('demo-frame-1').contentDocument.location.reload(true);">Reload</button>
+
+## StraightLineObject References
+The following are the properties and methods accessible on *Sanim.StraightLineObject*.
+
+### StraightLineObject.xEnd
+This property holds the *x* ending position of the line.
+
+### StraightLineObject.yEnd
+This property holds the *y* ending position of the line.
+
+
+*Sanim.StraightLineObject* inherits directly from *Sanim.PathObject*, thus it inherits all the properties and methods accessible on *Sanim.PathObject*.
+Checkout the references for the properties and methods.

@@ -6,7 +6,8 @@
     "publish-gh-pages": "docusaurus-publish",
     "write-translations": "docusaurus-write-translations",
     "version": "docusaurus-version",
-    "rename-version": "docusaurus-rename-version"
+    "rename-version": "docusaurus-rename-version",
+    "setup-publish": "cmd /C \"set \"GIT_USER=Nolwac\"&& set CURRENT_BRANCH=website && set USE_SSH=true && yarn run publish-gh-pages\""
   },
   "devDependencies": {
     "docusaurus": "^1.14.4"

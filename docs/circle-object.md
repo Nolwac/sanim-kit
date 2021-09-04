@@ -4,14 +4,51 @@ title: Circle Object
 sidebar_label: Circle Object
 ---
 
-Check the [documentation](https://docusaurus.io) for how to use Docusaurus.
+## CircleObject
+Sanim-kit provides *Sanim.CircleObject* which allows drawing of circles on the scene.
+It inherits directly from *Sanim.PathObject*.
+*Sanim.CircleObject* constructor can takes 4 parameters.
+  - the x position of the center of the circle in pixels.
+  - the y position of the center of the circle in pixels.
+  - the radius of the circle in pixels.
+  - (optional) a boolean value which specifies if the circle is to be filled with color or not. The default value is *false*.
 
-## Lorem
+```js
+import Sanim from "sanim-kit";
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum massa eget nulla aliquet sagittis. Proin odio tortor, vulputate ut odio in, ultrices ultricies augue. Cras ornare ultrices lorem malesuada iaculis. Etiam sit amet libero tempor, pulvinar mauris sed, sollicitudin sapien.
+let canvas = document.getElementById("canvas");
+let context = canvas.getContext("2d");
+const scene = new Sanim.Scene(context);//creating scene
+//making it take entire dimension of the screen
+scene.context.canvas.height = window.innerHeight;
+scene.context.canvas.width = window.innerWidth;
+scene.color = "black";//setting the color to black
 
-## Mauris In Code
-
+let circle = new Sanim.CircleObject(100, 100, 50, true);//creating the circle
+circle.props = {
+    lineWidth:5,
+    strokeStyle:"green",
+    fillStyle:"crimson"
+}//defining the properties of the circle
+scene.addObject(circle);//adding the created circle to scene.
+scene.play();//playing the scene animation frame
 ```
-Mauris vestibulum ullamcorper nibh, ut semper purus pulvinar ut. Donec volutpat orci sit amet mauris malesuada, non pulvinar augue aliquam. Vestibulum ultricies at urna ut suscipit. Morbi iaculis, erat at imperdiet semper, ipsum nulla sodales erat, eget tincidunt justo dui quis justo. Pellentesque dictum bibendum diam at aliquet. Sed pulvinar, dolor quis finibus ornare, eros odio facilisis erat, eu rhoncus nunc dui sed ex. Nunc gravida dui massa, sed ornare arcu tincidunt sit amet. Maecenas efficitur sapien neque, a laoreet libero feugiat ut.
-```
+### Result:
+<iframe src="/demo/circle-object/index.html" id="demo-frame-1" style="width:100%; height: 200px; background-color: black;"></iframe><br/>
+<button onclick="document.getElementById('demo-frame-1').contentDocument.location.reload(true);">Reload</button>
+
+## CircleObject References
+The following are the properties and methods accessible on *Sanim.CircleObject*.
+
+### CircleObject.radius.
+This property defines the radius of the circle.
+The default value is usually provided when calling the object constructor.
+
+### CircleObject.width.
+This property holds the width of the object which is equal to twice the radius.
+
+### CircleObject.height.
+This property holds the height of the object which equal to twice the radius.
+
+*Sanim.CircleObject* inherits directly from *Sanim.PathObject*, thus it inherits all the properties and methods accessible on *Sanim.PathObject*.
+Checkout the references for the properties and methods.

@@ -46,18 +46,8 @@ class Footer extends React.Component {
           </div>
           <div>
             <h5>Community</h5>
-            <a href={this.pageUrl('users.html', this.props.language)}>
-              User Showcase
-            </a>
             <a
-              href="https://stackoverflow.com/questions/tagged/"
-              target="_blank"
-              rel="noreferrer noopener">
-              Stack Overflow
-            </a>
-            <a href="https://discordapp.com/">Project Chat</a>
-            <a
-              href="https://twitter.com/"
+              href="https://twitter.com/sanim"
               target="_blank"
               rel="noreferrer noopener">
               Twitter
@@ -66,7 +56,7 @@ class Footer extends React.Component {
           <div>
             <h5>More</h5>
             <a href={`${this.props.config.baseUrl}blog`}>Blog</a>
-            <a href="https://github.com/">GitHub</a>
+            <a href="https://github.com/Nolwac/sanim-kit">GitHub</a>
             {this.props.config.twitterUsername && (
               <div className="social">
                 <a
@@ -104,7 +94,12 @@ class Footer extends React.Component {
             height="89"
           />
         </a>
-        <section className="copyright">{this.props.config.copyright}</section>
+
+        <section className="copyright">
+            Created by <a style={{fontWeight:"bold", fontSize:"20px"}} href="https://linktr.ee/nwafor">Nwafor Livinus Anayo</a><br/>
+            <h1></h1>
+            {this.props.config.copyright}
+        </section>
       </footer>
     );
   }
